@@ -2205,8 +2205,10 @@
 
     function initMap() {
       if (leagueMap) {
-        setTimeout(() => leagueMap.invalidateSize(), 50);
-        updateMapMarkers(getLeagueStandings());
+        setTimeout(() => {
+          leagueMap.invalidateSize();
+          updateMapMarkers(getLeagueStandings());
+        }, 80);
         return;
       }
       const el = document.getElementById('map');
@@ -2227,11 +2229,22 @@
       }).addTo(leagueMap);
 
       mapMarkersLayer = L.layerGroup().addTo(leagueMap);
-      updateMapMarkers(getLeagueStandings());
-      setTimeout(() => leagueMap.invalidateSize(), 100);
+      setTimeout(() => {
+        leagueMap.invalidateSize();
+        updateMapMarkers(getLeagueStandings());
+      }, 120);
     }
 
-    // Last standings used to redraw pins on zoom (pixel offsets stay tangent)
+    // Shared city centers so multi-team cities start from the same point
+    const CITY_CENTER = {
+      "Real Madrid": [40.4168, -3.7038],
+      "Atlético de Madrid": [40.4168, -3.7038],
+      "Manchester City": [53.4808, -2.2426],
+      "Manchester United": [53.4808, -2.2426],
+      "Galatasaray": [41.0082, 28.9784],
+      "Fenerbahçe": [41.0082, 28.9784]
+    };
+
     let lastMapStandings = null;
 
     function updateMapMarkers(standings) {
@@ -2240,30 +2253,25 @@
       if (!lastMapStandings) return;
 
       mapMarkersLayer.clearLayers();
+      const size = leagueMap.getSize();
+      const mapReady = size && size.x > 50 && size.y > 50;
 
-      // Base items with original coords
       const items = lastMapStandings.map((t, i) => {
-        const coords = TEAM_COORDS[t.name];
-        if (!coords) return null;
-        return {
-          t,
-          pos: i + 1,
-          base: L.latLng(coords[0], coords[1]),
-          coords: null
-        };
+        const c = CITY_CENTER[t.name] || TEAM_COORDS[t.name];
+        if (!c) return null;
+        return { t, pos: i + 1, base: L.latLng(c[0], c[1]) };
       }).filter(Boolean);
 
-      // Cluster by real proximity (~35 km), so Manchester / Madrid / Istanbul group correctly
+      // Cluster by distance (< 40 km)
       const clusters = [];
       const used = new Set();
-      const nearDeg = 0.35;
       items.forEach((item, i) => {
         if (used.has(i)) return;
         const group = [item];
         used.add(i);
         items.forEach((other, j) => {
-          if (i === j || used.has(j)) return;
-          if (item.base.distanceTo(other.base) < nearDeg * 111000) {
+          if (used.has(j)) return;
+          if (item.base.distanceTo(other.base) < 40000) {
             group.push(other);
             used.add(j);
           }
@@ -2271,7 +2279,7 @@
         clusters.push(group);
       });
 
-      // Pixel spacing: centers 5px apart → 4px circles just touch
+      // 4px dots → centers 5px apart = tangents touch
       const gapPx = 5;
 
       clusters.forEach(group => {
@@ -2280,29 +2288,34 @@
           group[0].coords = group[0].base;
           return;
         }
-        // Centroid in layer pixels
-        let sx = 0, sy = 0;
-        const pts = group.map(g => {
-          const p = leagueMap.latLngToLayerPoint(g.base);
-          sx += p.x; sy += p.y;
-          return p;
-        });
-        const cx = sx / n, cy = sy / n;
 
-        group.forEach((item, idx) => {
-          let x, y;
-          if (n === 2) {
-            const dir = idx === 0 ? -1 : 1;
-            x = cx + dir * (gapPx / 2);
-            y = cy;
-          } else {
-            const angle = (Math.PI * 2 * idx) / n - Math.PI / 2;
-            const r = gapPx / (2 * Math.sin(Math.PI / n));
-            x = cx + r * Math.cos(angle);
-            y = cy + r * Math.sin(angle);
-          }
-          item.coords = leagueMap.layerPointToLatLng(L.point(x, y));
-        });
+        if (mapReady) {
+          let sx = 0, sy = 0;
+          group.forEach(g => {
+            const p = leagueMap.latLngToLayerPoint(g.base);
+            sx += p.x; sy += p.y;
+          });
+          const cx = sx / n, cy = sy / n;
+          group.forEach((item, idx) => {
+            let x, y;
+            if (n === 2) {
+              const dir = idx === 0 ? -1 : 1;
+              x = cx + dir * (gapPx / 2);
+              y = cy;
+            } else {
+              const angle = (Math.PI * 2 * idx) / n - Math.PI / 2;
+              const r = gapPx / (2 * Math.sin(Math.PI / n));
+              x = cx + r * Math.cos(angle);
+              y = cy + r * Math.sin(angle);
+            }
+            item.coords = leagueMap.layerPointToLatLng(L.point(x, y));
+          });
+        } else {
+          group.forEach((item, idx) => {
+            const dir = idx - (n - 1) / 2;
+            item.coords = L.latLng(item.base.lat, item.base.lng + dir * 0.05);
+          });
+        }
       });
 
       items.forEach(item => {
@@ -2338,7 +2351,6 @@
         mapMarkersLayer.addLayer(marker);
       });
 
-      // Keep pins tangent when zooming
       if (!leagueMap._pinZoomBound) {
         leagueMap._pinZoomBound = true;
         leagueMap.on('zoomend', () => updateMapMarkers(null));
