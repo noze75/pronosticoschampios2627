@@ -2283,13 +2283,13 @@
         const icon = L.divIcon({
           className: '',
           html: `<div style="
-            width:10px;height:10px;border-radius:50%;
+            width:4px;height:4px;border-radius:50%;
             background:${color};
-            border:1.5px solid rgba(255,255,255,0.9);
-            box-shadow:0 0 8px ${color}, 0 0 3px rgba(0,0,0,0.55);
+            border:1px solid rgba(255,255,255,0.95);
+            box-shadow:0 0 4px ${color}, 0 0 1px rgba(0,0,0,0.45);
           "></div>`,
-          iconSize: [10, 10],
-          iconAnchor: [5, 5]
+          iconSize: [4, 4],
+          iconAnchor: [2, 2]
         });
 
         const marker = L.marker(coords, { icon });
