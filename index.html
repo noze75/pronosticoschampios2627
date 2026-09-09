@@ -23,7 +23,7 @@
       --danger: #ef5350;
       --warning: #ffb300;
       --success: #00e676;
-      --baez: #ff9800;
+      --báez: #ff9800;
       --juan: #ce93d8;
       --marrugo: #4dd0e1;
       --mauricio: #f48fb1;
@@ -315,7 +315,7 @@
       align-items: center;
       letter-spacing: 0.02em;
     }
-    .pred-box.baez .name { color: var(--baez); }
+    .pred-box.báez .name { color: var(--báez); }
     .pred-box.juan .name { color: var(--juan); }
     .pred-box.marrugo .name { color: var(--marrugo); }
     .pred-box.mauricio .name { color: var(--mauricio); }
@@ -453,7 +453,7 @@
     }
     td.pts-col { font-weight: 900; color: var(--accent); font-size: 1.05rem; }
     .player-name { font-weight: 800; font-size: 1rem; }
-    .player-name.baez { color: var(--baez); }
+    .player-name.báez { color: var(--báez); }
     .player-name.juan { color: var(--juan); }
     .player-name.marrugo { color: var(--marrugo); }
     .player-name.mauricio { color: var(--mauricio); }
@@ -862,7 +862,7 @@
       border-bottom: 1px solid var(--border);
       text-align: center;
     }
-    .pred-table-card h3.baez { color: var(--baez); }
+    .pred-table-card h3.báez { color: var(--báez); }
     .pred-table-card h3.juan { color: var(--juan); }
     .pred-table-card h3.marrugo { color: var(--marrugo); }
     .pred-table-card h3.mauricio { color: var(--mauricio); }
@@ -999,7 +999,7 @@
       <label style="color:var(--muted);font-size:0.85rem;">Soy:</label>
       <select id="currentUser">
         <option value="">— Ver todos —</option>
-        <option value="baez">Báez</option>
+        <option value="báez">Báez</option>
         <option value="juan">Juan</option>
         <option value="marrugo">Marrugo</option>
         <option value="mauricio">Mauricio</option>
@@ -1255,8 +1255,8 @@
 
   <script>
     // ========== DATA ==========
-    const PLAYERS = ['baez', 'juan', 'marrugo', 'mauricio'];
-    const PLAYER_NAMES = { baez: 'Báez', juan: 'Juan', marrugo: 'Marrugo', mauricio: 'Mauricio' };
+    const PLAYERS = ['báez', 'juan', 'marrugo', 'mauricio'];
+    const PLAYER_NAMES = { báez: 'Báez', juan: 'Juan', marrugo: 'Marrugo', mauricio: 'Mauricio' };
 
     // Contraseña de administrador para editar resultados reales.
     // Cámbiala por la que tú quieras:
@@ -1264,14 +1264,14 @@
     let adminUnlocked = false;
 
     // Fotos de los jugadores (carpeta fotos/ junto al HTML)
-    // Nombres sugeridos: baez.jpg, juan.jpg, marrugo.jpg, mauricio.jpg
+    // Nombres sugeridos: báez.jpg, juan.jpg, marrugo.jpg, mauricio.jpg
     const PHOTO_MAP = {
-      baez: 'fotos/baez.jpg',
+      báez: 'fotos/báez.jpg',
       juan: 'fotos/juan.jpg',
       marrugo: 'fotos/marrugo.jpg',
       mauricio: 'fotos/mauricio.jpg'
     };
-    const PHOTO_FALLBACK = { baez: '🧡', juan: '💜', marrugo: '💙', mauricio: '💗' };
+    const PHOTO_FALLBACK = { báez: '🧡', juan: '💜', marrugo: '💙', mauricio: '💗' };
 
     const PELMAZO_PHRASES = [
       'Parce… esto ya es personal con la mala suerte.',
@@ -1522,7 +1522,7 @@
     // ========== STATE + npoint.io ==========
     const API_URL = 'https://api.npoint.io/97341e5560deb493885a';
     let data = {
-      predictions: {}, // matchId -> { baez: {h,a}, juan:..., ... }
+      predictions: {}, // matchId -> { báez: {h,a}, juan:..., ... }
       results: {},     // matchId -> {h, a}
       updatedAt: null,
       updatedBy: null
@@ -1537,7 +1537,7 @@
     let mapMarkersLayer = null;
 
     const PLAYER_COLORS = {
-      baez: '#ff9800',
+      báez: '#ff9800',
       juan: '#ce93d8',
       marrugo: '#4dd0e1',
       mauricio: '#f48fb1'
