@@ -2254,14 +2254,14 @@
       Object.values(clusters).forEach(group => {
         if (group.length === 1) return;
         const n = group.length;
-        // Strong separation at country zoom (~80–100 km between pins)
-        const radius = n === 2 ? 0.65 : 0.55;
+        // Wide separation so pins don't overlap at country zoom
+        const radius = n === 2 ? 1.15 : 0.95;
         group.forEach((item, idx) => {
           if (n === 2) {
-            // Side by side (east / west) — clearer for Madrid, Manchester
+            // Side by side (west / east)
             const dir = idx === 0 ? -1 : 1;
             item.coords = [
-              item.coords[0],
+              item.coords[0] + dir * 0.15,
               item.coords[1] + dir * radius
             ];
           } else {
@@ -2283,13 +2283,13 @@
         const icon = L.divIcon({
           className: '',
           html: `<div style="
-            width:14px;height:14px;border-radius:50%;
+            width:10px;height:10px;border-radius:50%;
             background:${color};
-            border:2px solid rgba(255,255,255,0.85);
-            box-shadow:0 0 10px ${color}, 0 0 4px rgba(0,0,0,0.6);
+            border:1.5px solid rgba(255,255,255,0.9);
+            box-shadow:0 0 8px ${color}, 0 0 3px rgba(0,0,0,0.55);
           "></div>`,
-          iconSize: [14, 14],
-          iconAnchor: [7, 7]
+          iconSize: [10, 10],
+          iconAnchor: [5, 5]
         });
 
         const marker = L.marker(coords, { icon });
