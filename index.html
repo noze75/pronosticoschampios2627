@@ -837,6 +837,189 @@
       50% { opacity: 0.75; transform: scale(1.04); }
     }
 
+    .playoff-section {
+      margin-bottom: 1.4rem;
+    }
+    .playoff-section h3 {
+      font-size: 0.95rem;
+      font-weight: 800;
+      margin-bottom: 0.7rem;
+      letter-spacing: 0.02em;
+    }
+    .playoff-section h3.direct { color: var(--accent); }
+    .playoff-section h3.po { color: var(--gold); }
+    .playoff-section h3.out { color: var(--danger); }
+    .playoff-direct-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+    }
+    @media (max-width: 800px) {
+      .playoff-direct-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .playoff-team {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.55rem 0.7rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+    .playoff-team .pos {
+      font-weight: 900;
+      color: var(--accent);
+      min-width: 1.6rem;
+    }
+    .playoff-team.seed-low .pos { color: var(--gold); }
+    .playoff-team.seed-high .pos { color: #ffab40; }
+    .playoff-team.elim .pos { color: var(--danger); }
+    .playoff-team img {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+    }
+    .playoff-ties {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+    @media (max-width: 800px) {
+      .playoff-ties { grid-template-columns: 1fr; }
+    }
+    .playoff-tie {
+      background: var(--card);
+      border: 1px solid rgba(255, 213, 79, 0.28);
+      border-radius: 12px;
+      padding: 0.85rem 0.9rem;
+      position: relative;
+    }
+    .playoff-tie .tie-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gold);
+      margin-bottom: 0.55rem;
+    }
+    .playoff-tie .vs-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 0.4rem;
+      align-items: start;
+    }
+    .playoff-tie .side {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .playoff-tie .vs-badge {
+      align-self: center;
+      background: rgba(255,213,79,0.15);
+      color: var(--gold);
+      font-weight: 900;
+      font-size: 0.75rem;
+      padding: 0.25rem 0.45rem;
+      border-radius: 6px;
+      border: 1px solid rgba(255,213,79,0.3);
+    }
+    .playoff-tie .hint {
+      margin-top: 0.55rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .playoff-empty {
+      color: var(--muted);
+      font-size: 0.9rem;
+      padding: 1rem;
+      text-align: center;
+    }
+    .rondas-note {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin: -0.3rem 0 0.75rem;
+      line-height: 1.4;
+    }
+    .r16-bracket {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+    .r16-row {
+      display: grid;
+      grid-template-columns: 1.2fr auto 1.4fr;
+      gap: 0.55rem;
+      align-items: center;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.55rem 0.75rem;
+    }
+    @media (max-width: 700px) {
+      .r16-row { grid-template-columns: 1fr; gap: 0.35rem; }
+    }
+    .r16-seed {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.9rem;
+    }
+    .r16-seed .pos {
+      font-weight: 900;
+      color: var(--accent);
+      min-width: 1.5rem;
+    }
+    .r16-seed .pts {
+      margin-left: auto;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .r16-vs {
+      font-weight: 900;
+      font-size: 0.72rem;
+      color: var(--gold);
+      background: rgba(255,213,79,0.12);
+      border: 1px solid rgba(255,213,79,0.28);
+      border-radius: 6px;
+      padding: 0.2rem 0.45rem;
+      text-align: center;
+    }
+    .r16-opp {
+      font-size: 0.84rem;
+      color: var(--muted);
+      font-weight: 600;
+      line-height: 1.35;
+    }
+    .playoff-section h3.later { color: var(--accent2); }
+    .later-box {
+      background: var(--card);
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      padding: 1.1rem 1.2rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+    .later-stages {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.55rem;
+      margin-top: 0.7rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .later-stages span:nth-child(odd) {
+      background: rgba(66,165,245,0.12);
+      border: 1px solid rgba(66,165,245,0.3);
+      border-radius: 8px;
+      padding: 0.35rem 0.75rem;
+    }
+
     .pred-tables-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -1010,6 +1193,7 @@
         <button data-panel="tabla">Tabla equipos</button>
         <button data-panel="tablas-preds">Tablas preds</button>
         <button data-panel="estadisticas">Estadísticas</button>
+        <button data-panel="rondas">Rondas finales</button>
         <button data-panel="mapa">Mapa</button>
         <button data-panel="reglas">Reglas</button>
       </nav>
@@ -1172,6 +1356,15 @@
         </thead>
         <tbody id="teamsStatsBody"></tbody>
       </table>
+    </div>
+
+    <!-- RONDAS FINALES -->
+    <div id="rondas" class="panel">
+      <div class="rules" style="margin-bottom:1rem;">
+        <strong>Rondas finales</strong> — Se actualiza con la clasificación real.
+        Playoffs y octavos según el sorteo por bloques de la UEFA. Cuartos, semis y final se irán completando más adelante.
+      </div>
+      <div id="rondasContent"></div>
     </div>
 
     <!-- MAPA -->
@@ -2203,10 +2396,130 @@
       if (leagueMap) updateMapMarkers(standings);
     }
 
+    function teamChip(team, pos, cls) {
+      if (!team) {
+        return `<div class="playoff-team ${cls || ''}"><span class="pos">${pos}º</span><span style="color:var(--muted)">—</span></div>`;
+      }
+      const logo = LOGO_MAP[team.name]
+        ? `<img src="${LOGO_MAP[team.name]}" alt="" onerror="this.style.display='none'" />`
+        : '';
+      return `<div class="playoff-team ${cls || ''}">
+        <span class="pos">${pos}º</span>
+        ${logo}
+        <span>${team.name}</span>
+        <span style="margin-left:auto;color:var(--muted);font-size:0.78rem;font-weight:600">${team.pts} pts</span>
+      </div>`;
+    }
+
+    function renderRondas() {
+      const el = document.getElementById('rondasContent');
+      if (!el) return;
+      const standings = getLeagueStandings();
+      const hasData = standings.some(t => t.pj > 0);
+      const at = (n) => standings[n - 1] || null;
+      const nameOf = (n) => at(n) ? at(n).name : '—';
+
+      if (!hasData) {
+        el.innerHTML = `<div class="playoff-empty">Aún no hay resultados reales. Cuando se carguen, aquí verás playoffs, octavos y el camino a la final.</div>`;
+        return;
+      }
+
+      // Playoff blocks
+      const blocks = [
+        { id: 'A', label: 'Bloque A · 9º/10º vs 23º/24º', low: [9, 10], high: [23, 24],
+          hint: 'El 9º y el 10º se sortean para enfrentarse al 23º o al 24º.' },
+        { id: 'B', label: 'Bloque B · 11º/12º vs 21º/22º', low: [11, 12], high: [21, 22],
+          hint: 'El 11º y el 12º se sortean para enfrentarse al 21º o al 22º.' },
+        { id: 'C', label: 'Bloque C · 13º/14º vs 19º/20º', low: [13, 14], high: [19, 20],
+          hint: 'El 13º y el 14º se sortean para enfrentarse al 19º o al 20º.' },
+        { id: 'D', label: 'Bloque D · 15º/16º vs 17º/18º', low: [15, 16], high: [17, 18],
+          hint: 'El 15º y el 16º se sortean para enfrentarse al 17º o al 18º.' }
+      ];
+
+      const ties = blocks.map(b => {
+        const left = b.low.map(p => teamChip(at(p), p, 'seed-low')).join('');
+        const right = b.high.map(p => teamChip(at(p), p, 'seed-high')).join('');
+        return `<div class="playoff-tie">
+          <div class="tie-label">${b.label}</div>
+          <div class="vs-row">
+            <div class="side">${left}</div>
+            <div class="vs-badge">VS</div>
+            <div class="side">${right}</div>
+          </div>
+          <div class="hint">${b.hint}</div>
+        </div>`;
+      }).join('');
+
+      // R16: seed 1-8 vs winners of playoff blocks (per UEFA pairing table)
+      const r16 = [
+        { seed: 1, block: 'D', text: 'Ganador playoff 15º/16º vs 17º/18º' },
+        { seed: 2, block: 'D', text: 'El otro ganador del playoff 15º/16º vs 17º/18º' },
+        { seed: 3, block: 'C', text: 'Ganador playoff 13º/14º vs 19º/20º' },
+        { seed: 4, block: 'C', text: 'El otro ganador del playoff 13º/14º vs 19º/20º' },
+        { seed: 5, block: 'B', text: 'Ganador playoff 11º/12º vs 21º/22º' },
+        { seed: 6, block: 'B', text: 'El otro ganador del playoff 11º/12º vs 21º/22º' },
+        { seed: 7, block: 'A', text: 'Ganador playoff 9º/10º vs 23º/24º' },
+        { seed: 8, block: 'A', text: 'El otro ganador del playoff 9º/10º vs 23º/24º' }
+      ];
+
+      const r16Rows = r16.map(r => {
+        const team = at(r.seed);
+        const logo = team && LOGO_MAP[team.name]
+          ? `<img src="${LOGO_MAP[team.name]}" alt="" style="width:22px;height:22px;object-fit:contain" onerror="this.style.display='none'" />`
+          : '';
+        return `<div class="r16-row">
+          <div class="r16-seed">
+            <span class="pos">${r.seed}º</span>
+            ${logo}
+            <strong>${nameOf(r.seed)}</strong>
+            ${team ? `<span class="pts">${team.pts} pts</span>` : ''}
+          </div>
+          <div class="r16-vs">VS</div>
+          <div class="r16-opp">${r.text}</div>
+        </div>`;
+      }).join('');
+
+      // Eliminated
+      const out = [];
+      for (let p = 25; p <= 36; p++) out.push(teamChip(at(p), p, 'elim'));
+
+      el.innerHTML = `
+        <div class="playoff-section">
+          <h3 class="po">① Playoffs (9º – 24º)</h3>
+          <div class="playoff-ties">${ties}</div>
+        </div>
+
+        <div class="playoff-section">
+          <h3 class="direct">② Octavos de final</h3>
+          <p class="rondas-note">Los 1º–8º esperan al ganador de cada bloque de playoff. El emparejamiento exacto dentro del bloque lo define el sorteo.</p>
+          <div class="r16-bracket">${r16Rows}</div>
+        </div>
+
+        <div class="playoff-section">
+          <h3 class="later">③ Cuartos · Semis · Final</h3>
+          <div class="later-box">
+            Se completará cuando se conozcan los clasificados de octavos.
+            <div class="later-stages">
+              <span>Cuartos</span><span>→</span>
+              <span>Semis</span><span>→</span>
+              <span>Final</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="playoff-section">
+          <h3 class="out">Eliminados en fase de liga (25º – 36º)</h3>
+          <div class="playoff-direct-grid">${out.join('')}</div>
+        </div>
+      `;
+    }
+
     function initMap() {
       if (leagueMap) {
-        setTimeout(() => leagueMap.invalidateSize(), 50);
-        updateMapMarkers(getLeagueStandings());
+        setTimeout(() => {
+          leagueMap.invalidateSize();
+          updateMapMarkers(getLeagueStandings());
+        }, 80);
         return;
       }
       const el = document.getElementById('map');
@@ -2227,51 +2540,93 @@
       }).addTo(leagueMap);
 
       mapMarkersLayer = L.layerGroup().addTo(leagueMap);
-      updateMapMarkers(getLeagueStandings());
-      setTimeout(() => leagueMap.invalidateSize(), 100);
+      setTimeout(() => {
+        leagueMap.invalidateSize();
+        updateMapMarkers(getLeagueStandings());
+      }, 120);
     }
+
+    // Shared city centers so multi-team cities start from the same point
+    const CITY_CENTER = {
+      "Real Madrid": [40.4168, -3.7038],
+      "Atlético de Madrid": [40.4168, -3.7038],
+      "Manchester City": [53.4808, -2.2426],
+      "Manchester United": [53.4808, -2.2426],
+      "Galatasaray": [41.0082, 28.9784],
+      "Fenerbahçe": [41.0082, 28.9784]
+    };
+
+    let lastMapStandings = null;
 
     function updateMapMarkers(standings) {
       if (!leagueMap || !mapMarkersLayer) return;
-      mapMarkersLayer.clearLayers();
+      if (standings) lastMapStandings = standings;
+      if (!lastMapStandings) return;
 
-      // Group teams that are geographically very close so we can offset pins
-      const items = standings.map((t, i) => {
-        const coords = TEAM_COORDS[t.name];
-        if (!coords) return null;
-        return { t, pos: i + 1, coords: [coords[0], coords[1]] };
+      mapMarkersLayer.clearLayers();
+      const size = leagueMap.getSize();
+      const mapReady = size && size.x > 50 && size.y > 50;
+
+      const items = lastMapStandings.map((t, i) => {
+        const c = CITY_CENTER[t.name] || TEAM_COORDS[t.name];
+        if (!c) return null;
+        return { t, pos: i + 1, base: L.latLng(c[0], c[1]) };
       }).filter(Boolean);
 
-      // Cluster key ~ city level (~0.5°) so Madrid / Manchester share a group
-      const clusters = {};
-      items.forEach(item => {
-        const key = (Math.round(item.coords[0] * 2) / 2) + '_' + (Math.round(item.coords[1] * 2) / 2);
-        if (!clusters[key]) clusters[key] = [];
-        clusters[key].push(item);
-      });
-
-      // Offset members of the same cluster in a small fan/circle
-      Object.values(clusters).forEach(group => {
-        if (group.length === 1) return;
-        const n = group.length;
-        // Wide separation so pins don't overlap at country zoom
-        const radius = n === 2 ? 1.15 : 0.95;
-        group.forEach((item, idx) => {
-          if (n === 2) {
-            // Side by side (west / east)
-            const dir = idx === 0 ? -1 : 1;
-            item.coords = [
-              item.coords[0] + dir * 0.15,
-              item.coords[1] + dir * radius
-            ];
-          } else {
-            const angle = (Math.PI * 2 * idx) / n - Math.PI / 2;
-            item.coords = [
-              item.coords[0] + radius * Math.cos(angle),
-              item.coords[1] + radius * Math.sin(angle)
-            ];
+      // Cluster by distance (< 40 km)
+      const clusters = [];
+      const used = new Set();
+      items.forEach((item, i) => {
+        if (used.has(i)) return;
+        const group = [item];
+        used.add(i);
+        items.forEach((other, j) => {
+          if (used.has(j)) return;
+          if (item.base.distanceTo(other.base) < 40000) {
+            group.push(other);
+            used.add(j);
           }
         });
+        clusters.push(group);
+      });
+
+      // 10px dots → centers 11px apart = tangents just touch
+      const gapPx = 11;
+
+      clusters.forEach(group => {
+        const n = group.length;
+        if (n === 1) {
+          group[0].coords = group[0].base;
+          return;
+        }
+
+        if (mapReady) {
+          let sx = 0, sy = 0;
+          group.forEach(g => {
+            const p = leagueMap.latLngToLayerPoint(g.base);
+            sx += p.x; sy += p.y;
+          });
+          const cx = sx / n, cy = sy / n;
+          group.forEach((item, idx) => {
+            let x, y;
+            if (n === 2) {
+              const dir = idx === 0 ? -1 : 1;
+              x = cx + dir * (gapPx / 2);
+              y = cy;
+            } else {
+              const angle = (Math.PI * 2 * idx) / n - Math.PI / 2;
+              const r = gapPx / (2 * Math.sin(Math.PI / n));
+              x = cx + r * Math.cos(angle);
+              y = cy + r * Math.sin(angle);
+            }
+            item.coords = leagueMap.layerPointToLatLng(L.point(x, y));
+          });
+        } else {
+          group.forEach((item, idx) => {
+            const dir = idx - (n - 1) / 2;
+            item.coords = L.latLng(item.base.lat, item.base.lng + dir * 0.05);
+          });
+        }
       });
 
       items.forEach(item => {
@@ -2283,13 +2638,13 @@
         const icon = L.divIcon({
           className: '',
           html: `<div style="
-            width:4px;height:4px;border-radius:50%;
+            width:10px;height:10px;border-radius:50%;
             background:${color};
-            border:1px solid rgba(255,255,255,0.95);
-            box-shadow:0 0 4px ${color}, 0 0 1px rgba(0,0,0,0.45);
+            border:1.5px solid rgba(255,255,255,0.95);
+            box-shadow:0 0 7px ${color}, 0 0 2px rgba(0,0,0,0.45);
           "></div>`,
-          iconSize: [4, 4],
-          iconAnchor: [2, 2]
+          iconSize: [10, 10],
+          iconAnchor: [5, 5]
         });
 
         const marker = L.marker(coords, { icon });
@@ -2306,6 +2661,11 @@
         `);
         mapMarkersLayer.addLayer(marker);
       });
+
+      if (!leagueMap._pinZoomBound) {
+        leagueMap._pinZoomBound = true;
+        leagueMap.on('zoomend', () => updateMapMarkers(null));
+      }
     }
 
     function renderStats() {
@@ -2685,6 +3045,7 @@
       if (e.target.dataset.panel === 'tabla') renderLeagueTable();
       if (e.target.dataset.panel === 'tablas-preds') renderPredTables();
       if (e.target.dataset.panel === 'estadisticas') renderStats();
+      if (e.target.dataset.panel === 'rondas') renderRondas();
       if (e.target.dataset.panel === 'mapa') initMap();
     });
 
