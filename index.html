@@ -1787,42 +1787,42 @@
 
     // Ficha de clubes (datos orientativos para la app)
     const TEAM_INFO = {
-      "AEK Athens": { country: "Grecia", founded: 1924, uclTitles: 0, stadium: "OPAP Arena", fact: "Uno de los 'tres grandes' de Atenas; su nombre evoca el águila bicéfala bizantina." },
-      "Arsenal": { country: "Inglaterra", founded: 1886, uclTitles: 0, stadium: "Emirates Stadium", fact: "Fue el primer club londinense en llegar a una final de Champions (2006)." },
-      "Aston Villa": { country: "Inglaterra", founded: 1874, uclTitles: 1, stadium: "Villa Park", fact: "Campeón de Europa en 1982; uno de los 12 clubes fundadores de la Football League." },
-      "Atlético de Madrid": { country: "España", founded: 1903, uclTitles: 0, stadium: "Cívitas Metropolitano", fact: "Tres finales de Champions en la era moderna… y la maldición de no alzarla aún." },
-      "Barcelona": { country: "España", founded: 1899, uclTitles: 5, stadium: "Spotify Camp Nou", fact: "Más que un club: cinco orejonas y el legado del tiki-taka." },
-      "Bayern München": { country: "Alemania", founded: 1900, uclTitles: 6, stadium: "Allianz Arena", fact: "El club alemán con más Champions; dominio casi eterno en la Bundesliga." },
-      "Bodø/Glimt": { country: "Noruega", founded: 1916, uclTitles: 0, stadium: "Aspmyra Stadion", fact: "De Bodø, al norte del círculo polar: el 'milagro ártico' del fútbol europeo." },
-      "Borussia Dortmund": { country: "Alemania", founded: 1909, uclTitles: 1, stadium: "Signal Iduna Park", fact: "El Muro Amarillo: uno de los ambientes más intensos de Europa." },
-      "Club Brugge": { country: "Bélgica", founded: 1891, uclTitles: 0, stadium: "Jan Breydel", fact: "Finalista de la Copa de Europa en 1978; histórico del fútbol belga." },
-      "Como": { country: "Italia", founded: 1907, uclTitles: 0, stadium: "Giuseppe Sinigaglia", fact: "El club del lago de Como; regresó a la élite y sueña en Europa." },
-      "Fenerbahçe": { country: "Turquía", founded: 1907, uclTitles: 0, stadium: "Ülker Stadium", fact: "Uno de los tres gigantes de Estambul; pasión desbordada en Kadıköy." },
-      "Feyenoord": { country: "Países Bajos", founded: 1908, uclTitles: 1, stadium: "De Kuip", fact: "Campeón de Europa en 1970; De Kuip es templo del fútbol holandés." },
-      "Galatasaray": { country: "Turquía", founded: 1905, uclTitles: 0, stadium: "RAMS Park", fact: "Único turco en ganar la UEFA (2000); el derbi de Estambul es guerra santa." },
-      "Inter": { country: "Italia", founded: 1908, uclTitles: 3, stadium: "San Siro", fact: "El 'Scudetto de las estrellas' y el triplete de Mourinho en 2010." },
-      "LASK": { country: "Austria", founded: 1908, uclTitles: 0, stadium: "Raiffeisen Arena", fact: "Club histórico de Linz; de los más antiguos de Austria." },
-      "Leipzig": { country: "Alemania", founded: 2009, uclTitles: 0, stadium: "Red Bull Arena", fact: "El proyecto Red Bull: de categorías inferiores a la Champions en tiempo récord." },
-      "Lens": { country: "Francia", founded: 1906, uclTitles: 0, stadium: "Stade Bollaert-Delelis", fact: "Orgullo minero del norte de Francia; afición de las más fieles del país." },
-      "Lille": { country: "Francia", founded: 1944, uclTitles: 0, stadium: "Decathlon Arena", fact: "Campeón de Francia 2021 contra todo pronóstico; cantera muy respetada." },
-      "Liverpool": { country: "Inglaterra", founded: 1892, uclTitles: 6, stadium: "Anfield", fact: "You'll Never Walk Alone y seis orejonas; Anfield es leyenda viva." },
-      "Manchester City": { country: "Inglaterra", founded: 1880, uclTitles: 1, stadium: "Etihad Stadium", fact: "De la era Citizen al dominio continental: Champions 2023." },
-      "Manchester United": { country: "Inglaterra", founded: 1878, uclTitles: 3, stadium: "Old Trafford", fact: "El Teatro de los Sueños; el club inglés más laureado en Europa." },
-      "Napoli": { country: "Italia", founded: 1926, uclTitles: 0, stadium: "Diego Armando Maradona", fact: "Maradona, el scudetto del 87 y el del 23: Nápoles es religión." },
-      "PSV Eindhoven": { country: "Países Bajos", founded: 1913, uclTitles: 1, stadium: "Philips Stadion", fact: "Campeón de Europa 1988; fábrica de talentos holandeses." },
-      "Paris Saint-Germain": { country: "Francia", founded: 1970, uclTitles: 0, stadium: "Parc des Princes", fact: "Proyecto qatarí y una final de Champions (2020); aún buscan la orejona." },
-      "Porto": { country: "Portugal", founded: 1893, uclTitles: 2, stadium: "Estádio do Dragão", fact: "Mourinho en 2004 y la tradición de sorprender en Europa." },
-      "Real Betis": { country: "España", founded: 1907, uclTitles: 0, stadium: "Benito Villamarín", fact: "¡Viva el Betis manque pierda! Hinchada de las más queridas de España." },
-      "Real Madrid": { country: "España", founded: 1902, uclTitles: 15, stadium: "Santiago Bernabéu", fact: "El rey de Europa: récord de Champions y de finales ganadas." },
-      "Roma": { country: "Italia", founded: 1927, uclTitles: 0, stadium: "Stadio Olimpico", fact: "La Magica: Conference 2022 y una afición que no entiende de medias tintas." },
-      "Sabah": { country: "Azerbaiyán", founded: 2017, uclTitles: 0, stadium: "Bank Respublika Arena", fact: "Club joven de Bakú; símbolo del crecimiento del fútbol azerbaiyano." },
-      "Shakhtar Donetsk": { country: "Ucrania", founded: 1936, uclTitles: 0, stadium: "En el exilio / Europa", fact: "Campeón de la UEFA 2009; desde 2022 disputa 'en casa' fuera de Donetsk." },
-      "Slavia Praha": { country: "Chequia", founded: 1892, uclTitles: 0, stadium: "Fortuna Arena", fact: "Histórico de Praga; rivalidad eterna con el Sparta." },
-      "Slovan Bratislava": { country: "Eslovaquia", founded: 1919, uclTitles: 0, stadium: "Tehelné pole", fact: "El más laureado de Eslovaquia; campeón de la Recopa en 1969." },
-      "Sporting CP": { country: "Portugal", founded: 1906, uclTitles: 0, stadium: "Estádio José Alvalade", fact: "Cantera de Ronaldo, Figo y Quaresma; leones de Lisboa." },
-      "Stuttgart": { country: "Alemania", founded: 1893, uclTitles: 0, stadium: "MHPArena", fact: "Campeón alemán en varias épocas; clásico del suroeste alemán." },
-      "Viking": { country: "Noruega", founded: 1899, uclTitles: 0, stadium: "SR-Bank Arena", fact: "Club de Stavanger; nombre vikingo, historia centenaria." },
-      "Villarreal": { country: "España", founded: 1923, uclTitles: 0, stadium: "Estadio de la Cerámica", fact: "El Submarino Amarillo: semifinalista de Champions y orgullo de una ciudad pequeña." }
+      "AEK Athens": { country: "Grecia", founded: 1924, uclTitles: 0, uclYears: [], stadium: "OPAP Arena", fact: "Uno de los 'tres grandes' de Atenas; su nombre evoca el águila bicéfala bizantina." },
+      "Arsenal": { country: "Inglaterra", founded: 1886, uclTitles: 0, uclYears: [], stadium: "Emirates Stadium", fact: "Fue el primer club londinense en llegar a una final de Champions (2006)." },
+      "Aston Villa": { country: "Inglaterra", founded: 1874, uclTitles: 1, uclYears: [1982], stadium: "Villa Park", fact: "Campeón de Europa en 1982; uno de los 12 clubes fundadores de la Football League." },
+      "Atlético de Madrid": { country: "España", founded: 1903, uclTitles: 0, uclYears: [], stadium: "Cívitas Metropolitano", fact: "Tres finales de Champions en la era moderna… y la maldición de no alzarla aún." },
+      "Barcelona": { country: "España", founded: 1899, uclTitles: 5, uclYears: [1992, 2006, 2009, 2011, 2015], stadium: "Spotify Camp Nou", fact: "Más que un club: cinco orejonas y el legado del tiki-taka." },
+      "Bayern München": { country: "Alemania", founded: 1900, uclTitles: 6, uclYears: [1974, 1975, 1976, 2001, 2013, 2020], stadium: "Allianz Arena", fact: "El club alemán con más Champions; dominio casi eterno en la Bundesliga." },
+      "Bodø/Glimt": { country: "Noruega", founded: 1916, uclTitles: 0, uclYears: [], stadium: "Aspmyra Stadion", fact: "De Bodø, al norte del círculo polar: el 'milagro ártico' del fútbol europeo." },
+      "Borussia Dortmund": { country: "Alemania", founded: 1909, uclTitles: 1, uclYears: [1997], stadium: "Signal Iduna Park", fact: "El Muro Amarillo: uno de los ambientes más intensos de Europa." },
+      "Club Brugge": { country: "Bélgica", founded: 1891, uclTitles: 0, uclYears: [], stadium: "Jan Breydel", fact: "Finalista de la Copa de Europa en 1978; histórico del fútbol belga." },
+      "Como": { country: "Italia", founded: 1907, uclTitles: 0, uclYears: [], stadium: "Giuseppe Sinigaglia", fact: "El club del lago de Como; regresó a la élite y sueña en Europa." },
+      "Fenerbahçe": { country: "Turquía", founded: 1907, uclTitles: 0, uclYears: [], stadium: "Ülker Stadium", fact: "Uno de los tres gigantes de Estambul; pasión desbordada en Kadıköy." },
+      "Feyenoord": { country: "Países Bajos", founded: 1908, uclTitles: 1, uclYears: [1970], stadium: "De Kuip", fact: "Campeón de Europa en 1970; De Kuip es templo del fútbol holandés." },
+      "Galatasaray": { country: "Turquía", founded: 1905, uclTitles: 0, uclYears: [], stadium: "RAMS Park", fact: "Único turco en ganar la UEFA (2000); el derbi de Estambul es guerra santa." },
+      "Inter": { country: "Italia", founded: 1908, uclTitles: 3, uclYears: [1964, 1965, 2010], stadium: "San Siro", fact: "El 'Scudetto de las estrellas' y el triplete de Mourinho en 2010." },
+      "LASK": { country: "Austria", founded: 1908, uclTitles: 0, uclYears: [], stadium: "Raiffeisen Arena", fact: "Club histórico de Linz; de los más antiguos de Austria." },
+      "Leipzig": { country: "Alemania", founded: 2009, uclTitles: 0, uclYears: [], stadium: "Red Bull Arena", fact: "El proyecto Red Bull: de categorías inferiores a la Champions en tiempo récord." },
+      "Lens": { country: "Francia", founded: 1906, uclTitles: 0, uclYears: [], stadium: "Stade Bollaert-Delelis", fact: "Orgullo minero del norte de Francia; afición de las más fieles del país." },
+      "Lille": { country: "Francia", founded: 1944, uclTitles: 0, uclYears: [], stadium: "Decathlon Arena", fact: "Campeón de Francia 2021 contra todo pronóstico; cantera muy respetada." },
+      "Liverpool": { country: "Inglaterra", founded: 1892, uclTitles: 6, uclYears: [1977, 1978, 1981, 1984, 2005, 2019], stadium: "Anfield", fact: "You'll Never Walk Alone y seis orejonas; Anfield es leyenda viva." },
+      "Manchester City": { country: "Inglaterra", founded: 1880, uclTitles: 1, uclYears: [2023], stadium: "Etihad Stadium", fact: "De la era Citizen al dominio continental: Champions 2023." },
+      "Manchester United": { country: "Inglaterra", founded: 1878, uclTitles: 3, uclYears: [1968, 1999, 2008], stadium: "Old Trafford", fact: "El Teatro de los Sueños; el club inglés más laureado en Europa." },
+      "Napoli": { country: "Italia", founded: 1926, uclTitles: 0, uclYears: [], stadium: "Diego Armando Maradona", fact: "Maradona, el scudetto del 87 y el del 23: Nápoles es religión." },
+      "PSV Eindhoven": { country: "Países Bajos", founded: 1913, uclTitles: 1, uclYears: [1988], stadium: "Philips Stadion", fact: "Campeón de Europa 1988; fábrica de talentos holandeses." },
+      "Paris Saint-Germain": { country: "Francia", founded: 1970, uclTitles: 0, uclYears: [], stadium: "Parc des Princes", fact: "Proyecto qatarí y una final de Champions (2020); aún buscan la orejona." },
+      "Porto": { country: "Portugal", founded: 1893, uclTitles: 2, uclYears: [1987, 2004], stadium: "Estádio do Dragão", fact: "Mourinho en 2004 y la tradición de sorprender en Europa." },
+      "Real Betis": { country: "España", founded: 1907, uclTitles: 0, uclYears: [], stadium: "Benito Villamarín", fact: "¡Viva el Betis manque pierda! Hinchada de las más queridas de España." },
+      "Real Madrid": { country: "España", founded: 1902, uclTitles: 15, uclYears: [1956, 1957, 1958, 1959, 1960, 1966, 1998, 2000, 2002, 2014, 2016, 2017, 2018, 2022, 2024], stadium: "Santiago Bernabéu", fact: "El rey de Europa: récord de Champions y de finales ganadas." },
+      "Roma": { country: "Italia", founded: 1927, uclTitles: 0, uclYears: [], stadium: "Stadio Olimpico", fact: "La Magica: Conference 2022 y una afición que no entiende de medias tintas." },
+      "Sabah": { country: "Azerbaiyán", founded: 2017, uclTitles: 0, uclYears: [], stadium: "Bank Respublika Arena", fact: "Club joven de Bakú; símbolo del crecimiento del fútbol azerbaiyano." },
+      "Shakhtar Donetsk": { country: "Ucrania", founded: 1936, uclTitles: 0, uclYears: [], stadium: "En el exilio / Europa", fact: "Campeón de la UEFA 2009; desde 2022 disputa 'en casa' fuera de Donetsk." },
+      "Slavia Praha": { country: "Chequia", founded: 1892, uclTitles: 0, uclYears: [], stadium: "Fortuna Arena", fact: "Histórico de Praga; rivalidad eterna con el Sparta." },
+      "Slovan Bratislava": { country: "Eslovaquia", founded: 1919, uclTitles: 0, uclYears: [], stadium: "Tehelné pole", fact: "El más laureado de Eslovaquia; campeón de la Recopa en 1969." },
+      "Sporting CP": { country: "Portugal", founded: 1906, uclTitles: 0, uclYears: [], stadium: "Estádio José Alvalade", fact: "Cantera de Ronaldo, Figo y Quaresma; leones de Lisboa." },
+      "Stuttgart": { country: "Alemania", founded: 1893, uclTitles: 0, uclYears: [], stadium: "MHPArena", fact: "Campeón alemán en varias épocas; clásico del suroeste alemán." },
+      "Viking": { country: "Noruega", founded: 1899, uclTitles: 0, uclYears: [], stadium: "SR-Bank Arena", fact: "Club de Stavanger; nombre vikingo, historia centenaria." },
+      "Villarreal": { country: "España", founded: 1923, uclTitles: 0, uclYears: [], stadium: "Estadio de la Cerámica", fact: "El Submarino Amarillo: semifinalista de Champions y orgullo de una ciudad pequeña." }
     };
 
     function teamLogo(name) {
@@ -2953,7 +2953,8 @@
         used.add(i);
         items.forEach((other, j) => {
           if (used.has(j)) return;
-          if (item.base.distanceTo(other.base) < 40000) {
+          // Solo misma ciudad (~12 km). Lille–Lens (~35 km) no se agrupan.
+          if (item.base.distanceTo(other.base) < 12000) {
             group.push(other);
             used.add(j);
           }
@@ -3263,7 +3264,11 @@
       grid.innerHTML = list.map(n => {
         const info = TEAM_INFO[n] || {};
         const logo = LOGO_MAP[n] ? `<img src="${LOGO_MAP[n]}" alt="" onerror="this.style.display='none'" />` : '';
-        const titles = info.uclTitles != null ? info.uclTitles : '—';
+        const nTitles = info.uclTitles != null ? info.uclTitles : 0;
+        const years = (info.uclYears && info.uclYears.length)
+          ? ` (${info.uclYears.join(', ')})`
+          : '';
+        const titlesStr = nTitles > 0 ? `${nTitles}${years}` : '0';
         return `<div class="club-card">
           <div class="club-card-header">
             ${logo}
@@ -3274,7 +3279,7 @@
           </div>
           <dl class="club-meta">
             <dt>Fundación</dt><dd>${info.founded || '—'}</dd>
-            <dt>Champions</dt><dd>${titles}</dd>
+            <dt>Champions</dt><dd style="grid-column:1/-1">${titlesStr}</dd>
             <dt>Estadio</dt><dd style="grid-column:1/-1">${info.stadium || '—'}</dd>
           </dl>
           <div class="club-fact">${info.fact ? `<strong>Dato:</strong> ${info.fact}` : ''}</div>
