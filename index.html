@@ -1213,19 +1213,25 @@
       max-height: min(70vh, 720px);
       border: 1px solid var(--border);
       border-radius: 12px;
+      -webkit-overflow-scrolling: touch;
     }
     .historico-table {
       width: 100%;
-      border-collapse: separate;
+      border-collapse: separate !important;
       border-spacing: 0;
       margin: 0;
+      overflow: visible !important;
+      border-radius: 0 !important;
+      border: none !important;
+      background: transparent !important;
     }
     .historico-table thead th {
-      position: sticky;
-      top: 0;
-      z-index: 3;
-      background: #0c1a2e;
-      box-shadow: 0 1px 0 var(--border);
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 5 !important;
+      background: #0c1a2e !important;
+      background-image: none !important;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.45);
     }
 
     .pred-tables-grid {
@@ -1763,7 +1769,8 @@
       'Don Pelmazo: porque alguien tenía que cargar el grupo.',
       'Gracias por participar 😭',
       'No se preocupe por ir de último, mijo, que el sótano también es parte del edificio.',
-      'Si hay una polla ganable, es esta'
+      'Si hay una polla ganable, es esta',
+      'Lo haría mejor mi mascota'
     ];
 
     // Logos (carpeta logos/ junto al HTML)
