@@ -1100,38 +1100,6 @@
     }
     .club-fact strong { color: var(--accent); }
 
-    .player-streak-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 0.65rem;
-    }
-    .player-streak-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 0.75rem 0.9rem;
-    }
-    .player-streak-card .ps-name {
-      font-weight: 800;
-      font-size: 0.95rem;
-      margin-bottom: 0.5rem;
-    }
-    .player-streak-card .ps-pills {
-      display: flex;
-      gap: 4px;
-      margin-bottom: 0.4rem;
-    }
-    .ps-pill {
-      width: 28px; height: 28px; border-radius: 7px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.75rem; font-weight: 900;
-    }
-    .ps-pill.p2 { background: #00e676; color: #04120a; }
-    .ps-pill.p1 { background: #ffd54f; color: #04120a; }
-    .ps-pill.p0 { background: #ef5350; color: #fff; }
-    .ps-pill.empty { background: #1a2a40; color: var(--muted); }
-    .ps-sub { font-size: 0.78rem; color: var(--muted); font-weight: 600; }
-
     .cal-legend {
       display: flex; flex-wrap: wrap; gap: 0.85rem;
       margin-bottom: 1rem; font-size: 0.82rem; color: var(--muted); font-weight: 600;
@@ -1478,12 +1446,6 @@
       <p style="margin-top:0.75rem;font-size:0.8rem;color:var(--muted);">
         * % Aciertos = (puntos obtenidos / puntos máximos posibles) × 100. Máximo por partido = 2 pts.
       </p>
-
-      <h3 class="section-title" style="margin-top:1.5rem;">Racha personal · Últimos 5 partidos</h3>
-      <p style="font-size:0.85rem;color:var(--muted);margin:-0.35rem 0 0.75rem;">
-        Más reciente a la izquierda. Color según puntos: 2 exacto · 1 resultado · 0 fallo. Solo partidos con resultado real.
-      </p>
-      <div id="playerStreakGrid" class="player-streak-grid"></div>
     </div>
 
     <!-- TABLA EQUIPOS FASE DE LIGA -->
@@ -2559,58 +2521,7 @@
         }
       }
 
-      renderPlayerStreaks();
-    }
-
-    function getPlayerLast5(playerId) {
-      const sorted = [...MATCHES].sort((a, b) => {
-        if (a.jornada !== b.jornada) return a.jornada - b.jornada;
-        return a.id - b.id;
-      });
-      const items = [];
-      for (const m of sorted) {
-        const real = data.results[m.id];
-        if (!real || real.h == null || real.a == null) continue;
-        const pred = (data.predictions[m.id] || {})[playerId];
-        if (!pred || pred.h == null || pred.a == null) continue;
-        const r = calcPoints(pred.h, pred.a, real.h, real.a);
-        items.push({
-          pts: r.pts,
-          jornada: m.jornada,
-          label: `${m.local} ${real.h}-${real.a} ${m.visitante}`,
-          pred: `${pred.h}-${pred.a}`
-        });
       }
-      return items.slice(-5).reverse();
-    }
-
-    function renderPlayerStreaks() {
-      const grid = document.getElementById('playerStreakGrid');
-      if (!grid) return;
-      grid.innerHTML = PLAYERS.map(p => {
-        const last = getPlayerLast5(p);
-        const pills = [];
-        for (let i = 0; i < 5; i++) {
-          if (i < last.length) {
-            const it = last[i];
-            const cls = it.pts === 2 ? 'p2' : it.pts === 1 ? 'p1' : 'p0';
-            pills.push(`<span class="ps-pill ${cls}" title="J${it.jornada}: pred ${it.pred} · ${it.label}">${it.pts}</span>`);
-          } else {
-            pills.push(`<span class="ps-pill empty">·</span>`);
-          }
-        }
-        const sum = last.reduce((s, x) => s + x.pts, 0);
-        const max = last.length * 2;
-        const sub = last.length
-          ? `${sum}/${max} pts en los últimos ${last.length}`
-          : 'Aún sin partidos con resultado';
-        return `<div class="player-streak-card">
-          <div class="ps-name player-name ${p}">${PLAYER_NAMES[p]}</div>
-          <div class="ps-pills">${pills.join('')}</div>
-          <div class="ps-sub">${sub}</div>
-        </div>`;
-      }).join('');
-    }
 
     // Spanish date labels in MATCHES → {y, m, d}
     const MES_MAP = {
@@ -2644,8 +2555,9 @@
       });
 
       // Months that appear
-      const monthKeys = [...new Set(Object.values(byDay).map(x => `${x.meta.y}-${x.meta.m}`))]
-        .sort((a, b) => a.localeCompare(b));
+      const monthKeys = [...new Set(Object.values(byDay).map(x =>
+        `${x.meta.y}-${String(x.meta.m).padStart(2, '0')}`
+      ))].sort((a, b) => a.localeCompare(b));
 
       const monthNames = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
         'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
