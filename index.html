@@ -3649,7 +3649,7 @@
         });
       });
 
-      const labels = playedJornadas.length
+      const jornadaLabels = playedJornadas.length
         ? playedJornadas.map(j => 'J' + j)
         : ['—'];
 
@@ -3681,7 +3681,7 @@
         chartPerJornada = new Chart(ctxPer, {
           type: 'bar',
           data: {
-            labels,
+            labels: jornadaLabels,
             datasets: PLAYERS.map(p => ({
               label: PLAYER_NAMES[p],
               data: playedJornadas.length ? perData[p] : [0],
@@ -3701,7 +3701,7 @@
         chartCumulative = new Chart(ctxCum, {
           type: 'line',
           data: {
-            labels,
+            labels: jornadaLabels,
             datasets: PLAYERS.map(p => ({
               label: PLAYER_NAMES[p],
               data: playedJornadas.length ? cumData[p] : [0],
