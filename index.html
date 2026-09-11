@@ -1020,6 +1020,86 @@
       padding: 0.35rem 0.75rem;
     }
 
+    .team-form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 0.55rem;
+    }
+    .team-form-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.55rem 0.7rem;
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+    }
+    .team-form-card img {
+      width: 24px; height: 24px; object-fit: contain; flex-shrink: 0;
+    }
+    .team-form-card .tf-name {
+      font-weight: 700; font-size: 0.88rem; flex: 1; min-width: 0;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .form-pills { display: flex; gap: 3px; flex-shrink: 0; }
+    .form-pill {
+      width: 22px; height: 22px; border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.68rem; font-weight: 900; color: #04120a;
+    }
+    .form-pill.W { background: #00e676; }
+    .form-pill.E { background: #ffd54f; }
+    .form-pill.D { background: #ef5350; color: #fff; }
+    .form-pill.empty { background: #1a2a40; color: var(--muted); font-weight: 600; }
+
+    .clubes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 0.85rem;
+    }
+    .club-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1rem 1.1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+    .club-card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      margin-bottom: 0.2rem;
+    }
+    .club-card-header img {
+      width: 40px; height: 40px; object-fit: contain;
+    }
+    .club-card-header h3 {
+      font-size: 1.05rem; font-weight: 800; margin: 0;
+      letter-spacing: -0.01em;
+    }
+    .club-card-header .country {
+      font-size: 0.78rem; color: var(--muted); font-weight: 600;
+    }
+    .club-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.35rem 0.6rem;
+      font-size: 0.82rem;
+    }
+    .club-meta dt { color: var(--muted); font-weight: 600; }
+    .club-meta dd { margin: 0; font-weight: 700; color: var(--text); }
+    .club-fact {
+      margin-top: 0.35rem;
+      padding-top: 0.5rem;
+      border-top: 1px dashed var(--border);
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    .club-fact strong { color: var(--accent); }
+
     .pred-tables-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -1193,6 +1273,7 @@
         <button data-panel="tabla">Tabla equipos</button>
         <button data-panel="tablas-preds">Tablas preds</button>
         <button data-panel="estadisticas">Estadísticas</button>
+        <button data-panel="clubes">Clubes</button>
         <button data-panel="rondas">Rondas finales</button>
         <button data-panel="mapa">Mapa</button>
         <button data-panel="reglas">Reglas</button>
@@ -1356,6 +1437,24 @@
         </thead>
         <tbody id="teamsStatsBody"></tbody>
       </table>
+
+      <h3 class="section-title" style="margin-top:1.5rem;">Equipos · Últimos 5 partidos</h3>
+      <p style="font-size:0.85rem;color:var(--muted);margin:-0.4rem 0 0.75rem;">
+        Forma con resultados reales de esta fase de liga (más reciente a la izquierda). V = victoria · E = empate · D = derrota.
+      </p>
+      <div id="teamFormGrid" class="team-form-grid"></div>
+    </div>
+
+    <!-- CLUBES -->
+    <div id="clubes" class="panel">
+      <div class="rules" style="margin-bottom:1rem;">
+        <strong>Clubes de la Fase de Liga</strong> — Datos de los 36 participantes: fundación, país, títulos de Europa y alguna curiosidad.
+      </div>
+      <div class="filters" style="margin-bottom:1rem;">
+        <label>Buscar</label>
+        <input type="text" id="clubSearch" placeholder="Ej: Madrid, Italia, 1900…" style="width:220px;" />
+      </div>
+      <div id="clubesGrid" class="clubes-grid"></div>
     </div>
 
     <!-- RONDAS FINALES -->
@@ -1561,6 +1660,47 @@
       "Lens": [50.4329, 2.8151],
       "Roma": [41.9341, 12.4547],
       "Bodø/Glimt": [67.2778, 14.4278]
+    };
+
+
+    // Ficha de clubes (datos orientativos para la app)
+    const TEAM_INFO = {
+      "AEK Athens": { country: "Grecia", founded: 1924, uclTitles: 0, stadium: "OPAP Arena", fact: "Uno de los 'tres grandes' de Atenas; su nombre evoca el águila bicéfala bizantina." },
+      "Arsenal": { country: "Inglaterra", founded: 1886, uclTitles: 0, stadium: "Emirates Stadium", fact: "Fue el primer club londinense en llegar a una final de Champions (2006)." },
+      "Aston Villa": { country: "Inglaterra", founded: 1874, uclTitles: 1, stadium: "Villa Park", fact: "Campeón de Europa en 1982; uno de los 12 clubes fundadores de la Football League." },
+      "Atlético de Madrid": { country: "España", founded: 1903, uclTitles: 0, stadium: "Cívitas Metropolitano", fact: "Tres finales de Champions en la era moderna… y la maldición de no alzarla aún." },
+      "Barcelona": { country: "España", founded: 1899, uclTitles: 5, stadium: "Spotify Camp Nou", fact: "Más que un club: cinco orejonas y el legado del tiki-taka." },
+      "Bayern München": { country: "Alemania", founded: 1900, uclTitles: 6, stadium: "Allianz Arena", fact: "El club alemán con más Champions; dominio casi eterno en la Bundesliga." },
+      "Bodø/Glimt": { country: "Noruega", founded: 1916, uclTitles: 0, stadium: "Aspmyra Stadion", fact: "De Bodø, al norte del círculo polar: el 'milagro ártico' del fútbol europeo." },
+      "Borussia Dortmund": { country: "Alemania", founded: 1909, uclTitles: 1, stadium: "Signal Iduna Park", fact: "El Muro Amarillo: uno de los ambientes más intensos de Europa." },
+      "Club Brugge": { country: "Bélgica", founded: 1891, uclTitles: 0, stadium: "Jan Breydel", fact: "Finalista de la Copa de Europa en 1978; histórico del fútbol belga." },
+      "Como": { country: "Italia", founded: 1907, uclTitles: 0, stadium: "Giuseppe Sinigaglia", fact: "El club del lago de Como; regresó a la élite y sueña en Europa." },
+      "Fenerbahçe": { country: "Turquía", founded: 1907, uclTitles: 0, stadium: "Ülker Stadium", fact: "Uno de los tres gigantes de Estambul; pasión desbordada en Kadıköy." },
+      "Feyenoord": { country: "Países Bajos", founded: 1908, uclTitles: 1, stadium: "De Kuip", fact: "Campeón de Europa en 1970; De Kuip es templo del fútbol holandés." },
+      "Galatasaray": { country: "Turquía", founded: 1905, uclTitles: 0, stadium: "RAMS Park", fact: "Único turco en ganar la UEFA (2000); el derbi de Estambul es guerra santa." },
+      "Inter": { country: "Italia", founded: 1908, uclTitles: 3, stadium: "San Siro", fact: "El 'Scudetto de las estrellas' y el triplete de Mourinho en 2010." },
+      "LASK": { country: "Austria", founded: 1908, uclTitles: 0, stadium: "Raiffeisen Arena", fact: "Club histórico de Linz; de los más antiguos de Austria." },
+      "Leipzig": { country: "Alemania", founded: 2009, uclTitles: 0, stadium: "Red Bull Arena", fact: "El proyecto Red Bull: de categorías inferiores a la Champions en tiempo récord." },
+      "Lens": { country: "Francia", founded: 1906, uclTitles: 0, stadium: "Stade Bollaert-Delelis", fact: "Orgullo minero del norte de Francia; afición de las más fieles del país." },
+      "Lille": { country: "Francia", founded: 1944, uclTitles: 0, stadium: "Decathlon Arena", fact: "Campeón de Francia 2021 contra todo pronóstico; cantera muy respetada." },
+      "Liverpool": { country: "Inglaterra", founded: 1892, uclTitles: 6, stadium: "Anfield", fact: "You'll Never Walk Alone y seis orejonas; Anfield es leyenda viva." },
+      "Manchester City": { country: "Inglaterra", founded: 1880, uclTitles: 1, stadium: "Etihad Stadium", fact: "De la era Citizen al dominio continental: Champions 2023." },
+      "Manchester United": { country: "Inglaterra", founded: 1878, uclTitles: 3, stadium: "Old Trafford", fact: "El Teatro de los Sueños; el club inglés más laureado en Europa." },
+      "Napoli": { country: "Italia", founded: 1926, uclTitles: 0, stadium: "Diego Armando Maradona", fact: "Maradona, el scudetto del 87 y el del 23: Nápoles es religión." },
+      "PSV Eindhoven": { country: "Países Bajos", founded: 1913, uclTitles: 1, stadium: "Philips Stadion", fact: "Campeón de Europa 1988; fábrica de talentos holandeses." },
+      "Paris Saint-Germain": { country: "Francia", founded: 1970, uclTitles: 0, stadium: "Parc des Princes", fact: "Proyecto qatarí y una final de Champions (2020); aún buscan la orejona." },
+      "Porto": { country: "Portugal", founded: 1893, uclTitles: 2, stadium: "Estádio do Dragão", fact: "Mourinho en 2004 y la tradición de sorprender en Europa." },
+      "Real Betis": { country: "España", founded: 1907, uclTitles: 0, stadium: "Benito Villamarín", fact: "¡Viva el Betis manque pierda! Hinchada de las más queridas de España." },
+      "Real Madrid": { country: "España", founded: 1902, uclTitles: 15, stadium: "Santiago Bernabéu", fact: "El rey de Europa: récord de Champions y de finales ganadas." },
+      "Roma": { country: "Italia", founded: 1927, uclTitles: 0, stadium: "Stadio Olimpico", fact: "La Magica: Conference 2022 y una afición que no entiende de medias tintas." },
+      "Sabah": { country: "Azerbaiyán", founded: 2017, uclTitles: 0, stadium: "Bank Respublika Arena", fact: "Club joven de Bakú; símbolo del crecimiento del fútbol azerbaiyano." },
+      "Shakhtar Donetsk": { country: "Ucrania", founded: 1936, uclTitles: 0, stadium: "En el exilio / Europa", fact: "Campeón de la UEFA 2009; desde 2022 disputa 'en casa' fuera de Donetsk." },
+      "Slavia Praha": { country: "Chequia", founded: 1892, uclTitles: 0, stadium: "Fortuna Arena", fact: "Histórico de Praga; rivalidad eterna con el Sparta." },
+      "Slovan Bratislava": { country: "Eslovaquia", founded: 1919, uclTitles: 0, stadium: "Tehelné pole", fact: "El más laureado de Eslovaquia; campeón de la Recopa en 1969." },
+      "Sporting CP": { country: "Portugal", founded: 1906, uclTitles: 0, stadium: "Estádio José Alvalade", fact: "Cantera de Ronaldo, Figo y Quaresma; leones de Lisboa." },
+      "Stuttgart": { country: "Alemania", founded: 1893, uclTitles: 0, stadium: "MHPArena", fact: "Campeón alemán en varias épocas; clásico del suroeste alemán." },
+      "Viking": { country: "Noruega", founded: 1899, uclTitles: 0, stadium: "SR-Bank Arena", fact: "Club de Stavanger; nombre vikingo, historia centenaria." },
+      "Villarreal": { country: "España", founded: 1923, uclTitles: 0, stadium: "Estadio de la Cerámica", fact: "El Submarino Amarillo: semifinalista de Champions y orgullo de una ciudad pequeña." }
     };
 
     function teamLogo(name) {
@@ -2826,8 +2966,89 @@
         </tr>
       `).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--muted);">Aún no hay resultados cargados</td></tr>';
 
+      renderTeamForm();
+
       // Charts
       renderCharts(pStats, ranking);
+    }
+
+    function getTeamLast5(teamName) {
+      const played = [];
+      const sorted = [...MATCHES].sort((a, b) => {
+        if (a.jornada !== b.jornada) return a.jornada - b.jornada;
+        return a.id - b.id;
+      });
+      for (const m of sorted) {
+        const real = data.results[m.id];
+        if (!real || real.h == null || real.a == null) continue;
+        if (m.local !== teamName && m.visitante !== teamName) continue;
+        const isHome = m.local === teamName;
+        const gf = isHome ? real.h : real.a;
+        const ga = isHome ? real.a : real.h;
+        let res = 'E';
+        if (gf > ga) res = 'W';
+        else if (gf < ga) res = 'D';
+        played.push({
+          res,
+          jornada: m.jornada,
+          opp: isHome ? m.visitante : m.local,
+          score: `${gf}-${ga}`
+        });
+      }
+      return played.slice(-5).reverse(); // most recent first
+    }
+
+    function renderTeamForm() {
+      const grid = document.getElementById('teamFormGrid');
+      if (!grid) return;
+      const names = [...new Set(MATCHES.flatMap(m => [m.local, m.visitante]))].sort((a, b) => a.localeCompare(b));
+      grid.innerHTML = names.map(name => {
+        const last = getTeamLast5(name);
+        const pills = [];
+        for (let i = 0; i < 5; i++) {
+          if (i < last.length) {
+            const r = last[i];
+            pills.push(`<span class="form-pill ${r.res}" title="J${r.jornada} vs ${r.opp} (${r.score})">${r.res === 'W' ? 'V' : r.res === 'E' ? 'E' : 'D'}</span>`);
+          } else {
+            pills.push(`<span class="form-pill empty">·</span>`);
+          }
+        }
+        const logo = LOGO_MAP[name] ? `<img src="${LOGO_MAP[name]}" alt="" onerror="this.style.display='none'" />` : '';
+        return `<div class="team-form-card">${logo}<div class="tf-name">${name}</div><div class="form-pills">${pills.join('')}</div></div>`;
+      }).join('');
+    }
+
+    function renderClubes(filter = '') {
+      const grid = document.getElementById('clubesGrid');
+      if (!grid) return;
+      const q = filter.trim().toLowerCase();
+      const names = [...new Set(MATCHES.flatMap(m => [m.local, m.visitante]))].sort((a, b) => a.localeCompare(b));
+      const list = names.filter(n => {
+        if (!q) return true;
+        const info = TEAM_INFO[n] || {};
+        const blob = `${n} ${info.country || ''} ${info.founded || ''} ${info.stadium || ''} ${info.fact || ''}`.toLowerCase();
+        return blob.includes(q);
+      });
+      grid.innerHTML = list.map(n => {
+        const info = TEAM_INFO[n] || {};
+        const logo = LOGO_MAP[n] ? `<img src="${LOGO_MAP[n]}" alt="" onerror="this.style.display='none'" />` : '';
+        const titles = info.uclTitles != null ? info.uclTitles : '—';
+        return `<div class="club-card">
+          <div class="club-card-header">
+            ${logo}
+            <div>
+              <h3>${n}</h3>
+              <div class="country">${info.country || '—'}</div>
+            </div>
+          </div>
+          <dl class="club-meta">
+            <dt>Fundación</dt><dd>${info.founded || '—'}</dd>
+            <dt>Champions</dt><dd>${titles}</dd>
+            <dt>Estadio</dt><dd style="grid-column:1/-1">${info.stadium || '—'}</dd>
+          </dl>
+          <div class="club-fact">${info.fact ? `<strong>Dato:</strong> ${info.fact}` : ''}</div>
+        </div>`;
+      }).join('') || '<div class="playoff-empty">Sin clubes para ese filtro</div>';
     }
 
     function renderCharts(pStats, ranking) {
@@ -3045,8 +3266,13 @@
       if (e.target.dataset.panel === 'tabla') renderLeagueTable();
       if (e.target.dataset.panel === 'tablas-preds') renderPredTables();
       if (e.target.dataset.panel === 'estadisticas') renderStats();
+      if (e.target.dataset.panel === 'clubes') renderClubes(document.getElementById('clubSearch')?.value || '');
       if (e.target.dataset.panel === 'rondas') renderRondas();
       if (e.target.dataset.panel === 'mapa') initMap();
+    });
+
+    document.getElementById('clubSearch')?.addEventListener('input', e => {
+      renderClubes(e.target.value);
     });
 
     document.getElementById('filterJornada').addEventListener('change', renderMatches);
