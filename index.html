@@ -1532,7 +1532,11 @@
           <canvas id="chartAccuracy"></canvas>
         </div>
         <div class="chart-card" style="grid-column: 1 / -1;">
-          <h3>Evolución de puntos por jornada</h3>
+          <h3>Puntos por jornada</h3>
+          <canvas id="chartPerJornada" height="120"></canvas>
+        </div>
+        <div class="chart-card" style="grid-column: 1 / -1;">
+          <h3>Puntos acumulados</h3>
           <canvas id="chartCumulative" height="120"></canvas>
         </div>
       </div>
@@ -2060,6 +2064,7 @@
     let lastKnownUpdatedAt = null;
     let chartPoints = null;
     let chartAccuracy = null;
+    let chartPerJornada = null;
     let chartCumulative = null;
     let leagueMap = null;
     let mapMarkersLayer = null;
@@ -3607,7 +3612,7 @@
         });
       }
 
-      // Cumulative points — only jornadas that already have real results
+      // Points per jornada + cumulative — only jornadas with real results
       const allJornadas = [1,2,3,4,5,6,7,8];
       const playedJornadas = allJornadas.filter(j => {
         return MATCHES.some(m => {
@@ -3617,13 +3622,16 @@
         });
       });
 
+      const perData = {};
       const cumData = {};
-      PLAYERS.forEach(p => { cumData[p] = []; });
+      PLAYERS.forEach(p => { perData[p] = []; cumData[p] = []; });
       let running = {};
       PLAYERS.forEach(p => running[p] = 0);
 
       playedJornadas.forEach(j => {
         const matchesJ = MATCHES.filter(m => m.jornada === j);
+        const jornadaPts = {};
+        PLAYERS.forEach(p => jornadaPts[p] = 0);
         PLAYERS.forEach(p => {
           matchesJ.forEach(m => {
             const real = data.results[m.id];
@@ -3631,54 +3639,82 @@
             const pred = (data.predictions[m.id] || {})[p];
             if (!pred || pred.h == null || pred.a == null) return;
             const r = calcPoints(pred.h, pred.a, real.h, real.a);
+            jornadaPts[p] += r.pts;
             running[p] += r.pts;
           });
         });
-        PLAYERS.forEach(p => cumData[p].push(running[p]));
+        PLAYERS.forEach(p => {
+          perData[p].push(jornadaPts[p]);
+          cumData[p].push(running[p]);
+        });
       });
+
+      const labels = playedJornadas.length
+        ? playedJornadas.map(j => 'J' + j)
+        : ['—'];
+
+      const lineOpts = {
+        responsive: true,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { color: '#9bb0cc', boxWidth: 12, padding: 14 }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { color: '#9bb0cc' },
+            grid: { color: 'rgba(30,58,95,0.4)' }
+          },
+          y: {
+            beginAtZero: true,
+            ticks: { color: '#9bb0cc', stepSize: 1 },
+            grid: { color: 'rgba(30,58,95,0.4)' }
+          }
+        }
+      };
+
+      const ctxPer = document.getElementById('chartPerJornada');
+      if (ctxPer) {
+        if (chartPerJornada) chartPerJornada.destroy();
+        chartPerJornada = new Chart(ctxPer, {
+          type: 'bar',
+          data: {
+            labels,
+            datasets: PLAYERS.map(p => ({
+              label: PLAYER_NAMES[p],
+              data: playedJornadas.length ? perData[p] : [0],
+              backgroundColor: PLAYER_COLORS[p] + 'cc',
+              borderColor: PLAYER_COLORS[p],
+              borderWidth: 1,
+              borderRadius: 4
+            }))
+          },
+          options: lineOpts
+        });
+      }
 
       const ctxCum = document.getElementById('chartCumulative');
       if (ctxCum) {
         if (chartCumulative) chartCumulative.destroy();
-        // If nothing played yet, show empty placeholder axes
-        const labels = playedJornadas.length
-          ? playedJornadas.map(j => 'J' + j)
-          : ['—'];
-        const datasets = PLAYERS.map(p => ({
-          label: PLAYER_NAMES[p],
-          data: playedJornadas.length ? cumData[p] : [0],
-          borderColor: PLAYER_COLORS[p],
-          backgroundColor: PLAYER_COLORS[p] + '33',
-          tension: 0.25,
-          fill: false,
-          pointRadius: 5,
-          pointHoverRadius: 7,
-          borderWidth: 2.5
-        }));
         chartCumulative = new Chart(ctxCum, {
           type: 'line',
-          data: { labels, datasets },
-          options: {
-            responsive: true,
-            interaction: { mode: 'index', intersect: false },
-            plugins: {
-              legend: {
-                position: 'bottom',
-                labels: { color: '#9bb0cc', boxWidth: 12, padding: 14 }
-              }
-            },
-            scales: {
-              x: {
-                ticks: { color: '#9bb0cc' },
-                grid: { color: 'rgba(30,58,95,0.4)' }
-              },
-              y: {
-                beginAtZero: true,
-                ticks: { color: '#9bb0cc' },
-                grid: { color: 'rgba(30,58,95,0.4)' }
-              }
-            }
-          }
+          data: {
+            labels,
+            datasets: PLAYERS.map(p => ({
+              label: PLAYER_NAMES[p],
+              data: playedJornadas.length ? cumData[p] : [0],
+              borderColor: PLAYER_COLORS[p],
+              backgroundColor: PLAYER_COLORS[p] + '33',
+              tension: 0.25,
+              fill: false,
+              pointRadius: 5,
+              pointHoverRadius: 7,
+              borderWidth: 2.5
+            }))
+          },
+          options: lineOpts
         });
       }
     }
