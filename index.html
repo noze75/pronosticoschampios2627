@@ -116,6 +116,17 @@
       padding: 0.3rem;
       border-radius: 11px;
       border: 1px solid var(--border);
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+      max-width: 100%;
+    }
+    nav::-webkit-scrollbar { height: 4px; }
+    nav::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
     }
     nav button {
       background: transparent;
@@ -124,6 +135,8 @@
       border-radius: 8px;
       color: var(--muted);
       font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
     nav button.active {
       background: var(--accent);
@@ -1377,6 +1390,24 @@
     }
     .leaflet-control-attribution { background: rgba(10,22,40,0.7) !important; color: #9bb0cc !important; }
     .leaflet-control-attribution a { color: #9bb0cc !important; }
+    @media (max-width: 900px) {
+      .header-controls {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.55rem;
+      }
+      #mainNav {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        padding: 0.35rem;
+      }
+      #mainNav button {
+        padding: 0.48rem 0.75rem;
+        font-size: 0.82rem;
+      }
+    }
     @media (max-width: 640px) {
       header { padding: 0.7rem 0.9rem; }
       header h1 { font-size: 1.02rem; }
@@ -1385,6 +1416,8 @@
       .stat-value { font-size: 1.5rem; }
       .charts-grid { grid-template-columns: 1fr; }
       #mapContainer { height: 420px; }
+      .actions { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
+      .actions button { flex-shrink: 0; }
     }
   </style>
 </head>
