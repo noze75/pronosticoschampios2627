@@ -1208,6 +1208,26 @@
     tr.historico-gone td { opacity: 0.85; }
     tr.historico-gone td:first-child { border-left: 3px solid var(--danger); }
 
+    .historico-scroll {
+      overflow: auto;
+      max-height: min(70vh, 720px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .historico-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 0;
+    }
+    .historico-table thead th {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      background: #0c1a2e;
+      box-shadow: 0 1px 0 var(--border);
+    }
+
     .pred-tables-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -1596,8 +1616,8 @@
           <input type="checkbox" id="historicoOnlyGone" /> Solo desaparecidos
         </label>
       </div>
-      <div style="overflow-x:auto;">
-        <table>
+      <div class="historico-scroll">
+        <table class="historico-table">
           <thead>
             <tr>
               <th>#</th>
@@ -1611,6 +1631,8 @@
               <th>GC</th>
               <th>DG</th>
               <th>Pts</th>
+              <th>% Vic.</th>
+              <th>GF/PJ</th>
               <th>Nota</th>
             </tr>
           </thead>
@@ -3432,7 +3454,10 @@
         );
       }
 
-      body.innerHTML = rows.map((t, i) => `
+      body.innerHTML = rows.map((t, i) => {
+        const winPct = t.pj > 0 ? ((t.g / t.pj) * 100).toFixed(1) + '%' : '—';
+        const gfAvg = t.pj > 0 ? (t.gf / t.pj).toFixed(2) : '—';
+        return `
         <tr class="${t.note ? 'historico-gone' : ''}">
           <td class="rank">${i + 1}</td>
           <td><strong>${t.name}</strong></td>
@@ -3445,9 +3470,11 @@
           <td>${t.gc}</td>
           <td>${t.dg > 0 ? '+' : ''}${t.dg}</td>
           <td class="pts-col">${t.pts}</td>
+          <td>${winPct}</td>
+          <td>${gfAvg}</td>
           <td style="font-size:0.78rem;color:var(--danger);font-weight:600;">${t.note || ''}</td>
-        </tr>
-      `).join('') || '<tr><td colspan="12" style="text-align:center;color:var(--muted);">Sin resultados</td></tr>';
+        </tr>`;
+      }).join('') || '<tr><td colspan="14" style="text-align:center;color:var(--muted);">Sin resultados</td></tr>';
     }
 
     function renderClubes(filter = '') {
