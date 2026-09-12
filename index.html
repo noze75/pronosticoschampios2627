@@ -1749,7 +1749,7 @@
     <!-- MAPA -->
     <div id="mapa" class="panel">
       <div class="rules" style="margin-bottom:0.75rem;">
-        <strong>Mapa de la Fase de Liga</strong> — Filtros, tamaño por puntos, anillo de forma, rutas por jornada y comparación con predicciones.
+        <strong>Mapa de la Fase de Liga</strong> — Pines según la tabla real. Filtra por zona: 1–8, playoffs o eliminados.
       </div>
       <div class="map-controls" id="mapControls">
         <div class="map-ctrl-row">
@@ -1758,34 +1758,6 @@
           <button type="button" class="map-chip" data-map-zone="top">1–8</button>
           <button type="button" class="map-chip" data-map-zone="playoff">9–24</button>
           <button type="button" class="map-chip" data-map-zone="out">25–36</button>
-        </div>
-        <div class="map-ctrl-row">
-          <span class="map-ctrl-label">Colorear</span>
-          <select id="mapColorSource">
-            <option value="real">Tabla real</option>
-            <option value="baez">Como Báez</option>
-            <option value="juan">Como Juan</option>
-            <option value="marrugo">Como Marrugo</option>
-            <option value="mauricio">Como Mauricio</option>
-          </select>
-          <label class="map-check"><input type="checkbox" id="mapSizeByPts" checked /> Tamaño = pts</label>
-          <label class="map-check"><input type="checkbox" id="mapFormRing" checked /> Anillo forma</label>
-        </div>
-        <div class="map-ctrl-row">
-          <span class="map-ctrl-label">Rutas</span>
-          <select id="mapJornadaRoutes">
-            <option value="">— Sin rutas —</option>
-            <option value="1">Jornada 1</option>
-            <option value="2">Jornada 2</option>
-            <option value="3">Jornada 3</option>
-            <option value="4">Jornada 4</option>
-            <option value="5">Jornada 5</option>
-            <option value="6">Jornada 6</option>
-            <option value="7">Jornada 7</option>
-            <option value="8">Jornada 8</option>
-          </select>
-          <label class="map-check"><input type="checkbox" id="mapTodayLinks" /> Partidos de hoy</label>
-          <label class="map-check"><input type="checkbox" id="mapCountryHeat" /> Heat países</label>
         </div>
       </div>
       <div id="mapContainer">
@@ -3135,8 +3107,8 @@
     const mapUi = {
       zone: 'all', // all | top | playoff | out
       colorSource: 'real',
-      sizeByPts: true,
-      formRing: true,
+      sizeByPts: false,
+      formRing: false,
       jornadaRoutes: '',
       todayLinks: false,
       countryHeat: false
@@ -3392,12 +3364,6 @@
     }
 
     function refreshMapFromUi() {
-      mapUi.colorSource = document.getElementById('mapColorSource')?.value || 'real';
-      mapUi.sizeByPts = !!document.getElementById('mapSizeByPts')?.checked;
-      mapUi.formRing = !!document.getElementById('mapFormRing')?.checked;
-      mapUi.jornadaRoutes = document.getElementById('mapJornadaRoutes')?.value || '';
-      mapUi.todayLinks = !!document.getElementById('mapTodayLinks')?.checked;
-      mapUi.countryHeat = !!document.getElementById('mapCountryHeat')?.checked;
       updateMapMarkers(null);
     }
 
@@ -3421,13 +3387,7 @@
           updateMapMarkers(null);
         });
       });
-      ['mapColorSource', 'mapSizeByPts', 'mapFormRing', 'mapJornadaRoutes', 'mapTodayLinks', 'mapCountryHeat']
-        .forEach(id => {
-          const el = document.getElementById(id);
-          if (!el) return;
-          el.addEventListener('change', refreshMapFromUi);
-        });
-    }
+      }
 
     function renderStats() {
       renderLeagueTable();
