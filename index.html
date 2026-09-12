@@ -1390,6 +1390,59 @@
     }
     .leaflet-control-attribution { background: rgba(10,22,40,0.7) !important; color: #9bb0cc !important; }
     .leaflet-control-attribution a { color: #9bb0cc !important; }
+
+    .map-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      margin-bottom: 0.75rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.65rem 0.8rem;
+    }
+    .map-ctrl-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.4rem 0.55rem;
+    }
+    .map-ctrl-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      min-width: 4.2rem;
+    }
+    .map-chip {
+      padding: 0.28rem 0.65rem !important;
+      font-size: 0.78rem !important;
+      border-radius: 999px !important;
+      background: #0d1a2a !important;
+      color: var(--muted) !important;
+      border: 1px solid var(--border) !important;
+    }
+    .map-chip.active {
+      background: rgba(0,230,118,0.18) !important;
+      color: var(--accent) !important;
+      border-color: rgba(0,230,118,0.45) !important;
+    }
+    .map-check {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .map-check input { accent-color: var(--accent); }
+    .map-leg-item { cursor: pointer; padding: 0.15rem 0.25rem; border-radius: 6px; }
+    .map-leg-item:hover, .map-leg-item.active {
+      background: rgba(0,230,118,0.12);
+    }
+
     @media (max-width: 900px) {
       .header-controls {
         width: 100%;
@@ -1695,16 +1748,52 @@
 
     <!-- MAPA -->
     <div id="mapa" class="panel">
-      <div class="rules" style="margin-bottom:1rem;">
-        <strong>Mapa de la Fase de Liga</strong> — Los pines se colorean según la clasificación actual con los resultados reales cargados.
-        🟢 1-8 octavos · 🟡 9-24 playoffs · 🔴 25-36 eliminados. Haz clic en un pin para ver detalles.
+      <div class="rules" style="margin-bottom:0.75rem;">
+        <strong>Mapa de la Fase de Liga</strong> — Filtros, tamaño por puntos, anillo de forma, rutas por jornada y comparación con predicciones.
+      </div>
+      <div class="map-controls" id="mapControls">
+        <div class="map-ctrl-row">
+          <span class="map-ctrl-label">Zona</span>
+          <button type="button" class="map-chip active" data-map-zone="all">Todos</button>
+          <button type="button" class="map-chip" data-map-zone="top">1–8</button>
+          <button type="button" class="map-chip" data-map-zone="playoff">9–24</button>
+          <button type="button" class="map-chip" data-map-zone="out">25–36</button>
+        </div>
+        <div class="map-ctrl-row">
+          <span class="map-ctrl-label">Colorear</span>
+          <select id="mapColorSource">
+            <option value="real">Tabla real</option>
+            <option value="baez">Como Báez</option>
+            <option value="juan">Como Juan</option>
+            <option value="marrugo">Como Marrugo</option>
+            <option value="mauricio">Como Mauricio</option>
+          </select>
+          <label class="map-check"><input type="checkbox" id="mapSizeByPts" checked /> Tamaño = pts</label>
+          <label class="map-check"><input type="checkbox" id="mapFormRing" checked /> Anillo forma</label>
+        </div>
+        <div class="map-ctrl-row">
+          <span class="map-ctrl-label">Rutas</span>
+          <select id="mapJornadaRoutes">
+            <option value="">— Sin rutas —</option>
+            <option value="1">Jornada 1</option>
+            <option value="2">Jornada 2</option>
+            <option value="3">Jornada 3</option>
+            <option value="4">Jornada 4</option>
+            <option value="5">Jornada 5</option>
+            <option value="6">Jornada 6</option>
+            <option value="7">Jornada 7</option>
+            <option value="8">Jornada 8</option>
+          </select>
+          <label class="map-check"><input type="checkbox" id="mapTodayLinks" /> Partidos de hoy</label>
+          <label class="map-check"><input type="checkbox" id="mapCountryHeat" /> Heat países</label>
+        </div>
       </div>
       <div id="mapContainer">
         <div id="map" style="height:100%;width:100%;"></div>
-        <div class="map-legend">
-          <div><span class="dot top"></span> 1–8 · Octavos</div>
-          <div><span class="dot playoff"></span> 9–24 · Playoffs</div>
-          <div><span class="dot out"></span> 25–36 · Eliminados</div>
+        <div class="map-legend" id="mapLegend">
+          <div class="map-leg-item" data-map-zone="top"><span class="dot top"></span> 1–8 · Octavos</div>
+          <div class="map-leg-item" data-map-zone="playoff"><span class="dot playoff"></span> 9–24 · Playoffs</div>
+          <div class="map-leg-item" data-map-zone="out"><span class="dot out"></span> 25–36 · Eliminados</div>
         </div>
       </div>
     </div>
@@ -2996,10 +3085,11 @@
     }
 
     function initMap() {
+      wireMapControls();
       if (leagueMap) {
         setTimeout(() => {
           leagueMap.invalidateSize();
-          updateMapMarkers(getLeagueStandings());
+          refreshMapFromUi();
         }, 80);
         return;
       }
@@ -3021,9 +3111,11 @@
       }).addTo(leagueMap);
 
       mapMarkersLayer = L.layerGroup().addTo(leagueMap);
+      mapRoutesLayer = L.layerGroup().addTo(leagueMap);
+      mapHeatLayer = L.layerGroup().addTo(leagueMap);
       setTimeout(() => {
         leagueMap.invalidateSize();
-        updateMapMarkers(getLeagueStandings());
+        refreshMapFromUi();
       }, 120);
     }
 
@@ -3038,23 +3130,102 @@
     };
 
     let lastMapStandings = null;
+    let mapRoutesLayer = null;
+    let mapHeatLayer = null;
+    const mapUi = {
+      zone: 'all', // all | top | playoff | out
+      colorSource: 'real',
+      sizeByPts: true,
+      formRing: true,
+      jornadaRoutes: '',
+      todayLinks: false,
+      countryHeat: false
+    };
+
+    function zoneOf(pos) {
+      if (pos <= 8) return 'top';
+      if (pos <= 24) return 'playoff';
+      return 'out';
+    }
+    function zoneColor(zone) {
+      if (zone === 'top') return '#00e676';
+      if (zone === 'playoff') return '#ffd54f';
+      return '#ef5350';
+    }
+
+    function getStandingsForMap() {
+      const src = mapUi.colorSource;
+      if (src === 'real') return getLeagueStandings();
+      const predMap = {};
+      MATCHES.forEach(m => {
+        const pred = (data.predictions[m.id] || {})[src];
+        if (pred && pred.h != null && pred.a != null) {
+          predMap[m.id] = { h: pred.h, a: pred.a };
+        }
+      });
+      return getStandingsFromResultsMap(predMap);
+    }
+
+    function getTeamFormLetters(teamName) {
+      const last = getTeamLast5(teamName);
+      return last.map(x => x.res); // W E D
+    }
+    function formRingColor(letters) {
+      if (!letters.length) return 'rgba(255,255,255,0.5)';
+      const w = letters.filter(x => x === 'W').length;
+      const d = letters.filter(x => x === 'D').length;
+      if (w >= 3) return '#00e676';
+      if (d >= 3 || w === 0) return '#ef5350';
+      return '#ffd54f';
+    }
+
+    function nextOpponent(teamName) {
+      const sorted = [...MATCHES].sort((a, b) => a.jornada - b.jornada || a.id - b.id);
+      for (const m of sorted) {
+        if (m.local !== teamName && m.visitante !== teamName) continue;
+        const real = data.results[m.id];
+        if (real && real.h != null && real.a != null) continue;
+        const opp = m.local === teamName ? m.visitante : m.local;
+        return `J${m.jornada} vs ${opp}`;
+      }
+      return '—';
+    }
+
+    function isMatchToday(m) {
+      const pd = parseMatchDate(m.fecha);
+      if (!pd) return false;
+      const now = new Date();
+      return pd.y === now.getFullYear() && pd.m === (now.getMonth() + 1) && pd.d === now.getDate();
+    }
 
     function updateMapMarkers(standings) {
       if (!leagueMap || !mapMarkersLayer) return;
-      if (standings) lastMapStandings = standings;
-      if (!lastMapStandings) return;
+      const table = standings || getStandingsForMap();
+      lastMapStandings = table;
 
       mapMarkersLayer.clearLayers();
+      if (mapRoutesLayer) { mapRoutesLayer.clearLayers(); }
+      else { mapRoutesLayer = L.layerGroup().addTo(leagueMap); }
+      if (mapHeatLayer) { mapHeatLayer.clearLayers(); }
+      else { mapHeatLayer = L.layerGroup().addTo(leagueMap); }
+
       const size = leagueMap.getSize();
       const mapReady = size && size.x > 50 && size.y > 50;
 
-      const items = lastMapStandings.map((t, i) => {
+      let items = table.map((t, i) => {
         const c = CITY_CENTER[t.name] || TEAM_COORDS[t.name];
         if (!c) return null;
-        return { t, pos: i + 1, base: L.latLng(c[0], c[1]) };
+        const pos = i + 1;
+        const z = zoneOf(pos);
+        return { t, pos, zone: z, base: L.latLng(c[0], c[1]) };
       }).filter(Boolean);
 
-      // Cluster by distance (< 40 km)
+      // Zone filter
+      if (mapUi.zone !== 'all') {
+        items = items.filter(it => it.zone === mapUi.zone);
+      }
+
+      // Cluster same city
       const clusters = [];
       const used = new Set();
       items.forEach((item, i) => {
@@ -3063,7 +3234,6 @@
         used.add(i);
         items.forEach((other, j) => {
           if (used.has(j)) return;
-          // Solo misma ciudad (~12 km). Lille–Lens (~35 km) no se agrupan.
           if (item.base.distanceTo(other.base) < 12000) {
             group.push(other);
             used.add(j);
@@ -3072,16 +3242,10 @@
         clusters.push(group);
       });
 
-      // 10px dots → centers 11px apart = tangents just touch
       const gapPx = 11;
-
       clusters.forEach(group => {
         const n = group.length;
-        if (n === 1) {
-          group[0].coords = group[0].base;
-          return;
-        }
-
+        if (n === 1) { group[0].coords = group[0].base; return; }
         if (mapReady) {
           let sx = 0, sy = 0;
           group.forEach(g => {
@@ -3111,43 +3275,158 @@
         }
       });
 
+      const maxPts = Math.max(1, ...items.map(it => it.t.pts || 0));
+      const coordByName = {};
+
       items.forEach(item => {
-        const { t, pos, coords } = item;
-        let color = '#ef5350';
-        if (pos <= 8) color = '#00e676';
-        else if (pos <= 24) color = '#ffd54f';
+        const { t, pos, zone, coords } = item;
+        coordByName[t.name] = coords;
+        const color = zoneColor(zone);
+        const letters = getTeamFormLetters(t.name);
+        const ring = mapUi.formRing ? formRingColor(letters) : 'rgba(255,255,255,0.85)';
+        let pin = 10;
+        if (mapUi.sizeByPts) {
+          pin = 8 + Math.round((t.pts / maxPts) * 12); // 8–20
+        }
+        const formStr = letters.length
+          ? letters.map(x => x === 'W' ? 'V' : x === 'E' ? 'E' : 'D').join('')
+          : '—';
+        const next = nextOpponent(t.name);
+        const dgStr = t.dg > 0 ? '+' + t.dg : t.dg;
 
         const icon = L.divIcon({
           className: '',
           html: `<div style="
-            width:10px;height:10px;border-radius:50%;
+            width:${pin}px;height:${pin}px;border-radius:50%;
             background:${color};
-            border:1.5px solid rgba(255,255,255,0.95);
-            box-shadow:0 0 7px ${color}, 0 0 2px rgba(0,0,0,0.45);
+            border:2.5px solid ${ring};
+            box-shadow:0 0 8px ${color}, 0 0 2px rgba(0,0,0,0.5);
           "></div>`,
-          iconSize: [10, 10],
-          iconAnchor: [5, 5]
+          iconSize: [pin, pin],
+          iconAnchor: [pin / 2, pin / 2]
         });
 
         const marker = L.marker(coords, { icon });
-        const dgStr = t.dg > 0 ? '+' + t.dg : t.dg;
         marker.bindPopup(`
-          <div style="min-width:150px">
+          <div style="min-width:180px">
             <strong style="font-size:1.05rem">${t.name}</strong><br>
             <span style="color:${color};font-weight:800">#${pos}</span>
-            &nbsp;·&nbsp; <b>${t.pts} pts</b><br>
+            &nbsp;·&nbsp; <b>${t.pts} pts</b>
+            <span style="color:#9bb0cc;font-size:0.8rem">(${mapUi.colorSource === 'real' ? 'tabla real' : 'pred. ' + (PLAYER_NAMES[mapUi.colorSource] || '')})</span><br>
             <span style="color:#9bb0cc;font-size:0.85rem">
-              PJ ${t.pj} · GF ${t.gf} · GC ${t.gc} · DG ${dgStr}
+              PJ ${t.pj} · G ${t.g} E ${t.e} P ${t.p}<br>
+              GF ${t.gf} · GC ${t.gc} · DG ${dgStr}<br>
+              Forma: <b style="color:${ring}">${formStr}</b><br>
+              Próximo: ${next}
             </span>
           </div>
         `);
         mapMarkersLayer.addLayer(marker);
       });
 
+      // Jornada routes
+      const jRoute = parseInt(mapUi.jornadaRoutes, 10);
+      if (jRoute) {
+        MATCHES.filter(m => m.jornada === jRoute).forEach(m => {
+          const a = CITY_CENTER[m.local] || TEAM_COORDS[m.local];
+          const b = CITY_CENTER[m.visitante] || TEAM_COORDS[m.visitante];
+          if (!a || !b) return;
+          const real = data.results[m.id];
+          const done = real && real.h != null && real.a != null;
+          L.polyline([a, b], {
+            color: done ? '#00e676' : '#42a5f5',
+            weight: 2,
+            opacity: 0.75,
+            dashArray: done ? null : '6 6'
+          }).bindPopup(`${m.local} vs ${m.visitante}${done ? ` (${real.h}-${real.a})` : ''}`)
+            .addTo(mapRoutesLayer);
+        });
+      }
+
+      // Today links
+      if (mapUi.todayLinks) {
+        MATCHES.filter(isMatchToday).forEach(m => {
+          const a = CITY_CENTER[m.local] || TEAM_COORDS[m.local];
+          const b = CITY_CENTER[m.visitante] || TEAM_COORDS[m.visitante];
+          if (!a || !b) return;
+          L.polyline([a, b], {
+            color: '#ffd54f',
+            weight: 3,
+            opacity: 0.9
+          }).bindPopup(`Hoy: ${m.local} vs ${m.visitante}`).addTo(mapRoutesLayer);
+        });
+      }
+
+      // Country heat (simple circles at country centroid of its clubs)
+      if (mapUi.countryHeat) {
+        const byCountry = {};
+        table.forEach(t => {
+          const info = TEAM_INFO[t.name];
+          const country = info?.country || '—';
+          const c = TEAM_COORDS[t.name];
+          if (!c) return;
+          if (!byCountry[country]) byCountry[country] = { pts: 0, lat: 0, lng: 0, n: 0 };
+          byCountry[country].pts += t.pts;
+          byCountry[country].lat += c[0];
+          byCountry[country].lng += c[1];
+          byCountry[country].n++;
+        });
+        const maxC = Math.max(1, ...Object.values(byCountry).map(x => x.pts));
+        Object.entries(byCountry).forEach(([country, v]) => {
+          if (!v.n) return;
+          const intensity = v.pts / maxC;
+          const radius = 18000 + intensity * 90000;
+          L.circle([v.lat / v.n, v.lng / v.n], {
+            radius,
+            color: 'transparent',
+            fillColor: '#00e676',
+            fillOpacity: 0.12 + intensity * 0.28
+          }).bindPopup(`<b>${country}</b><br>${v.pts} pts (clubes en fase)`).addTo(mapHeatLayer);
+        });
+      }
+
       if (!leagueMap._pinZoomBound) {
         leagueMap._pinZoomBound = true;
         leagueMap.on('zoomend', () => updateMapMarkers(null));
       }
+    }
+
+    function refreshMapFromUi() {
+      mapUi.colorSource = document.getElementById('mapColorSource')?.value || 'real';
+      mapUi.sizeByPts = !!document.getElementById('mapSizeByPts')?.checked;
+      mapUi.formRing = !!document.getElementById('mapFormRing')?.checked;
+      mapUi.jornadaRoutes = document.getElementById('mapJornadaRoutes')?.value || '';
+      mapUi.todayLinks = !!document.getElementById('mapTodayLinks')?.checked;
+      mapUi.countryHeat = !!document.getElementById('mapCountryHeat')?.checked;
+      updateMapMarkers(null);
+    }
+
+    function wireMapControls() {
+      if (wireMapControls._done) return;
+      wireMapControls._done = true;
+      document.querySelectorAll('[data-map-zone]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const z = btn.getAttribute('data-map-zone');
+          mapUi.zone = z === mapUi.zone && btn.classList.contains('map-chip') ? 'all' : z;
+          // chips
+          document.querySelectorAll('.map-chip[data-map-zone]').forEach(b => {
+            b.classList.toggle('active', b.getAttribute('data-map-zone') === mapUi.zone);
+          });
+          if (mapUi.zone === 'all') {
+            document.querySelector('.map-chip[data-map-zone="all"]')?.classList.add('active');
+          }
+          document.querySelectorAll('.map-leg-item').forEach(b => {
+            b.classList.toggle('active', b.getAttribute('data-map-zone') === mapUi.zone);
+          });
+          updateMapMarkers(null);
+        });
+      });
+      ['mapColorSource', 'mapSizeByPts', 'mapFormRing', 'mapJornadaRoutes', 'mapTodayLinks', 'mapCountryHeat']
+        .forEach(id => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.addEventListener('change', refreshMapFromUi);
+        });
     }
 
     function renderStats() {
