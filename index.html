@@ -44,16 +44,27 @@
     header {
       background: linear-gradient(180deg, #0d2137 0%, #0a1628 100%);
       border-bottom: 2px solid var(--accent);
-      padding: 0.9rem 1.4rem;
+      padding: 0.75rem 1.4rem 0.65rem;
       position: sticky;
       top: 0;
       z-index: 100;
       display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+    }
+    .header-top {
+      display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 0.9rem;
       justify-content: space-between;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+      gap: 0.7rem;
+    }
+    .header-top-right {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.55rem;
     }
     header h1 {
       font-size: 1.2rem;
@@ -70,41 +81,53 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    .header-controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.7rem;
-      align-items: center;
-    }
     .header-actions {
       display: flex;
       gap: 0.45rem;
       align-items: center;
-      margin-left: auto;
     }
     .header-actions button {
       padding: 0.42rem 0.75rem;
       font-size: 0.85rem;
       white-space: nowrap;
     }
+    header #mainNav {
+      width: 100%;
+      max-width: 100%;
+    }
     .identity-picker {
+      position: relative;
+      flex-shrink: 0;
+    }
+    .identity-trigger {
       display: flex;
       align-items: center;
       gap: 0.55rem;
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 0.28rem 0.55rem 0.28rem 0.35rem;
-      transition: border-color 0.15s, box-shadow 0.15s;
+      padding: 0.28rem 0.6rem 0.28rem 0.35rem;
+      cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+      color: var(--text);
+      font-weight: 700;
+      min-width: 11.5rem;
     }
-    .identity-picker.active {
+    .identity-trigger:hover {
+      background: var(--card-hover);
+      border-color: #2a4a75;
+    }
+    .identity-picker.open .identity-trigger {
       border-color: rgba(0,230,118,0.45);
       box-shadow: 0 0 0 3px rgba(0,230,118,0.12);
     }
-    .identity-picker.baez { border-color: rgba(255,152,0,0.5); box-shadow: 0 0 0 3px rgba(255,152,0,0.12); }
-    .identity-picker.juan { border-color: rgba(206,147,216,0.5); box-shadow: 0 0 0 3px rgba(206,147,216,0.12); }
-    .identity-picker.marrugo { border-color: rgba(77,208,225,0.5); box-shadow: 0 0 0 3px rgba(77,208,225,0.12); }
-    .identity-picker.mauricio { border-color: rgba(244,143,177,0.5); box-shadow: 0 0 0 3px rgba(244,143,177,0.12); }
+    .identity-picker.active .identity-trigger {
+      border-color: rgba(0,230,118,0.4);
+    }
+    .identity-picker.baez .identity-trigger { border-color: rgba(255,152,0,0.55); box-shadow: 0 0 0 3px rgba(255,152,0,0.1); }
+    .identity-picker.juan .identity-trigger { border-color: rgba(206,147,216,0.55); box-shadow: 0 0 0 3px rgba(206,147,216,0.1); }
+    .identity-picker.marrugo .identity-trigger { border-color: rgba(77,208,225,0.55); box-shadow: 0 0 0 3px rgba(77,208,225,0.1); }
+    .identity-picker.mauricio .identity-trigger { border-color: rgba(244,143,177,0.55); box-shadow: 0 0 0 3px rgba(244,143,177,0.1); }
     .identity-avatar {
       width: 36px;
       height: 36px;
@@ -117,9 +140,7 @@
       justify-content: center;
       flex-shrink: 0;
     }
-    .identity-picker.active .identity-avatar {
-      border-color: var(--accent);
-    }
+    .identity-picker.active .identity-avatar { border-color: var(--accent); }
     .identity-picker.baez .identity-avatar { border-color: var(--baez); }
     .identity-picker.juan .identity-avatar { border-color: var(--juan); }
     .identity-picker.marrugo .identity-avatar { border-color: var(--marrugo); }
@@ -130,37 +151,98 @@
       object-fit: cover;
       display: block;
     }
-    .identity-fallback {
-      font-size: 1.15rem;
-      line-height: 1;
-    }
+    .identity-fallback { font-size: 1.15rem; line-height: 1; }
     .identity-meta {
       display: flex;
       flex-direction: column;
-      gap: 0.05rem;
+      gap: 0.08rem;
       min-width: 0;
+      flex: 1;
+      text-align: left;
     }
-    .identity-meta label {
-      font-size: 0.65rem;
+    .identity-label {
+      font-size: 0.62rem;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.06em;
       color: var(--muted);
       line-height: 1;
     }
-    .identity-meta select {
-      padding: 0.15rem 0.35rem;
-      font-size: 0.9rem;
+    .identity-name {
+      font-size: 0.92rem;
       font-weight: 800;
-      border: none;
-      background: transparent;
       color: var(--text);
-      cursor: pointer;
-      min-width: 9.5rem;
+      line-height: 1.15;
+      white-space: nowrap;
     }
-    .identity-meta select:focus {
-      outline: none;
-      box-shadow: none;
+    .identity-name.placeholder { color: var(--muted); font-weight: 700; }
+    .identity-name.baez { color: var(--baez); }
+    .identity-name.juan { color: var(--juan); }
+    .identity-name.marrugo { color: var(--marrugo); }
+    .identity-name.mauricio { color: var(--mauricio); }
+    .identity-caret {
+      color: var(--muted);
+      font-size: 0.75rem;
+      margin-left: 0.15rem;
+      transition: transform 0.15s;
+    }
+    .identity-picker.open .identity-caret { transform: rotate(180deg); }
+    .identity-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      min-width: 100%;
+      width: max-content;
+      background: #0f2138;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.35rem;
+      z-index: 200;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.45);
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+    .identity-menu[hidden] { display: none !important; }
+    .identity-option {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: none;
+      border-radius: 9px;
+      padding: 0.45rem 0.6rem;
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    .identity-option:hover {
+      background: rgba(0,230,118,0.1);
+    }
+    .identity-option[aria-selected="true"] {
+      background: rgba(0,230,118,0.16);
+    }
+    .identity-option-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: #0d1a2a;
+      border: 1.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+    .identity-option-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
     .pred-box.locked-edit {
       opacity: 0.55;
@@ -1602,15 +1684,17 @@
     }
 
     @media (max-width: 900px) {
-      .header-controls {
-        width: 100%;
+      .header-top {
         flex-direction: column;
         align-items: stretch;
         gap: 0.55rem;
       }
+      .header-top-right {
+        width: 100%;
+        justify-content: space-between;
+      }
       .header-actions {
-        margin-left: 0;
-        justify-content: flex-end;
+        margin-left: auto;
       }
       #mainNav {
         width: 100%;
@@ -1638,16 +1722,44 @@
 </head>
 <body>
   <header>
-    <h1><span class="ball">⚽</span> <span class="brand">Champions 26/27</span> · Pronósticos</h1>
-    <div class="header-controls">
-      <span id="syncStatus" style="font-size:0.8rem;font-weight:600;color:var(--muted);">◌ Cargando…</span>
-      <div class="identity-picker" id="identityPicker">
-        <div class="identity-avatar" id="identityAvatar">
-          <span class="identity-fallback">👤</span>
-        </div>
-        <div class="identity-meta">
-          <label for="currentUser">Soy</label>
-          <select id="currentUser">
+    <div class="header-top">
+      <h1><span class="ball">⚽</span> <span class="brand">Champions 26/27</span> · Pronósticos</h1>
+      <div class="header-top-right">
+        <span id="syncStatus" style="font-size:0.8rem;font-weight:600;color:var(--muted);">◌ Cargando…</span>
+        <div class="identity-picker" id="identityPicker">
+          <button type="button" class="identity-trigger" id="identityTrigger" aria-haspopup="listbox" aria-expanded="false">
+            <div class="identity-avatar" id="identityAvatar">
+              <span class="identity-fallback">👤</span>
+            </div>
+            <div class="identity-meta">
+              <span class="identity-label">Soy</span>
+              <span class="identity-name" id="identityName">Elige quién eres</span>
+            </div>
+            <span class="identity-caret">▾</span>
+          </button>
+          <div class="identity-menu" id="identityMenu" role="listbox" hidden>
+            <button type="button" class="identity-option" data-value="" role="option">
+              <span class="identity-option-avatar">👤</span>
+              <span>Ver todos (solo lectura)</span>
+            </button>
+            <button type="button" class="identity-option" data-value="baez" role="option">
+              <span class="identity-option-avatar" data-player="baez"></span>
+              <span>Báez</span>
+            </button>
+            <button type="button" class="identity-option" data-value="juan" role="option">
+              <span class="identity-option-avatar" data-player="juan"></span>
+              <span>Juan</span>
+            </button>
+            <button type="button" class="identity-option" data-value="marrugo" role="option">
+              <span class="identity-option-avatar" data-player="marrugo"></span>
+              <span>Marrugo</span>
+            </button>
+            <button type="button" class="identity-option" data-value="mauricio" role="option">
+              <span class="identity-option-avatar" data-player="mauricio"></span>
+              <span>Mauricio</span>
+            </button>
+          </div>
+          <select id="currentUser" hidden aria-hidden="true">
             <option value="">— Elige quién eres —</option>
             <option value="baez">Báez</option>
             <option value="juan">Juan</option>
@@ -1655,25 +1767,25 @@
             <option value="mauricio">Mauricio</option>
           </select>
         </div>
-      </div>
-      <nav id="mainNav">
-        <button data-panel="partidos" class="active">Partidos</button>
-        <button data-panel="clasificacion">Ranking amigos</button>
-        <button data-panel="tabla">Tabla equipos</button>
-        <button data-panel="tablas-preds">Tablas preds</button>
-        <button data-panel="estadisticas">Estadísticas</button>
-        <button data-panel="clubes">Clubes</button>
-        <button data-panel="calendario">Calendario</button>
-        <button data-panel="historico">Histórico</button>
-        <button data-panel="rondas">Rondas finales</button>
-        <button data-panel="mapa">Mapa</button>
-        <button data-panel="reglas">Reglas</button>
-      </nav>
-      <div class="header-actions">
-        <button class="primary" onclick="saveData(true); pushToRemote(true);">💾 Guardar</button>
-        <button id="adminUnlockBtn" onclick="toggleAdminUnlock()">🔐 Admin</button>
+        <div class="header-actions">
+          <button class="primary" onclick="saveData(true); pushToRemote(true);">💾 Guardar</button>
+          <button id="adminUnlockBtn" onclick="toggleAdminUnlock()">🔐 Admin</button>
+        </div>
       </div>
     </div>
+    <nav id="mainNav">
+      <button data-panel="partidos" class="active">Partidos</button>
+      <button data-panel="clasificacion">Ranking amigos</button>
+      <button data-panel="tabla">Tabla equipos</button>
+      <button data-panel="tablas-preds">Tablas preds</button>
+      <button data-panel="estadisticas">Estadísticas</button>
+      <button data-panel="clubes">Clubes</button>
+      <button data-panel="calendario">Calendario</button>
+      <button data-panel="historico">Histórico</button>
+      <button data-panel="rondas">Rondas finales</button>
+      <button data-panel="mapa">Mapa</button>
+      <button data-panel="reglas">Reglas</button>
+    </nav>
   </header>
 
   <main>
@@ -1697,13 +1809,6 @@
         <label>
           <input type="checkbox" id="onlyPending" /> Solo pendientes de resultado
         </label>
-      </div>
-      <div class="toolbar toolbar-secondary">
-        <button class="secondary" onclick="refreshFromCloud()" title="Descarga cambios de los demás ya (también se actualiza solo cada 45 s)">🔄 Actualizar nube</button>
-        <button onclick="exportData()" title="Copia de seguridad">📤 Exportar</button>
-        <button onclick="document.getElementById('importFile').click()" title="Restaurar desde archivo">📥 Importar</button>
-        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)" />
-        <button onclick="resetAll()" title="Borrar todo (pide contraseña)">🗑️ Reset</button>
       </div>
       <div id="matchesContainer"></div>
     </div>
@@ -1962,9 +2067,8 @@
         <ul>
           <li>Selecciona <strong>Soy</strong> con tu nombre (arriba). Sin elegir a nadie, todos los pronósticos están bloqueados; solo se activan los tuyos.</li>
           <li>Los resultados reales se actualizan automáticamente (solo el admin puede editarlos).</li>
-          <li>Los datos se guardan solos en la nube. Arriba a la derecha tienes <strong>Guardar</strong> por si quieres forzar el envío.</li>
-          <li><strong>Actualizar nube</strong> (en Partidos) fuerza la descarga de cambios de los demás. También se revisa solo cada 45 s.</li>
-          <li>Exportar / Importar JSON siguen como respaldo manual.</li>
+          <li>Los datos se guardan solos en la nube. Arriba tienes <strong>Guardar</strong> por si quieres forzar el envío.</li>
+          <li>Cada 45 segundos se revisan cambios nuevos de los demás automáticamente.</li>
         </ul>
       </div>
     </div>
@@ -2599,32 +2703,111 @@
     });
 
     function currentUser() {
-      return document.getElementById('currentUser').value;
+      const el = document.getElementById('currentUser');
+      return el ? el.value : '';
+    }
+
+    function setCurrentUser(value) {
+      const sel = document.getElementById('currentUser');
+      if (sel) sel.value = value || '';
+      updateIdentityUI();
+      closeIdentityMenu();
+      renderMatches();
+    }
+
+    function avatarHtml(playerId, sizeClass) {
+      if (!playerId) return '<span class="identity-fallback">👤</span>';
+      const candidates = photoCandidates(playerId);
+      const fallback = PHOTO_FALLBACK[playerId] || '👤';
+      if (!candidates.length) return `<span class="identity-fallback">${fallback}</span>`;
+      const candidatesJson = JSON.stringify(candidates).replace(/"/g, '&quot;');
+      return `<img src="${candidates[0]}" alt="${PLAYER_NAMES[playerId] || playerId}" data-try="0" data-candidates="${candidatesJson}"
+        onerror="(function(img){var list=[];try{list=JSON.parse(img.getAttribute('data-candidates')||'[]')}catch(e){} var i=parseInt(img.getAttribute('data-try')||'0',10)+1; if(i&lt;list.length){img.setAttribute('data-try',String(i)); img.src=list[i];} else {img.style.display='none'; var fb=document.createElement('span'); fb.className='identity-fallback'; fb.textContent='${fallback}'; img.parentNode.appendChild(fb);}})(this);" />`;
     }
 
     function updateIdentityUI() {
       const user = currentUser();
       const picker = document.getElementById('identityPicker');
       const avatar = document.getElementById('identityAvatar');
+      const nameEl = document.getElementById('identityName');
       if (!picker || !avatar) return;
 
-      picker.className = 'identity-picker' + (user ? ` active ${user}` : '');
+      const open = picker.classList.contains('open');
+      picker.className = 'identity-picker' + (user ? ` active ${user}` : '') + (open ? ' open' : '');
 
-      if (!user) {
-        avatar.innerHTML = '<span class="identity-fallback">👤</span>';
-        return;
+      avatar.innerHTML = avatarHtml(user);
+      if (nameEl) {
+        if (user) {
+          nameEl.textContent = PLAYER_NAMES[user] || user;
+          nameEl.className = 'identity-name ' + user;
+        } else {
+          nameEl.textContent = 'Elige quién eres';
+          nameEl.className = 'identity-name placeholder';
+        }
       }
 
-      const candidates = photoCandidates(user);
-      const fallback = PHOTO_FALLBACK[user] || '👤';
-      if (!candidates.length) {
-        avatar.innerHTML = `<span class="identity-fallback">${fallback}</span>`;
-        return;
-      }
+      // Mark selected option
+      document.querySelectorAll('.identity-option').forEach(opt => {
+        const v = opt.getAttribute('data-value') || '';
+        opt.setAttribute('aria-selected', v === (user || '') ? 'true' : 'false');
+      });
+    }
 
-      const candidatesJson = JSON.stringify(candidates).replace(/"/g, '&quot;');
-      avatar.innerHTML = `<img src="${candidates[0]}" alt="${PLAYER_NAMES[user] || user}" data-try="0" data-candidates="${candidatesJson}"
-        onerror="(function(img){var list=[];try{list=JSON.parse(img.getAttribute('data-candidates')||'[]')}catch(e){} var i=parseInt(img.getAttribute('data-try')||'0',10)+1; if(i&lt;list.length){img.setAttribute('data-try',String(i)); img.src=list[i];} else {img.style.display='none'; var fb=document.createElement('span'); fb.className='identity-fallback'; fb.textContent='${fallback}'; img.parentNode.appendChild(fb);}})(this);" />`;
+    function openIdentityMenu() {
+      const picker = document.getElementById('identityPicker');
+      const menu = document.getElementById('identityMenu');
+      const trigger = document.getElementById('identityTrigger');
+      if (!picker || !menu || !trigger) return;
+      menu.hidden = false;
+      picker.classList.add('open');
+      trigger.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeIdentityMenu() {
+      const picker = document.getElementById('identityPicker');
+      const menu = document.getElementById('identityMenu');
+      const trigger = document.getElementById('identityTrigger');
+      if (!picker || !menu || !trigger) return;
+      menu.hidden = true;
+      picker.classList.remove('open');
+      trigger.setAttribute('aria-expanded', 'false');
+    }
+
+    function initIdentityPicker() {
+      const trigger = document.getElementById('identityTrigger');
+      const menu = document.getElementById('identityMenu');
+      if (!trigger || !menu) return;
+
+      // Fill option avatars
+      menu.querySelectorAll('.identity-option-avatar[data-player]').forEach(el => {
+        const pid = el.getAttribute('data-player');
+        el.innerHTML = avatarHtml(pid);
+      });
+
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = !menu.hidden;
+        if (isOpen) closeIdentityMenu();
+        else openIdentityMenu();
+      });
+
+      menu.querySelectorAll('.identity-option').forEach(opt => {
+        opt.addEventListener('click', (e) => {
+          e.stopPropagation();
+          setCurrentUser(opt.getAttribute('data-value') || '');
+        });
+      });
+
+      document.addEventListener('click', (e) => {
+        const picker = document.getElementById('identityPicker');
+        if (picker && !picker.contains(e.target)) closeIdentityMenu();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeIdentityMenu();
+      });
+
+      updateIdentityUI();
     }
 
     function renderMatches() {
@@ -4300,14 +4483,9 @@
     document.getElementById('filterJornada').addEventListener('change', renderMatches);
     document.getElementById('filterTeam').addEventListener('input', renderMatches);
     document.getElementById('onlyPending').addEventListener('change', renderMatches);
-    document.getElementById('currentUser').addEventListener('change', () => {
-      updateIdentityUI();
-      renderMatches();
-    });
-
     (async function init() {
       await loadData();
-      updateIdentityUI();
+      initIdentityPicker();
       renderMatches();
       renderLeaderboard();
       renderStats();
