@@ -261,6 +261,158 @@
       border: 1px solid rgba(255,179,0,0.28);
       border-radius: 10px;
     }
+
+    .personal-bar {
+      max-width: 1180px;
+      margin: 0.75rem auto 0;
+      padding: 0 1.15rem;
+    }
+    .personal-bar[hidden] { display: none !important; }
+    .personal-bar-main {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 0.65rem 0.9rem;
+      cursor: pointer;
+      text-align: left;
+      color: var(--text);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .personal-bar-main:hover {
+      border-color: #2a4a75;
+      background: var(--card-hover);
+    }
+    .personal-bar.expanded .personal-bar-main {
+      border-radius: 14px 14px 0 0;
+      border-bottom-color: transparent;
+    }
+    .personal-bar.baez .personal-bar-main { border-color: rgba(255,152,0,0.4); }
+    .personal-bar.juan .personal-bar-main { border-color: rgba(206,147,216,0.4); }
+    .personal-bar.marrugo .personal-bar-main { border-color: rgba(77,208,225,0.4); }
+    .personal-bar.mauricio .personal-bar-main { border-color: rgba(244,143,177,0.4); }
+    .pb-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: #0d1a2a;
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .personal-bar.baez .pb-avatar { border-color: var(--baez); }
+    .personal-bar.juan .pb-avatar { border-color: var(--juan); }
+    .personal-bar.marrugo .pb-avatar { border-color: var(--marrugo); }
+    .personal-bar.mauricio .pb-avatar { border-color: var(--mauricio); }
+    .pb-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .pb-info { flex: 1; min-width: 0; }
+    .pb-name-row {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.2rem;
+    }
+    .pb-name {
+      font-weight: 900;
+      font-size: 1.05rem;
+    }
+    .pb-name.baez { color: var(--baez); }
+    .pb-name.juan { color: var(--juan); }
+    .pb-name.marrugo { color: var(--marrugo); }
+    .pb-name.mauricio { color: var(--mauricio); }
+    .pb-rank {
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      background: rgba(0,230,118,0.12);
+      color: var(--accent);
+    }
+    .pb-rank.mid {
+      background: rgba(255,213,79,0.15);
+      color: var(--gold);
+    }
+    .pb-rank.last {
+      background: rgba(239,83,80,0.15);
+      color: var(--danger);
+    }
+    .pb-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem 0.85rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .pb-stats strong {
+      color: var(--text);
+      font-weight: 800;
+    }
+    .pb-caret {
+      color: var(--muted);
+      font-size: 0.85rem;
+      transition: transform 0.15s;
+      flex-shrink: 0;
+    }
+    .personal-bar.expanded .pb-caret { transform: rotate(180deg); }
+    .personal-bar-detail {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-top: 1px dashed var(--border);
+      border-radius: 0 0 14px 14px;
+      padding: 0.85rem 1rem 1rem;
+    }
+    .personal-bar-detail[hidden] { display: none !important; }
+    .personal-bar.baez .personal-bar-detail { border-color: rgba(255,152,0,0.35); }
+    .personal-bar.juan .personal-bar-detail { border-color: rgba(206,147,216,0.35); }
+    .personal-bar.marrugo .personal-bar-detail { border-color: rgba(77,208,225,0.35); }
+    .personal-bar.mauricio .personal-bar-detail { border-color: rgba(244,143,177,0.35); }
+    .pb-detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 0.55rem;
+      margin-bottom: 0.75rem;
+    }
+    .pb-metric {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.55rem 0.65rem;
+    }
+    .pb-metric .label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      margin-bottom: 0.15rem;
+    }
+    .pb-metric .value {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: var(--accent);
+    }
+    .pb-phrase {
+      font-size: 0.88rem;
+      color: var(--muted);
+      font-style: italic;
+      font-weight: 600;
+      text-align: center;
+      line-height: 1.4;
+    }
+    .pb-phrase strong { color: var(--text); font-style: normal; }
+    @media (max-width: 640px) {
+      .personal-bar { padding: 0 0.9rem; margin-top: 0.55rem; }
+      .pb-stats { font-size: 0.78rem; gap: 0.25rem 0.65rem; }
+      .pb-avatar { width: 38px; height: 38px; }
+    }
     .toolbar-secondary {
       opacity: 0.92;
     }
@@ -1788,6 +1940,24 @@
     </nav>
   </header>
 
+  <div id="personalBar" class="personal-bar" hidden>
+    <button type="button" class="personal-bar-main" id="personalBarToggle" aria-expanded="false">
+      <div class="pb-avatar" id="pbAvatar"></div>
+      <div class="pb-info">
+        <div class="pb-name-row">
+          <span class="pb-name" id="pbName">—</span>
+          <span class="pb-rank" id="pbRank"></span>
+        </div>
+        <div class="pb-stats" id="pbStats"></div>
+      </div>
+      <span class="pb-caret">▾</span>
+    </button>
+    <div class="personal-bar-detail" id="personalBarDetail" hidden>
+      <div class="pb-detail-grid" id="pbDetailGrid"></div>
+      <div class="pb-phrase" id="pbPhrase"></div>
+    </div>
+  </div>
+
   <main>
     <!-- PARTIDOS -->
     <div id="partidos" class="panel active">
@@ -2486,6 +2656,7 @@
       renderLeaderboard();
       renderStats();
       renderLeagueTable();
+      renderPersonalBar();
       if (document.getElementById('tablas-preds')?.classList.contains('active')) {
         renderPredTables();
       }
@@ -2554,6 +2725,7 @@
       renderMatches();
       renderLeaderboard();
       renderStats();
+      renderPersonalBar();
       toast('Datos actualizados desde la nube');
     }
 
@@ -2712,7 +2884,178 @@
       if (sel) sel.value = value || '';
       updateIdentityUI();
       closeIdentityMenu();
+      renderPersonalBar();
       renderMatches();
+    }
+
+    function getTableHitsForPlayer(playerId) {
+      const realStandings = getLeagueStandings();
+      const realPos = {};
+      realStandings.forEach((t, i) => { realPos[t.name] = i + 1; });
+      const hasReal = realStandings.some(t => t.pj > 0);
+      if (!hasReal) return { hits: 0, total: realStandings.length || 36, hasReal: false };
+
+      const predMap = {};
+      MATCHES.forEach(m => {
+        const pred = (data.predictions[m.id] || {})[playerId];
+        if (pred && pred.h != null && pred.a != null) {
+          predMap[m.id] = { h: pred.h, a: pred.a };
+        }
+      });
+      const standings = getStandingsFromResultsMap(predMap);
+      let hits = 0;
+      standings.forEach((t, i) => {
+        if (realPos[t.name] === i + 1) hits++;
+      });
+      return { hits, total: standings.length || 36, hasReal: true };
+    }
+
+    function getLastJornadaPts(playerId) {
+      const played = [];
+      for (let j = 1; j <= 8; j++) {
+        const matchesJ = MATCHES.filter(m => m.jornada === j);
+        let anyReal = false;
+        let pts = 0;
+        matchesJ.forEach(m => {
+          const real = data.results[m.id];
+          if (!real || real.h == null || real.a == null) return;
+          anyReal = true;
+          const pred = (data.predictions[m.id] || {})[playerId];
+          if (!pred || pred.h == null || pred.a == null) return;
+          pts += calcPoints(pred.h, pred.a, real.h, real.a).pts;
+        });
+        if (anyReal) played.push({ j, pts });
+      }
+      return played.slice(-2);
+    }
+
+    const PERSONAL_PHRASES = {
+      first: [
+        'Vas liderando el grupo. No aflojes, papi.',
+        'Primero del ranking: el resto te mira de reojo.',
+        'Momento efecty.com total. Sigue así.'
+      ],
+      mid: [
+        'En la pelea: ni arriba del todo ni en el sótano.',
+        'Hay margen de mejora… y también de hundirte. Tú decides.',
+        'Mitad de tabla: clásico de temporada larga.'
+      ],
+      last: [
+        'Don Pelmazo mode: el sótano también es parte del edificio.',
+        'Tranquilo, alguien tenía que hacer el sacrificio.',
+        'La remontada empieza eligiendo bien el próximo marcador.'
+      ],
+      empty: [
+        'Aún no hay resultados reales con tus pronósticos. ¡A meter números!'
+      ]
+    };
+
+    function renderPersonalBar() {
+      const bar = document.getElementById('personalBar');
+      if (!bar) return;
+      const user = currentUser();
+      if (!user) {
+        bar.hidden = true;
+        bar.classList.remove('expanded');
+        const detail = document.getElementById('personalBarDetail');
+        if (detail) detail.hidden = true;
+        return;
+      }
+
+      bar.hidden = false;
+      bar.className = 'personal-bar ' + user + (bar.classList.contains('expanded') ? ' expanded' : '');
+
+      const avatar = document.getElementById('pbAvatar');
+      const nameEl = document.getElementById('pbName');
+      const rankEl = document.getElementById('pbRank');
+      const statsEl = document.getElementById('pbStats');
+      if (avatar) avatar.innerHTML = avatarHtml(user);
+      if (nameEl) {
+        nameEl.textContent = PLAYER_NAMES[user] || user;
+        nameEl.className = 'pb-name ' + user;
+      }
+
+      const pStats = getPlayerStats();
+      const ranking = PLAYERS.map(p => ({
+        id: p,
+        ...pStats[p],
+        pct: pStats[p].maxPossible > 0 ? (pStats[p].pts / pStats[p].maxPossible * 100) : 0
+      })).sort((a, b) => {
+        if (b.pts !== a.pts) return b.pts - a.pts;
+        if (b.goalsHit !== a.goalsHit) return b.goalsHit - a.goalsHit;
+        return b.exact - a.exact;
+      });
+      const pos = ranking.findIndex(r => r.id === user) + 1;
+      const me = ranking.find(r => r.id === user) || pStats[user];
+      const fails = (me.played || 0) - (me.exact || 0) - (me.resultOnly || 0);
+      const pct = me.maxPossible > 0 ? (me.pts / me.maxPossible * 100) : 0;
+
+      if (rankEl) {
+        if ((me.played || 0) === 0) {
+          rankEl.textContent = 'Sin partidos aún';
+          rankEl.className = 'pb-rank mid';
+        } else {
+          rankEl.textContent = pos + 'º de ' + PLAYERS.length;
+          rankEl.className = 'pb-rank' + (pos === 1 ? '' : (pos === PLAYERS.length ? ' last' : ' mid'));
+        }
+      }
+
+      const tableHits = getTableHitsForPlayer(user);
+      if (statsEl) {
+        const tableStr = tableHits.hasReal
+          ? `<span>Tabla <strong>${tableHits.hits}/${tableHits.total}</strong></span>`
+          : '';
+        statsEl.innerHTML = `
+          <span><strong>${me.pts || 0}</strong> pts</span>
+          <span><strong>${me.exact || 0}</strong> exactos</span>
+          <span><strong>${me.resultOnly || 0}</strong> solo res.</span>
+          <span><strong>${pct.toFixed(0)}%</strong> acierto</span>
+          ${tableStr}
+        `;
+      }
+
+      const grid = document.getElementById('pbDetailGrid');
+      if (grid) {
+        const lastJ = getLastJornadaPts(user);
+        const lastJHtml = lastJ.length
+          ? lastJ.map(x => `J${x.j}: ${x.pts} pts`).join(' · ')
+          : '—';
+        grid.innerHTML = `
+          <div class="pb-metric"><div class="label">Puntos</div><div class="value">${me.pts || 0}</div></div>
+          <div class="pb-metric"><div class="label">Exactos</div><div class="value">${me.exact || 0}</div></div>
+          <div class="pb-metric"><div class="label">Solo resultado</div><div class="value">${me.resultOnly || 0}</div></div>
+          <div class="pb-metric"><div class="label">Fallos</div><div class="value">${fails}</div></div>
+          <div class="pb-metric"><div class="label">Goles acertados</div><div class="value">${me.goalsHit || 0}</div></div>
+          <div class="pb-metric"><div class="label">Partidos</div><div class="value">${me.played || 0}</div></div>
+          <div class="pb-metric"><div class="label">% acierto</div><div class="value">${pct.toFixed(1)}%</div></div>
+          <div class="pb-metric"><div class="label">Tabla (pos. exactas)</div><div class="value">${tableHits.hasReal ? tableHits.hits + '/' + tableHits.total : '—'}</div></div>
+          <div class="pb-metric" style="grid-column: 1 / -1;"><div class="label">Últimas jornadas</div><div class="value" style="font-size:0.95rem;">${lastJHtml}</div></div>
+        `;
+      }
+
+      const phraseEl = document.getElementById('pbPhrase');
+      if (phraseEl) {
+        let pool = PERSONAL_PHRASES.empty;
+        if ((me.played || 0) > 0) {
+          if (pos === 1) pool = PERSONAL_PHRASES.first;
+          else if (pos === PLAYERS.length) pool = PERSONAL_PHRASES.last;
+          else pool = PERSONAL_PHRASES.mid;
+        }
+        const phrase = pool[Math.floor(Math.random() * pool.length)];
+        phraseEl.innerHTML = `“${phrase}”`;
+      }
+    }
+
+    function initPersonalBar() {
+      const toggle = document.getElementById('personalBarToggle');
+      const detail = document.getElementById('personalBarDetail');
+      const bar = document.getElementById('personalBar');
+      if (!toggle || !detail || !bar) return;
+      toggle.addEventListener('click', () => {
+        const open = bar.classList.toggle('expanded');
+        detail.hidden = !open;
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
     }
 
     function avatarHtml(playerId, sizeClass) {
@@ -4486,9 +4829,11 @@
     (async function init() {
       await loadData();
       initIdentityPicker();
+      initPersonalBar();
       renderMatches();
       renderLeaderboard();
       renderStats();
+      renderPersonalBar();
       // Auto-refresh every 45s so others see changes
       setInterval(async () => {
         try {
@@ -4507,6 +4852,7 @@
             renderMatches();
             renderLeaderboard();
             renderStats();
+            renderPersonalBar();
             updateSyncStatus('synced');
             toast('Nuevos datos de ' + (remote.updatedBy || 'alguien'));
           }
