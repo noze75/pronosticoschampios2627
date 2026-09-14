@@ -1266,37 +1266,84 @@
     }
     .pred-table-card h3 {
       margin: 0;
-      padding: 0.65rem 0.75rem;
+      padding: 0.55rem 0.65rem 0.35rem;
       font-size: 0.95rem;
       font-weight: 800;
-      border-bottom: 1px solid var(--border);
       text-align: center;
     }
     .pred-table-card h3.baez { color: var(--baez); }
     .pred-table-card h3.juan { color: var(--juan); }
     .pred-table-card h3.marrugo { color: var(--marrugo); }
     .pred-table-card h3.mauricio { color: var(--mauricio); }
+    .pred-table-card .hits-badge {
+      display: block;
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--muted);
+      padding: 0 0.65rem 0.55rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .pred-table-card .hits-badge strong {
+      color: var(--accent);
+      font-weight: 900;
+    }
     .pred-table-card table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       border: none;
       border-radius: 0;
     }
     .pred-table-card th {
-      padding: 0.4rem 0.45rem;
-      font-size: 0.68rem;
+      padding: 0.35rem 0.35rem;
+      font-size: 0.65rem;
     }
     .pred-table-card td {
-      padding: 0.32rem 0.45rem;
+      padding: 0.28rem 0.35rem;
       border-bottom: 1px solid rgba(30,58,95,0.5);
     }
+    .pred-table-card tr.zone-top td { background: rgba(0, 230, 118, 0.07); }
+    .pred-table-card tr.zone-playoff td { background: rgba(255, 213, 79, 0.06); }
+    .pred-table-card tr.zone-out td { background: rgba(239, 83, 80, 0.05); }
+    .pred-table-card tr.zone-top td.rank { color: var(--accent); }
+    .pred-table-card tr.zone-playoff td.rank { color: var(--gold); }
+    .pred-table-card tr.zone-out td.rank { color: var(--danger); }
     .pred-table-card tr.match-real td {
-      background: rgba(0, 230, 118, 0.14) !important;
+      background: rgba(0, 230, 118, 0.18) !important;
       color: #b9f6ca;
       font-weight: 700;
     }
-    .pred-table-card .rank { width: 28px; font-size: 0.85rem; }
+    .pred-table-card .rank { width: 24px; font-size: 0.8rem; font-weight: 900; }
+    .pred-table-card .team-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-weight: 700;
+      min-width: 0;
+    }
+    .pred-table-card .team-cell img {
+      width: 18px;
+      height: 18px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+    .pred-table-card .team-cell span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .pred-table-card .delta {
+      font-size: 0.68rem;
+      font-weight: 800;
+      white-space: nowrap;
+      min-width: 2.2rem;
+      text-align: right;
+    }
+    .pred-table-card .delta.up { color: var(--accent); }
+    .pred-table-card .delta.down { color: var(--danger); }
+    .pred-table-card .delta.same { color: var(--muted); }
+    .pred-table-card .pts-col { font-weight: 900; color: var(--accent); }
 
     .pelmazo-quote {
       margin-top: 1rem;
@@ -1598,7 +1645,9 @@
     <div id="tablas-preds" class="panel">
       <div class="rules" style="margin-bottom:1rem;">
         <strong>Tablas según cada pronosticador</strong> — Cómo quedaría la clasificación si los resultados fueran los de cada uno.
-        En <span style="color:var(--accent);font-weight:800;">verde</span> los equipos que coinciden en posición con la tabla real.
+        Franjas: <span style="color:var(--accent);font-weight:800;">1–8</span> · <span style="color:var(--gold);font-weight:800;">9–24</span> · <span style="color:var(--danger);font-weight:800;">25–36</span>.
+        En <span style="color:var(--accent);font-weight:800;">verde fuerte</span> los equipos que están exactamente en la misma posición que en la tabla real.
+        Flechas <strong>↑↓</strong> = diferencia de puestos respecto a la real.
       </div>
       <div id="predTablesGrid" class="pred-tables-grid"></div>
     </div>
@@ -2879,9 +2928,9 @@
       const realPos = {};
       realStandings.forEach((t, i) => { realPos[t.name] = i + 1; });
       const hasReal = realStandings.some(t => t.pj > 0);
+      const totalTeams = realStandings.length || 36;
 
       grid.innerHTML = PLAYERS.map(p => {
-        // Build results map from this player's predictions
         const predMap = {};
         MATCHES.forEach(m => {
           const pred = (data.predictions[m.id] || {})[p];
@@ -2890,22 +2939,53 @@
           }
         });
         const standings = getStandingsFromResultsMap(predMap);
+
+        let hits = 0;
         const rows = standings.map((t, i) => {
           const pos = i + 1;
-          const matchReal = hasReal && realPos[t.name] === pos;
-          return `<tr class="${matchReal ? 'match-real' : ''}">
+          let zone = 'zone-out';
+          if (pos <= 8) zone = 'zone-top';
+          else if (pos <= 24) zone = 'zone-playoff';
+
+          const rPos = realPos[t.name];
+          const matchReal = hasReal && rPos === pos;
+          if (matchReal) hits++;
+
+          let deltaHtml = '<span class="delta same">—</span>';
+          if (hasReal && rPos != null) {
+            const diff = rPos - pos;
+            if (diff === 0) {
+              deltaHtml = '<span class="delta same">=</span>';
+            } else if (diff > 0) {
+              deltaHtml = `<span class="delta up">↑${diff}</span>`;
+            } else {
+              deltaHtml = `<span class="delta down">↓${Math.abs(diff)}</span>`;
+            }
+          }
+
+          const logo = LOGO_MAP[t.name]
+            ? `<img src="${LOGO_MAP[t.name]}" alt="" onerror="this.style.display='none'" />`
+            : '';
+
+          return `<tr class="${zone}${matchReal ? ' match-real' : ''}">
             <td class="rank">${pos}</td>
-            <td>${t.name}</td>
-            <td><strong>${t.pts}</strong></td>
+            <td><div class="team-cell">${logo}<span>${t.name}</span></div></td>
+            <td class="pts-col">${t.pts}</td>
+            <td>${deltaHtml}</td>
           </tr>`;
         }).join('');
+
+        const hitsLabel = hasReal
+          ? `<span class="hits-badge"><strong>${hits}/${totalTeams}</strong> posiciones exactas</span>`
+          : `<span class="hits-badge">Sin resultados reales aún</span>`;
 
         return `
           <div class="pred-table-card">
             <h3 class="${p}">${PLAYER_NAMES[p]}</h3>
+            ${hitsLabel}
             <table>
-              <thead><tr><th>#</th><th>Equipo</th><th>Pts</th></tr></thead>
-              <tbody>${rows || '<tr><td colspan="3" style="text-align:center;color:var(--muted);">Sin pronósticos</td></tr>'}</tbody>
+              <thead><tr><th>#</th><th>Equipo</th><th>Pts</th><th>±</th></tr></thead>
+              <tbody>${rows || '<tr><td colspan="4" style="text-align:center;color:var(--muted);">Sin pronósticos</td></tr>'}</tbody>
             </table>
           </div>`;
       }).join('');
