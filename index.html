@@ -76,6 +76,117 @@
       gap: 0.7rem;
       align-items: center;
     }
+    .header-actions {
+      display: flex;
+      gap: 0.45rem;
+      align-items: center;
+      margin-left: auto;
+    }
+    .header-actions button {
+      padding: 0.42rem 0.75rem;
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+    .identity-picker {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.28rem 0.55rem 0.28rem 0.35rem;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .identity-picker.active {
+      border-color: rgba(0,230,118,0.45);
+      box-shadow: 0 0 0 3px rgba(0,230,118,0.12);
+    }
+    .identity-picker.baez { border-color: rgba(255,152,0,0.5); box-shadow: 0 0 0 3px rgba(255,152,0,0.12); }
+    .identity-picker.juan { border-color: rgba(206,147,216,0.5); box-shadow: 0 0 0 3px rgba(206,147,216,0.12); }
+    .identity-picker.marrugo { border-color: rgba(77,208,225,0.5); box-shadow: 0 0 0 3px rgba(77,208,225,0.12); }
+    .identity-picker.mauricio { border-color: rgba(244,143,177,0.5); box-shadow: 0 0 0 3px rgba(244,143,177,0.12); }
+    .identity-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: #0d1a2a;
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .identity-picker.active .identity-avatar {
+      border-color: var(--accent);
+    }
+    .identity-picker.baez .identity-avatar { border-color: var(--baez); }
+    .identity-picker.juan .identity-avatar { border-color: var(--juan); }
+    .identity-picker.marrugo .identity-avatar { border-color: var(--marrugo); }
+    .identity-picker.mauricio .identity-avatar { border-color: var(--mauricio); }
+    .identity-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .identity-fallback {
+      font-size: 1.15rem;
+      line-height: 1;
+    }
+    .identity-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.05rem;
+      min-width: 0;
+    }
+    .identity-meta label {
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      line-height: 1;
+    }
+    .identity-meta select {
+      padding: 0.15rem 0.35rem;
+      font-size: 0.9rem;
+      font-weight: 800;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      cursor: pointer;
+      min-width: 9.5rem;
+    }
+    .identity-meta select:focus {
+      outline: none;
+      box-shadow: none;
+    }
+    .pred-box.locked-edit {
+      opacity: 0.55;
+    }
+    .pred-box.can-edit {
+      border-color: rgba(0,230,118,0.35);
+      box-shadow: 0 0 0 1px rgba(0,230,118,0.12);
+    }
+    .identity-hint {
+      font-size: 0.82rem;
+      color: var(--warning);
+      font-weight: 600;
+      margin: 0 0 0.75rem;
+      padding: 0.55rem 0.85rem;
+      background: rgba(255,179,0,0.1);
+      border: 1px solid rgba(255,179,0,0.28);
+      border-radius: 10px;
+    }
+    .toolbar-secondary {
+      opacity: 0.92;
+    }
+    .toolbar-secondary button {
+      font-size: 0.82rem;
+      padding: 0.4rem 0.7rem;
+      font-weight: 600;
+    }
     select, button, input[type="number"], input[type="text"] {
       background: var(--card);
       color: var(--text);
@@ -1497,6 +1608,10 @@
         align-items: stretch;
         gap: 0.55rem;
       }
+      .header-actions {
+        margin-left: 0;
+        justify-content: flex-end;
+      }
       #mainNav {
         width: 100%;
         max-width: 100%;
@@ -1526,14 +1641,21 @@
     <h1><span class="ball">⚽</span> <span class="brand">Champions 26/27</span> · Pronósticos</h1>
     <div class="header-controls">
       <span id="syncStatus" style="font-size:0.8rem;font-weight:600;color:var(--muted);">◌ Cargando…</span>
-      <label style="color:var(--muted);font-size:0.85rem;">Soy:</label>
-      <select id="currentUser">
-        <option value="">— Ver todos —</option>
-        <option value="baez">Báez</option>
-        <option value="juan">Juan</option>
-        <option value="marrugo">Marrugo</option>
-        <option value="mauricio">Mauricio</option>
-      </select>
+      <div class="identity-picker" id="identityPicker">
+        <div class="identity-avatar" id="identityAvatar">
+          <span class="identity-fallback">👤</span>
+        </div>
+        <div class="identity-meta">
+          <label for="currentUser">Soy</label>
+          <select id="currentUser">
+            <option value="">— Elige quién eres —</option>
+            <option value="baez">Báez</option>
+            <option value="juan">Juan</option>
+            <option value="marrugo">Marrugo</option>
+            <option value="mauricio">Mauricio</option>
+          </select>
+        </div>
+      </div>
       <nav id="mainNav">
         <button data-panel="partidos" class="active">Partidos</button>
         <button data-panel="clasificacion">Ranking amigos</button>
@@ -1547,6 +1669,10 @@
         <button data-panel="mapa">Mapa</button>
         <button data-panel="reglas">Reglas</button>
       </nav>
+      <div class="header-actions">
+        <button class="primary" onclick="saveData(true); pushToRemote(true);">💾 Guardar</button>
+        <button id="adminUnlockBtn" onclick="toggleAdminUnlock()">🔐 Admin</button>
+      </div>
     </div>
   </header>
 
@@ -1572,14 +1698,12 @@
           <input type="checkbox" id="onlyPending" /> Solo pendientes de resultado
         </label>
       </div>
-      <div class="toolbar">
-        <button class="primary" onclick="saveData(true); pushToRemote(true);">💾 Guardar ahora</button>
-        <button class="secondary" onclick="refreshFromCloud()">🔄 Actualizar de la nube</button>
-        <button id="adminUnlockBtn" onclick="toggleAdminUnlock()">🔐 Admin resultados</button>
-        <button onclick="exportData()">📤 Exportar JSON</button>
-        <button onclick="document.getElementById('importFile').click()">📥 Importar JSON</button>
+      <div class="toolbar toolbar-secondary">
+        <button class="secondary" onclick="refreshFromCloud()" title="Descarga cambios de los demás ya (también se actualiza solo cada 45 s)">🔄 Actualizar nube</button>
+        <button onclick="exportData()" title="Copia de seguridad">📤 Exportar</button>
+        <button onclick="document.getElementById('importFile').click()" title="Restaurar desde archivo">📥 Importar</button>
         <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)" />
-        <button onclick="resetAll()">🗑️ Reset</button>
+        <button onclick="resetAll()" title="Borrar todo (pide contraseña)">🗑️ Reset</button>
       </div>
       <div id="matchesContainer"></div>
     </div>
@@ -1836,12 +1960,11 @@
         </ul>
         <h3 style="margin-top:1.25rem;">Cómo usar</h3>
         <ul>
-          <li>Selecciona “Soy:” con tu nombre para poder editar solo tus pronósticos.</li>
-          <li>Los resultados reales se actualizan automáticamente.</li>
-          <li>Los datos se guardan automáticamente en la nube. También hay copia local.</li>
-          <li>Pulsa <strong>Actualizar de la nube</strong> si quieres forzar la descarga de cambios de los demás.</li>
-          <li>Cada 45 segundos se revisan cambios nuevos automáticamente.</li>
-          <li>Exportar / Importar JSON sigue disponible como respaldo.</li>
+          <li>Selecciona <strong>Soy</strong> con tu nombre (arriba). Sin elegir a nadie, todos los pronósticos están bloqueados; solo se activan los tuyos.</li>
+          <li>Los resultados reales se actualizan automáticamente (solo el admin puede editarlos).</li>
+          <li>Los datos se guardan solos en la nube. Arriba a la derecha tienes <strong>Guardar</strong> por si quieres forzar el envío.</li>
+          <li><strong>Actualizar nube</strong> (en Partidos) fuerza la descarga de cambios de los demás. También se revisa solo cada 45 s.</li>
+          <li>Exportar / Importar JSON siguen como respaldo manual.</li>
         </ul>
       </div>
     </div>
@@ -1857,7 +1980,7 @@
       <ul>
         <li>
           <span class="icon">1</span>
-          <div><strong>Selecciona “Soy:”</strong> con tu nombre arriba a la derecha. Así solo editas tus pronósticos.</div>
+          <div><strong>Selecciona “Soy”</strong> con tu nombre arriba. Sin elegir a nadie, nadie puede editar; solo se activan tus casillas.</div>
         </li>
         <li>
           <span class="icon">2</span>
@@ -2462,7 +2585,7 @@
         btn.style.color = '#04120a';
         btn.style.borderColor = 'transparent';
       } else {
-        btn.textContent = '🔐 Admin resultados';
+        btn.textContent = '🔐 Admin';
         btn.style.background = '';
         btn.style.color = '';
         btn.style.borderColor = '';
@@ -2477,6 +2600,31 @@
 
     function currentUser() {
       return document.getElementById('currentUser').value;
+    }
+
+    function updateIdentityUI() {
+      const user = currentUser();
+      const picker = document.getElementById('identityPicker');
+      const avatar = document.getElementById('identityAvatar');
+      if (!picker || !avatar) return;
+
+      picker.className = 'identity-picker' + (user ? ` active ${user}` : '');
+
+      if (!user) {
+        avatar.innerHTML = '<span class="identity-fallback">👤</span>';
+        return;
+      }
+
+      const candidates = photoCandidates(user);
+      const fallback = PHOTO_FALLBACK[user] || '👤';
+      if (!candidates.length) {
+        avatar.innerHTML = `<span class="identity-fallback">${fallback}</span>`;
+        return;
+      }
+
+      const candidatesJson = JSON.stringify(candidates).replace(/"/g, '&quot;');
+      avatar.innerHTML = `<img src="${candidates[0]}" alt="${PLAYER_NAMES[user] || user}" data-try="0" data-candidates="${candidatesJson}"
+        onerror="(function(img){var list=[];try{list=JSON.parse(img.getAttribute('data-candidates')||'[]')}catch(e){} var i=parseInt(img.getAttribute('data-try')||'0',10)+1; if(i&lt;list.length){img.setAttribute('data-try',String(i)); img.src=list[i];} else {img.style.display='none'; var fb=document.createElement('span'); fb.className='identity-fallback'; fb.textContent='${fallback}'; img.parentNode.appendChild(fb);}})(this);" />`;
     }
 
     function renderMatches() {
@@ -2534,15 +2682,17 @@
 
         const predBoxes = PLAYERS.map(p => {
           const pred = preds[p] || {};
-          const canEdit = !user || user === p;
+          // Solo se puede editar si hay alguien elegido en "Soy" y es esa persona
+          const canEdit = !!user && user === p;
           let badge = '';
           if (hasReal && pred.h != null && pred.a != null) {
             const r = calcPoints(pred.h, pred.a, real.h, real.a);
             const cls = r.exact ? 'exact' : (r.pts > 0 ? 'has-pts' : '');
             badge = `<span class="pts-badge ${cls}">${r.pts} pts</span>`;
           }
+          const boxCls = canEdit ? 'can-edit' : 'locked-edit';
           return `
-            <div class="pred-box ${p}">
+            <div class="pred-box ${p} ${boxCls}">
               <div class="name">${PLAYER_NAMES[p]} ${badge}</div>
               <div class="score-inputs">
                 <input type="number" min="0" max="20" data-match="${m.id}" data-player="${p}" data-side="h"
@@ -2582,7 +2732,11 @@
           </div>`;
       });
 
-      container.innerHTML = html;
+      const hint = !user
+        ? `<div class="identity-hint">👆 Elige quién eres en <strong>Soy</strong> (arriba) para poder introducir tus pronósticos. Mientras tanto todo está bloqueado.</div>`
+        : `<div class="identity-hint" style="color:var(--accent);background:rgba(0,230,118,0.08);border-color:rgba(0,230,118,0.28);">Pronosticando como <strong>${PLAYER_NAMES[user]}</strong> — solo puedes editar tus casillas.</div>`;
+
+      container.innerHTML = hint + html;
 
       // Attach listeners
       container.querySelectorAll('input[type="number"]').forEach(inp => {
@@ -2609,6 +2763,12 @@
         else data.results[matchId].a = val;
       } else {
         const player = inp.dataset.player;
+        const user = currentUser();
+        if (!user || user !== player) {
+          toast('Elige quién eres en Soy para editar tus pronósticos');
+          renderMatches();
+          return;
+        }
         if (!data.predictions[matchId]) data.predictions[matchId] = {};
         if (!data.predictions[matchId][player]) data.predictions[matchId][player] = {};
         if (side === 'h') data.predictions[matchId][player].h = val;
@@ -4140,10 +4300,14 @@
     document.getElementById('filterJornada').addEventListener('change', renderMatches);
     document.getElementById('filterTeam').addEventListener('input', renderMatches);
     document.getElementById('onlyPending').addEventListener('change', renderMatches);
-    document.getElementById('currentUser').addEventListener('change', renderMatches);
+    document.getElementById('currentUser').addEventListener('change', () => {
+      updateIdentityUI();
+      renderMatches();
+    });
 
     (async function init() {
       await loadData();
+      updateIdentityUI();
       renderMatches();
       renderLeaderboard();
       renderStats();
