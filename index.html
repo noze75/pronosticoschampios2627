@@ -413,6 +413,185 @@
       .pb-stats { font-size: 0.78rem; gap: 0.25rem 0.65rem; }
       .pb-avatar { width: 38px; height: 38px; }
     }
+
+    /* Trivia millonario */
+    .trivia-layout {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 1rem;
+      align-items: start;
+    }
+    @media (max-width: 800px) {
+      .trivia-layout { grid-template-columns: 1fr; }
+    }
+    .trivia-ladder {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 0.65rem 0.55rem;
+      list-style: none;
+      margin: 0;
+    }
+    .trivia-ladder li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.28rem 0.5rem;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .trivia-ladder li.safe { color: var(--gold); }
+    .trivia-ladder li.current {
+      background: rgba(0,230,118,0.15);
+      color: var(--accent);
+      box-shadow: inset 0 0 0 1px rgba(0,230,118,0.35);
+    }
+    .trivia-ladder li.done { color: var(--text); opacity: 0.85; }
+    .trivia-ladder li .step-num { min-width: 1.4rem; opacity: 0.7; }
+    .trivia-main {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.15rem 1.2rem 1.25rem;
+      min-height: 320px;
+    }
+    .trivia-prize-now {
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.35rem;
+    }
+    .trivia-prize-now strong {
+      display: block;
+      font-size: 1.6rem;
+      color: var(--gold);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      margin-top: 0.15rem;
+    }
+    .trivia-q {
+      font-size: 1.15rem;
+      font-weight: 800;
+      line-height: 1.4;
+      margin: 0.85rem 0 1rem;
+      text-align: center;
+    }
+    .trivia-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.55rem;
+    }
+    @media (max-width: 560px) {
+      .trivia-options { grid-template-columns: 1fr; }
+    }
+    .trivia-opt {
+      text-align: left;
+      padding: 0.75rem 0.9rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .trivia-opt:hover:not(:disabled) {
+      border-color: var(--accent);
+      background: rgba(0,230,118,0.08);
+    }
+    .trivia-opt:disabled { cursor: default; opacity: 0.85; }
+    .trivia-opt.correct {
+      background: rgba(0,230,118,0.2);
+      border-color: rgba(0,230,118,0.55);
+      color: #b9f6ca;
+    }
+    .trivia-opt.wrong {
+      background: rgba(239,83,80,0.18);
+      border-color: rgba(239,83,80,0.45);
+      color: #ffcdd2;
+    }
+    .trivia-opt.dim { opacity: 0.35; }
+    .trivia-opt .letter {
+      display: inline-block;
+      width: 1.4rem;
+      color: var(--gold);
+      font-weight: 900;
+    }
+    .trivia-lifelines {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      justify-content: center;
+      margin: 1rem 0 0.5rem;
+    }
+    .trivia-lifelines button {
+      font-size: 0.82rem;
+      padding: 0.4rem 0.75rem;
+    }
+    .trivia-lifelines button.used {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+    .trivia-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+    .trivia-home {
+      text-align: center;
+      padding: 1.5rem 0.5rem;
+    }
+    .trivia-home h2 {
+      font-size: 1.35rem;
+      margin-bottom: 0.5rem;
+    }
+    .trivia-home p {
+      color: var(--muted);
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+    }
+    .trivia-records {
+      margin-top: 1.25rem;
+      text-align: left;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      font-size: 0.88rem;
+    }
+    .trivia-records h3 {
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.45rem;
+    }
+    .trivia-records li {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.25rem 0;
+      border-bottom: 1px solid rgba(30,58,95,0.4);
+      font-weight: 600;
+    }
+    .trivia-records li:last-child { border-bottom: none; }
+    .trivia-result {
+      text-align: center;
+      padding: 1.5rem 0.5rem;
+    }
+    .trivia-result .big {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--gold);
+      margin: 0.4rem 0 0.8rem;
+    }
     .toolbar-secondary {
       opacity: 0.92;
     }
@@ -1936,6 +2115,7 @@
       <button data-panel="historico">Histórico</button>
       <button data-panel="rondas">Rondas finales</button>
       <button data-panel="mapa">Mapa</button>
+      <button data-panel="trivia">Trivia</button>
       <button data-panel="reglas">Reglas</button>
     </nav>
   </header>
@@ -2218,6 +2398,16 @@
       </div>
     </div>
 
+    <!-- TRIVIA -->
+    <div id="trivia" class="panel">
+      <div class="rules" style="margin-bottom:1rem;">
+        <strong>Trivia Champions · Quién quiere ser millonario</strong> —
+        15 escalones de $100 a $10.000. Elige <strong>Soy</strong> para guardar tu récord.
+        Seguros en $1.000 y $5.000. Fallar = te quedas con el último seguro (o $0).
+      </div>
+      <div id="triviaApp"></div>
+    </div>
+
     <!-- REGLAS -->
     <div id="reglas" class="panel">
       <div class="rules">
@@ -2283,6 +2473,7 @@
     // ========== DATA ==========
     const PLAYERS = ['baez', 'juan', 'marrugo', 'mauricio'];
     const PLAYER_NAMES = { baez: 'Báez', juan: 'Juan', marrugo: 'Marrugo', mauricio: 'Mauricio' };
+    const TRIVIA_BANK = {"version":1,"currency":"pesos","ladder":[{"step":1,"prize":100,"safe":false},{"step":2,"prize":200,"safe":false},{"step":3,"prize":300,"safe":false},{"step":4,"prize":500,"safe":false},{"step":5,"prize":1000,"safe":true},{"step":6,"prize":1500,"safe":false},{"step":7,"prize":2000,"safe":false},{"step":8,"prize":3000,"safe":false},{"step":9,"prize":4000,"safe":false},{"step":10,"prize":5000,"safe":true},{"step":11,"prize":6000,"safe":false},{"step":12,"prize":7000,"safe":false},{"step":13,"prize":8000,"safe":false},{"step":14,"prize":9000,"safe":false},{"step":15,"prize":10000,"safe":false}],"lifelines":["fifty","group","pelmazo"],"rules":{"steps":15,"questions_per_game":15,"walk_away":true,"wrong_answer":"Caes al último seguro alcanzado (0 si no hay seguro)","selection":"Por cada escalón se elige 1 pregunta aleatoria del pool de ese nivel (1-5, 6-10, 11-15) sin repetir en la misma partida"},"questions":[{"id":1,"q":"¿Qué club tiene más títulos de Champions League / Copa de Europa?","options":["Bayern Múnich","Real Madrid","Milan","Liverpool"],"answer":1,"level":1,"topic":"titulos"},{"id":2,"q":"¿Cuántas Champions ha ganado el Real Madrid (hasta 2024 inclusive)?","options":["12","13","14","15"],"answer":3,"level":1,"topic":"titulos"},{"id":3,"q":"¿Quién es el máximo goleador histórico de la Champions League?","options":["Lionel Messi","Robert Lewandowski","Cristiano Ronaldo","Karim Benzema"],"answer":2,"level":1,"topic":"goleadores"},{"id":4,"q":"¿Qué equipo inglés ganó la Champions 2018/19?","options":["Chelsea","Manchester City","Liverpool","Tottenham"],"answer":2,"level":1,"topic":"finales"},{"id":5,"q":"¿Cómo se llama popularmente el trofeo de la Champions?","options":["La Copa Grande","La Orejona","El Balón de Europa","La Jarra"],"answer":1,"level":1,"topic":"cultura"},{"id":6,"q":"¿En qué ciudad está el estadio Anfield?","options":["Manchester","Londres","Liverpool","Birmingham"],"answer":2,"level":1,"topic":"estadios"},{"id":7,"q":"¿Qué club ganó la primera edición de la Copa de Europa (1955/56)?","options":["Benfica","Real Madrid","Milan","Ajax"],"answer":1,"level":1,"topic":"historia"},{"id":8,"q":"¿Qué país ha ganado más Champions sumando todos sus clubes?","options":["Inglaterra","Italia","España","Alemania"],"answer":2,"level":1,"topic":"titulos"},{"id":9,"q":"¿Qué equipo ganó la Champions 2022/23, su primera orejona?","options":["Chelsea","Manchester City","Arsenal","Tottenham"],"answer":1,"level":1,"topic":"finales"},{"id":10,"q":"¿Quién marcó el gol de la final 2014 (Real Madrid 4-1 Atlético) en la prórroga?","options":["Bale","Ronaldo","Ramos","Di María"],"answer":2,"level":2,"topic":"finales"},{"id":11,"q":"¿Qué club es apodado 'Los Rojos' y tiene 6 Champions?","options":["Manchester United","Liverpool","Bayern","Milan"],"answer":1,"level":1,"topic":"clubes"},{"id":12,"q":"¿En qué estadio juega el Barcelona como local?","options":["Wanda Metropolitano","Camp Nou","San Mamés","Mestalla"],"answer":1,"level":1,"topic":"estadios"},{"id":13,"q":"¿Qué entrenador ganó la Champions 2009 y 2011 con el Barcelona?","options":["Luis Enrique","Frank Rijkaard","Pep Guardiola","Ronald Koeman"],"answer":2,"level":2,"topic":"entrenadores"},{"id":14,"q":"¿Qué equipo ganó la Champions 2019/20 en Lisboa?","options":["PSG","Bayern Múnich","Lyon","RB Leipzig"],"answer":1,"level":2,"topic":"finales"},{"id":15,"q":"Himno oficial de la Champions: ¿en qué idioma se canta principalmente el estribillo famoso?","options":["Inglés","Latín","Italiano","Francés"],"answer":1,"level":1,"topic":"cultura"},{"id":16,"q":"¿Qué club italiano tiene 7 Champions?","options":["Inter","Juventus","Milan","Roma"],"answer":2,"level":1,"topic":"titulos"},{"id":17,"q":"¿Qué jugador es conocido como 'CR7'?","options":["Carlo Ronaldo","Cristiano Ronaldo","Carlos Ruiz","Cesc Ronaldo"],"answer":1,"level":1,"topic":"jugadores"},{"id":18,"q":"Final 2005 en Estambul: ¿quién remontó de 0-3 a ganar en penaltis?","options":["Milan","Liverpool","Juventus","Chelsea"],"answer":1,"level":2,"topic":"finales"},{"id":19,"q":"¿Qué color es el dorsal típico asociado al ' Balón de Oro' que muchos asocian con Messi/Ronaldo en Champions?","options":["Es un trofeo, no un dorsal","Siempre el 10","Siempre el 7","Siempre el 9"],"answer":0,"level":1,"topic":"cultura"},{"id":20,"q":"¿Qué equipo ganó la Champions 2023/24 en Wembley?","options":["Dortmund","Real Madrid","Bayern","PSG"],"answer":1,"level":1,"topic":"finales"},{"id":21,"q":"¿Qué club neerlandés ganó tres Champions seguidas en los 70?","options":["Feyenoord","PSV","Ajax","AZ"],"answer":2,"level":2,"topic":"historia"},{"id":22,"q":"¿En qué país se inventó y se juega el Real Madrid?","options":["Portugal","España","México","Argentina"],"answer":1,"level":1,"topic":"clubes"},{"id":23,"q":"¿Qué final se recuerda por el 'gol de Ramos' de cabeza en el 93'?","options":["2014 vs Atlético","2016 vs Atlético","2018 vs Liverpool","2002 vs Leverkusen"],"answer":0,"level":2,"topic":"finales"},{"id":24,"q":"¿Qué equipo ganó la Champions 2011/12 en penaltis ante el Bayern?","options":["Chelsea","Manchester United","Arsenal","Tottenham"],"answer":0,"level":2,"topic":"finales"},{"id":25,"q":"Estadio del Bayern Múnich:","options":["Signal Iduna Park","Allianz Arena","Olympiastadion Berlín","Volkswagen Arena"],"answer":1,"level":1,"topic":"estadios"},{"id":26,"q":"¿Qué club portugués ganó la Champions con Mourinho en 2004?","options":["Benfica","Sporting","Porto","Braga"],"answer":2,"level":2,"topic":"finales"},{"id":27,"q":"¿Cuántas Champions consecutivas ganó el Real Madrid entre 2016 y 2018?","options":["Dos","Tres","Cuatro","Una"],"answer":1,"level":2,"topic":"titulos"},{"id":28,"q":"¿Qué jugador argentino es el segundo máximo goleador histórico de la Champions?","options":["Di María","Messi","Agüero","Higuain"],"answer":1,"level":1,"topic":"goleadores"},{"id":29,"q":"Final 1999: United remontó en el descuento ante…","options":["Juventus","Bayern Múnich","Dortmund","Milan"],"answer":1,"level":2,"topic":"finales"},{"id":30,"q":"¿Qué club escocés ganó la Copa de Europa en 1967?","options":["Rangers","Celtic","Aberdeen","Hearts"],"answer":1,"level":2,"topic":"historia"},{"id":31,"q":"¿Qué equipo es 'La Vecchia Signora'?","options":["Inter","Milan","Juventus","Napoli"],"answer":2,"level":1,"topic":"clubes"},{"id":32,"q":"¿En qué ciudad se jugó la final 2024?","options":["París","Estambul","Londres","Múnich"],"answer":2,"level":1,"topic":"finales"},{"id":33,"q":"¿Qué club ganó la Champions 2024/25 con un 5-0 en la final?","options":["Real Madrid","PSG","Bayern","Inter"],"answer":1,"level":1,"topic":"finales"},{"id":34,"q":"Máximo goleador en una sola edición de Champions (récord): ¿quién hizo 17 goles?","options":["Messi","Lewandowski","Cristiano Ronaldo","Benzema"],"answer":2,"level":3,"topic":"goleadores"},{"id":35,"q":"¿Qué significa UCL en inglés?","options":["United Club League","UEFA Champions League","Ultra Club League","Union of Champions List"],"answer":1,"level":1,"topic":"cultura"},{"id":36,"q":"¿Quién entrenaba al Inter campeón de 2010?","options":["Mourinho","Conte","Spalletti","Mancini"],"answer":0,"level":3,"topic":"entrenadores"},{"id":37,"q":"Final 2008 en Moscú: ¿quién ganó en penaltis?","options":["Chelsea","Manchester United","Liverpool","Arsenal"],"answer":1,"level":3,"topic":"finales"},{"id":38,"q":"¿Qué club inglés ganó dos Champions seguidas a finales de los 70?","options":["Nottingham Forest","Liverpool","Aston Villa","United"],"answer":1,"level":3,"topic":"historia"},{"id":39,"q":"¿Nottingham Forest cuántas Copas de Europa tiene?","options":["1","2","3","0"],"answer":1,"level":3,"topic":"titulos"},{"id":40,"q":"Final 2013: Bayern vs Dortmund. ¿Marcador?","options":["1-0","2-1","3-2","2-0"],"answer":1,"level":3,"topic":"finales"},{"id":41,"q":"¿Qué estadio ha alojado más finales de Champions/Copa de Europa?","options":["San Siro","Bernabéu","Wembley","Olimpico de Roma"],"answer":2,"level":3,"topic":"estadios"},{"id":42,"q":"¿Quién marcó el gol de la final 2022 (Madrid 1-0 Liverpool)?","options":["Benzema","Vinícius Jr.","Modrić","Valverde"],"answer":1,"level":3,"topic":"finales"},{"id":43,"q":"¿Qué club ganó la primera Champions con el formato actual de 'Champions League' (1992/93)?","options":["Milan","Marsella","Barcelona","Ajax"],"answer":1,"level":4,"topic":"historia"},{"id":44,"q":"Zinedine Zidane como entrenador: ¿cuántas Champions ganó seguidas con el Madrid?","options":["1","2","3","4"],"answer":2,"level":3,"topic":"entrenadores"},{"id":45,"q":"¿Qué jugador tiene el récord de más partidos en Champions?","options":["Casillas","Messi","Cristiano Ronaldo","Xavi"],"answer":2,"level":3,"topic":"jugadores"},{"id":46,"q":"Final 2006: Barcelona ganó a…","options":["Arsenal","Milan","Chelsea","United"],"answer":0,"level":3,"topic":"finales"},{"id":47,"q":"¿Qué club rumano ganó la Copa de Europa en 1986?","options":["Dinamo Bucarest","Steaua Bucarest","CFR Cluj","Rapid"],"answer":1,"level":4,"topic":"historia"},{"id":48,"q":"¿Quién fue el técnico del Chelsea campeón en 2021?","options":["Lampard","Tuchel","Sarri","Conte"],"answer":1,"level":3,"topic":"entrenadores"},{"id":49,"q":"El 'Milagro de Estambul' enfrentó a Liverpool con…","options":["Juventus","Milan","Inter","Roma"],"answer":1,"level":2,"topic":"finales"},{"id":50,"q":"¿Qué equipo alemán ganó tres Copas de Europa seguidas en los 70?","options":["Dortmund","Hamburgo","Bayern Múnich","Mönchengladbach"],"answer":2,"level":3,"topic":"historia"},{"id":51,"q":"Final 2018 en Kiev: Madrid 3-1 Liverpool. ¿Quién hizo doblete?","options":["Ronaldo","Bale","Benzema","Asensio"],"answer":1,"level":4,"topic":"finales"},{"id":52,"q":"¿Qué club ganó la Champions 1994 goleando 4-0 al Barcelona?","options":["Milan","Ajax","Juventus","Porto"],"answer":0,"level":4,"topic":"finales"},{"id":53,"q":"Raúl González es histórico goleador de la Champions con el…","options":["Atlético","Real Madrid","Schalke solo","Barcelona"],"answer":1,"level":2,"topic":"goleadores"},{"id":54,"q":"¿En qué final debutó el 'trampolín' de Bale con chilena?","options":["2014","2016","2017","2018"],"answer":3,"level":4,"topic":"finales"},{"id":55,"q":"¿Qué país no tenía campeón de Champions hasta 2025 (club)?","options":["Francia (Marsella 1993)","Francia solo tenía Marsella hasta PSG 2025","Portugal","Países Bajos"],"answer":1,"level":4,"topic":"titulos"},{"id":56,"q":"Clarificación: antes de PSG 2025, el único campeón francés era…","options":["PSG","Lyon","Marsella","Monaco"],"answer":2,"level":3,"topic":"historia"},{"id":57,"q":"¿Qué club ganó la Champions 2003/04 contra el Monaco?","options":["Porto","Milan","Deportivo","Chelsea"],"answer":0,"level":3,"topic":"finales"},{"id":58,"q":"Steven Gerrard es leyenda de…","options":["Chelsea","Liverpool","United","Aston Villa"],"answer":1,"level":1,"topic":"jugadores"},{"id":59,"q":"¿Qué final se jugó en el Atatürk de Estambul en 2023?","options":["Madrid vs Liverpool","City vs Inter","Bayern vs PSG","Chelsea vs City"],"answer":1,"level":3,"topic":"finales"},{"id":60,"q":"¿Quién anotó el único gol de la final 2023 (City 1-0 Inter)?","options":["Haaland","Rodri","De Bruyne","Mahrez"],"answer":1,"level":4,"topic":"finales"},{"id":61,"q":"Ajax de 1995: ¿qué joven estrella holandesa destacaba (luego del Barça/United)?","options":["Seedorf","Davids","Kluivert","Bergkamp"],"answer":2,"level":5,"topic":"historia"},{"id":62,"q":"¿Qué club tiene el récord de más finales perdidas (7)?","options":["Bayern","Benfica","Juventus","Atlético"],"answer":2,"level":4,"topic":"titulos"},{"id":63,"q":"Final 2015: Barcelona 3-1 Juventus. ¿Quién entrenaba al Barça?","options":["Guardiola","Luis Enrique","Valverde","Setién"],"answer":1,"level":3,"topic":"entrenadores"},{"id":64,"q":"¿Qué portero es el que más partidos ha jugado en Champions tras Ronaldo (entre los históricos top)?","options":["Buffon","Casillas","Neuer solo","Navas"],"answer":1,"level":4,"topic":"jugadores"},{"id":65,"q":"El 'Triple' del United 1999 lo logró con técnico…","options":["Van Gaal","Ferguson","Moyes","Busby"],"answer":1,"level":2,"topic":"entrenadores"},{"id":66,"q":"¿Qué equipo ganó la Champions 1987 ante el Bayern?","options":["Porto","Benfica","PSV","Ajax"],"answer":0,"level":4,"topic":"historia"},{"id":67,"q":"Dani Carvajal: ¿cuántas Champions ha ganado con el Madrid (hasta 2024)?","options":["4","5","6","3"],"answer":2,"level":4,"topic":"jugadores"},{"id":68,"q":"Final 2020: ¿en qué ciudad (a puerta cerrada)?","options":["Madrid","Lisboa","Múnich","París"],"answer":1,"level":3,"topic":"finales"},{"id":69,"q":"¿Qué club belga fue finalista en 1978?","options":["Anderlecht","Club Brujas","Standard","Genk"],"answer":1,"level":5,"topic":"historia"},{"id":70,"q":"Lewandowski marcó 5 goles en un partido de Champions ante el…","options":["Arsenal","Real Madrid","Wolfsburgo","Chelsea"],"answer":2,"level":4,"topic":"goleadores"},{"id":71,"q":"¿Qué equipo ganó la Copa de Europa 1982 en De Kuip?","options":["Hamburgo","Aston Villa","Bayern","Juventus"],"answer":1,"level":4,"topic":"historia"},{"id":72,"q":"Xavi Hernández jugó toda su carrera de club profesional europea principalmente en…","options":["Madrid","Barcelona","PSG","Milan"],"answer":1,"level":1,"topic":"jugadores"},{"id":73,"q":"¿Qué final terminó 4-1 a favor del Madrid en Lisboa 2014?","options":["vs Bayern","vs Atlético","vs Juventus","vs Liverpool"],"answer":1,"level":2,"topic":"finales"},{"id":74,"q":"PSV Eindhoven ganó la Champions en…","options":["1986","1988","1990","1992"],"answer":1,"level":5,"topic":"historia"},{"id":75,"q":"¿Qué jugador marcó 2 goles en la final 2025 (PSG 5-0 Inter)?","options":["Mbappé","Désiré Doué","Hakimi","Dembélé"],"answer":1,"level":4,"topic":"finales"},{"id":76,"q":"¿Quién ganó la Bota de Oro de la Champions 2013/14 con 17 goles?","options":["Messi","Cristiano Ronaldo","Benzema","Bale"],"answer":1,"level":5,"topic":"goleadores"},{"id":77,"q":"Red Star Belgrado ganó la Copa de Europa en…","options":["1989","1991","1993","1987"],"answer":1,"level":5,"topic":"historia"},{"id":78,"q":"Final 1977: Liverpool 3-1… ¿rival?","options":["Bayern","Borussia Mönchengladbach","Hamburgo","Juventus"],"answer":1,"level":5,"topic":"historia"},{"id":79,"q":"¿Qué estadio acogió la final 2002 (Madrid 2-1 Leverkusen)?","options":["Old Trafford","Hampden Park","San Siro","De Kuip"],"answer":1,"level":5,"topic":"estadios"},{"id":80,"q":"Clarence Seedorf ganó Champions con…","options":["Solo Milan","Ajax, Madrid y Milan","Ajax y Milan","Madrid y Milan"],"answer":1,"level":5,"topic":"jugadores"},{"id":81,"q":"¿Qué club soviético/ucraniano es histórico en participaciones (Dinamo…)?","options":["Moscú","Kiev","Tbilisi","Minsk"],"answer":1,"level":4,"topic":"clubes"},{"id":82,"q":"Final 1989: Milan 4-0 Steaua. Técnico del Milan:","options":["Capello","Sacchi","Trapattoni","Lippi"],"answer":1,"level":5,"topic":"entrenadores"},{"id":83,"q":"¿En qué año se introdujo el nombre 'UEFA Champions League'?","options":["1990/91","1991/92","1992/93","1993/94"],"answer":2,"level":5,"topic":"historia"},{"id":84,"q":"Marseille campeón 1993: ¿ante qué equipo?","options":["Barcelona","Milan","Ajax","Monaco"],"answer":1,"level":4,"topic":"finales"},{"id":85,"q":"¿Qué jugador marcó el gol de la final 2013 para el Bayern (2-1 Dortmund)?","options":["Robben","Müller","Ribéry","Mandzukic"],"answer":0,"level":5,"topic":"finales"},{"id":86,"q":"Francisco Gento tiene un récord clásico de…","options":["Más goles en finales","Más Copas de Europa como jugador (6)","Más tarjetas","Más penaltis parados"],"answer":1,"level":5,"topic":"jugadores"},{"id":87,"q":"Final 2003: Milan vs Juventus en Old Trafford. ¿Cómo se decidió?","options":["1-0 en el 90'","Prórroga y gol de oro","Penaltis","2-1"],"answer":2,"level":5,"topic":"finales"},{"id":88,"q":"¿Qué club sueco fue finalista en 1979?","options":["IFK Göteborg","Malmö FF","AIK","Hammarby"],"answer":1,"level":5,"topic":"historia"},{"id":89,"q":"Samuel Eto'o ganó Champions con…","options":["Solo Barça","Barça e Inter","Barça y Madrid","Inter y Milan"],"answer":1,"level":4,"topic":"jugadores"},{"id":90,"q":"Final 1997: Dortmund 3-1 Juventus. ¿Quién entrenaba al Dortmund?","options":["Klopp","Ottmar Hitzfeld","Favre","Sacchi"],"answer":1,"level":5,"topic":"entrenadores"},{"id":91,"q":"¿Qué final se jugó en el Luzhniki de Moscú?","options":["2007","2008","2009","2010"],"answer":1,"level":4,"topic":"estadios"},{"id":92,"q":"Hamburgo campeón de Europa: año…","options":["1981","1983","1985","1979"],"answer":1,"level":5,"topic":"historia"},{"id":93,"q":"¿Qué jugador anotó el gol de la victoria del Chelsea en la final 2012 (tiempo reglamentario, empate 1-1)?","options":["Drogba","Lampard","Mata","Terry"],"answer":0,"level":4,"topic":"finales"},{"id":94,"q":"La final 2016 Madrid-Atlético se decidió en penaltis. ¿Quién falló un penalti decisivo del Atlético?","options":["Griezmann","Juanfran","Gabi","Koke"],"answer":1,"level":5,"topic":"finales"},{"id":95,"q":"¿Qué club ganó la última Copa de Europa antes del nombre Champions League (1991/92)?","options":["Estrella Roja","Marsella","Barcelona","Milan"],"answer":2,"level":5,"topic":"historia"},{"id":96,"q":"Paolo Maldini jugó cuántas finales de Champions/Copa de Europa (récord compartido era)?","options":["4","5","6","7"],"answer":2,"level":5,"topic":"jugadores"},{"id":97,"q":"Final 2007 Atenas: Milan 2-1 Liverpool. ¿Quién marcó primero para el Milan?","options":["Inzaghi","Kaká","Seedorf","Pirlo"],"answer":0,"level":5,"topic":"finales"},{"id":98,"q":"¿Qué estadio acogió la final 2017 (Madrid 4-1 Juventus)?","options":["Wembley","Cardiff (National Stadium of Wales)","San Siro","Berlín"],"answer":1,"level":4,"topic":"estadios"},{"id":99,"q":"Bob Paisley cuántas Copas de Europa ganó como técnico del Liverpool?","options":["1","2","3","4"],"answer":2,"level":5,"topic":"entrenadores"},{"id":100,"q":"En la final 2024, ¿quién marcó el 1-0 del Real Madrid ante el Dortmund?","options":["Vinícius","Carvajal","Bellingham","Rodrygo"],"answer":1,"level":3,"topic":"finales"}]};
 
     // Contraseña de administrador para editar resultados reales.
     // Cámbiala por la que tú quieras:
@@ -4820,6 +5011,199 @@
       e.target.value = '';
     }
 
+    // ========== TRIVIA MILLONARIO ==========
+    let triviaState = null;
+
+    function formatPesos(n) {
+      return '$' + Number(n).toLocaleString('es-CO');
+    }
+
+    function loadTriviaRecords() {
+      try {
+        return JSON.parse(localStorage.getItem('cl_trivia_records_v1') || '{}');
+      } catch (_) {
+        return {};
+      }
+    }
+
+    function saveTriviaRecord(playerId, prize, step) {
+      if (!playerId) return;
+      const rec = loadTriviaRecords();
+      const prev = rec[playerId] || { best: 0, bestStep: 0, plays: 0 };
+      prev.plays = (prev.plays || 0) + 1;
+      if (prize > (prev.best || 0)) {
+        prev.best = prize;
+        prev.bestStep = step;
+        prev.name = PLAYER_NAMES[playerId] || playerId;
+      }
+      rec[playerId] = prev;
+      try { localStorage.setItem('cl_trivia_records_v1', JSON.stringify(rec)); } catch (_) {}
+    }
+
+    function triviaLevelForStep(step) {
+      if (step <= 5) return [1, 2];
+      if (step <= 10) return [3, 4];
+      return [4, 5];
+    }
+
+    function pickQuestion(step, usedIds) {
+      const levels = triviaLevelForStep(step);
+      let pool = TRIVIA_BANK.questions.filter(q => levels.includes(q.level) && !usedIds.has(q.id));
+      if (!pool.length) pool = TRIVIA_BANK.questions.filter(q => !usedIds.has(q.id));
+      if (!pool.length) pool = TRIVIA_BANK.questions.slice();
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+
+    function startTriviaGame() {
+      const user = currentUser();
+      triviaState = {
+        step: 1,
+        usedIds: new Set(),
+        lifelines: { fifty: true, group: true, pelmazo: true },
+        locked: false,
+        player: user || null,
+        question: null,
+        hiddenOptions: []
+      };
+      nextTriviaQuestion();
+    }
+
+    function nextTriviaQuestion() {
+      if (!triviaState) return;
+      const q = pickQuestion(triviaState.step, triviaState.usedIds);
+      triviaState.usedIds.add(q.id);
+      triviaState.question = q;
+      triviaState.locked = false;
+      triviaState.hiddenOptions = [];
+      renderTrivia();
+    }
+
+    function triviaCurrentPrize() {
+      const row = TRIVIA_BANK.ladder.find(l => l.step === triviaState.step);
+      return row ? row.prize : 0;
+    }
+
+    function triviaSafePrize() {
+      let safe = 0;
+      for (const l of TRIVIA_BANK.ladder) {
+        if (l.step < triviaState.step && l.safe) safe = l.prize;
+      }
+      return safe;
+    }
+
+    function answerTrivia(optIndex) {
+      if (!triviaState || triviaState.locked) return;
+      triviaState.locked = true;
+      const q = triviaState.question;
+      const correct = optIndex === q.answer;
+      renderTrivia({ reveal: true, chosen: optIndex, correct });
+      setTimeout(() => {
+        if (correct) {
+          if (triviaState.step >= 15) endTrivia(true, triviaCurrentPrize(), 15);
+          else { triviaState.step += 1; nextTriviaQuestion(); }
+        } else {
+          endTrivia(false, triviaSafePrize(), Math.max(0, triviaState.step - 1));
+        }
+      }, 1100);
+    }
+
+    function walkAwayTrivia() {
+      if (!triviaState || triviaState.locked || triviaState.step === 1) return;
+      const prev = TRIVIA_BANK.ladder.find(l => l.step === triviaState.step - 1);
+      endTrivia(true, prev ? prev.prize : 0, triviaState.step - 1);
+    }
+
+    function useFifty() {
+      if (!triviaState || !triviaState.lifelines.fifty || triviaState.locked) return;
+      const q = triviaState.question;
+      const wrong = [0, 1, 2, 3].filter(i => i !== q.answer);
+      for (let i = wrong.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [wrong[i], wrong[j]] = [wrong[j], wrong[i]];
+      }
+      triviaState.hiddenOptions = wrong.slice(0, 2);
+      triviaState.lifelines.fifty = false;
+      renderTrivia();
+    }
+
+    function useGroup() {
+      if (!triviaState || !triviaState.lifelines.group || triviaState.locked) return;
+      triviaState.lifelines.group = false;
+      const q = triviaState.question;
+      let suggestion = q.answer;
+      if (Math.random() > 0.65) {
+        const wrong = [0, 1, 2, 3].filter(i => i !== q.answer && !triviaState.hiddenOptions.includes(i));
+        if (wrong.length) suggestion = wrong[Math.floor(Math.random() * wrong.length)];
+      }
+      toast('El grupo votaría: ' + ['A','B','C','D'][suggestion] + ') ' + q.options[suggestion]);
+      renderTrivia();
+    }
+
+    function usePelmazo() {
+      if (!triviaState || !triviaState.lifelines.pelmazo || triviaState.locked) return;
+      triviaState.lifelines.pelmazo = false;
+      const q = triviaState.question;
+      const wrong = [0, 1, 2, 3].filter(i => i !== q.answer);
+      const pick = wrong[Math.floor(Math.random() * wrong.length)];
+      toast('Don Pelmazo dice: “Seguro es ' + ['A','B','C','D'][pick] + '… o no 😅”');
+      renderTrivia();
+    }
+
+    function endTrivia(success, prize, step) {
+      if (triviaState && triviaState.player) saveTriviaRecord(triviaState.player, prize, step);
+      triviaState = { ended: true, success, prize, step, player: triviaState && triviaState.player };
+      renderTrivia();
+    }
+
+    function renderTrivia(flash) {
+      const el = document.getElementById('triviaApp');
+      if (!el) return;
+
+      if (!triviaState) {
+        const rec = loadTriviaRecords();
+        const rows = PLAYERS.map(p => {
+          const r = rec[p];
+          if (!r) return '<li><span class="player-name ' + p + '">' + PLAYER_NAMES[p] + '</span><span style="color:var(--muted)">Sin partidas</span></li>';
+          return '<li><span class="player-name ' + p + '">' + PLAYER_NAMES[p] + '</span><span><strong>' + formatPesos(r.best) + '</strong> · ' + r.plays + ' partidas</span></li>';
+        }).join('');
+        el.innerHTML = '<div class="trivia-home"><h2>⚽ ¿Quién quiere ser millonario?</h2><p>15 preguntas de Champions · de ' + formatPesos(100) + ' a ' + formatPesos(10000) + '.<br>Seguros: ' + formatPesos(1000) + ' y ' + formatPesos(5000) + '. Elige <strong>Soy</strong> para guardar tu récord.</p><button class="primary" onclick="startTriviaGame()">▶ Jugar ahora</button><div class="trivia-records"><h3>Récords del grupo</h3><ul style="list-style:none;padding:0;margin:0;">' + rows + '</ul></div></div>';
+        return;
+      }
+
+      if (triviaState.ended) {
+        const msg = triviaState.success && triviaState.step >= 15 ? '¡Campeón de la trivia!' : (triviaState.success ? 'Te plantaste a tiempo' : 'Respuesta incorrecta');
+        el.innerHTML = '<div class="trivia-result"><div style="color:var(--muted);font-weight:700;">' + msg + '</div><div class="big">' + formatPesos(triviaState.prize) + '</div><p style="color:var(--muted);margin-bottom:1rem;">Escalón alcanzado: ' + (triviaState.step || 0) + '/15' + (triviaState.player ? ' · ' + (PLAYER_NAMES[triviaState.player] || '') : '') + '</p><button class="primary" onclick="triviaState=null;renderTrivia();">Volver</button> <button class="secondary" onclick="startTriviaGame()">Jugar otra</button></div>';
+        return;
+      }
+
+      const q = triviaState.question;
+      const letters = ['A', 'B', 'C', 'D'];
+      const ladderHtml = TRIVIA_BANK.ladder.slice().reverse().map(l => {
+        let cls = '';
+        if (l.step === triviaState.step) cls = 'current';
+        else if (l.step < triviaState.step) cls = 'done';
+        if (l.safe) cls += ' safe';
+        return '<li class="' + cls + '"><span class="step-num">' + l.step + '</span><span>' + formatPesos(l.prize) + (l.safe ? ' 🔒' : '') + '</span></li>';
+      }).join('');
+
+      const opts = q.options.map((text, i) => {
+        if (triviaState.hiddenOptions.includes(i)) {
+          return '<button type="button" class="trivia-opt dim" disabled><span class="letter">' + letters[i] + '</span> —</button>';
+        }
+        let cls = 'trivia-opt';
+        if (flash && flash.reveal) {
+          if (i === q.answer) cls += ' correct';
+          else if (i === flash.chosen && !flash.correct) cls += ' wrong';
+          else cls += ' dim';
+        }
+        const dis = triviaState.locked ? 'disabled' : '';
+        return '<button type="button" class="' + cls + '" ' + dis + ' onclick="answerTrivia(' + i + ')"><span class="letter">' + letters[i] + '</span> ' + text + '</button>';
+      }).join('');
+
+      const walkPrize = triviaState.step > 1 ? ((TRIVIA_BANK.ladder.find(l => l.step === triviaState.step - 1) || {}).prize || 0) : 0;
+      el.innerHTML = '<div class="trivia-layout"><ul class="trivia-ladder">' + ladderHtml + '</ul><div class="trivia-main"><div class="trivia-prize-now">En juego<strong>' + formatPesos(triviaCurrentPrize()) + '</strong></div><div class="trivia-q">' + q.q + '</div><div class="trivia-options">' + opts + '</div><div class="trivia-lifelines"><button type="button" class="' + (triviaState.lifelines.fifty ? '' : 'used') + '" onclick="useFifty()">50:50</button><button type="button" class="' + (triviaState.lifelines.group ? '' : 'used') + '" onclick="useGroup()">Pregunta al grupo</button><button type="button" class="' + (triviaState.lifelines.pelmazo ? '' : 'used') + '" onclick="usePelmazo()">Llamada al Pelmazo</button></div><div class="trivia-actions"><button type="button" onclick="walkAwayTrivia()" ' + (triviaState.step <= 1 || triviaState.locked ? 'disabled' : '') + '>Plantarse (' + formatPesos(walkPrize) + ')</button></div></div></div>';
+    }
+
     // ========== INIT ==========
     document.getElementById('mainNav').addEventListener('click', e => {
       if (e.target.tagName !== 'BUTTON') return;
@@ -4836,6 +5220,7 @@
       if (e.target.dataset.panel === 'historico') renderHistorico();
       if (e.target.dataset.panel === 'rondas') renderRondas();
       if (e.target.dataset.panel === 'mapa') initMap();
+      if (e.target.dataset.panel === 'trivia') renderTrivia();
     });
 
     document.getElementById('clubSearch')?.addEventListener('input', e => {
