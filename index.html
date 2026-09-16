@@ -2788,9 +2788,44 @@
     let data = {
       predictions: {}, // matchId -> { baez: {h,a}, juan:..., ... }
       results: {},     // matchId -> {h, a}
+      trivia: {},      // playerId -> { best, bestStep, plays, name }
       updatedAt: null,
       updatedBy: null
     };
+
+    function emptyTriviaSlot() {
+      return { best: 0, bestStep: 0, plays: 0 };
+    }
+
+    function mergeTriviaMaps(a, b) {
+      const out = {};
+      const ids = new Set([...Object.keys(a || {}), ...Object.keys(b || {})]);
+      ids.forEach(id => {
+        const x = (a && a[id]) || emptyTriviaSlot();
+        const y = (b && b[id]) || emptyTriviaSlot();
+        const best = Math.max(x.best || 0, y.best || 0);
+        let bestStep = x.bestStep || 0;
+        if ((y.best || 0) > (x.best || 0)) bestStep = y.bestStep || 0;
+        else if ((y.best || 0) === (x.best || 0)) bestStep = Math.max(x.bestStep || 0, y.bestStep || 0);
+        out[id] = {
+          best,
+          bestStep,
+          plays: Math.max(x.plays || 0, y.plays || 0),
+          name: y.name || x.name || (PLAYER_NAMES[id] || id)
+        };
+      });
+      return out;
+    }
+
+    function migrateLocalTriviaOnly() {
+      try {
+        const raw = localStorage.getItem('cl_trivia_records_v1');
+        if (!raw) return {};
+        return JSON.parse(raw) || {};
+      } catch (_) {
+        return {};
+      }
+    }
     let saveTimer = null;
     let isSaving = false;
     let lastKnownUpdatedAt = null;
@@ -2828,11 +2863,14 @@
             data = {
               predictions: local.predictions || {},
               results: local.results || {},
+              trivia: mergeTriviaMaps(local.trivia || {}, migrateLocalTriviaOnly()),
               updatedAt: local.updatedAt || null,
               updatedBy: local.updatedBy || null
             };
             lastKnownUpdatedAt = data.updatedAt;
           }
+        } else {
+          data.trivia = mergeTriviaMaps({}, migrateLocalTriviaOnly());
         }
       } catch(_) {}
 
@@ -2840,10 +2878,11 @@
         const res = await fetchWithTimeout(API_URL + '?t=' + Date.now());
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const remote = await res.json();
-        if (remote && typeof remote === 'object' && (remote.predictions || remote.results)) {
+        if (remote && typeof remote === 'object' && (remote.predictions || remote.results || remote.trivia)) {
           data = {
-            predictions: remote.predictions || {},
-            results: remote.results || {},
+            predictions: remote.predictions || data.predictions || {},
+            results: remote.results || data.results || {},
+            trivia: mergeTriviaMaps(data.trivia || {}, remote.trivia || {}),
             updatedAt: remote.updatedAt || null,
             updatedBy: remote.updatedBy || null
           };
@@ -2885,6 +2924,7 @@
       const payload = {
         predictions: data.predictions,
         results: data.results,
+        trivia: data.trivia || {},
         updatedAt: new Date().toISOString(),
         updatedBy: currentUser() || 'anon'
       };
@@ -2938,6 +2978,7 @@
       renderLeaderboard();
       renderStats();
       renderPersonalBar();
+      if (document.getElementById('trivia')?.classList.contains('active')) renderTrivia();
       toast('Datos actualizados desde la nube');
     }
 
@@ -2951,7 +2992,7 @@
         }
       }
       if (!confirm('¿Borrar TODOS los pronósticos y resultados de TODOS?')) return;
-      data = { predictions: {}, results: {}, updatedAt: null, updatedBy: null };
+      data = { predictions: {}, results: {}, trivia: data.trivia || {}, updatedAt: null, updatedBy: null };
       saveData(false);
       pushToRemote(false).then(() => {
         renderMatches();
@@ -5019,25 +5060,23 @@
     }
 
     function loadTriviaRecords() {
-      try {
-        return JSON.parse(localStorage.getItem('cl_trivia_records_v1') || '{}');
-      } catch (_) {
-        return {};
-      }
+      return (data && data.trivia) ? data.trivia : {};
     }
 
     function saveTriviaRecord(playerId, prize, step) {
       if (!playerId) return;
-      const rec = loadTriviaRecords();
-      const prev = rec[playerId] || { best: 0, bestStep: 0, plays: 0 };
+      if (!data.trivia) data.trivia = {};
+      const prev = data.trivia[playerId] || emptyTriviaSlot();
       prev.plays = (prev.plays || 0) + 1;
       if (prize > (prev.best || 0)) {
         prev.best = prize;
         prev.bestStep = step;
-        prev.name = PLAYER_NAMES[playerId] || playerId;
       }
-      rec[playerId] = prev;
-      try { localStorage.setItem('cl_trivia_records_v1', JSON.stringify(rec)); } catch (_) {}
+      prev.name = PLAYER_NAMES[playerId] || playerId;
+      data.trivia[playerId] = prev;
+      try { localStorage.setItem('cl_preds_2026', JSON.stringify(data)); } catch (_) {}
+      // Sube a la misma nube que los pronósticos (incluye predictions/results/trivia)
+      pushToRemote(false);
     }
 
     function triviaLevelForStep(step) {
@@ -5242,11 +5281,14 @@
             data = {
               predictions: local.predictions || {},
               results: local.results || {},
+              trivia: mergeTriviaMaps(local.trivia || {}, migrateLocalTriviaOnly()),
               updatedAt: local.updatedAt || null,
               updatedBy: local.updatedBy || null
             };
             lastKnownUpdatedAt = data.updatedAt;
           }
+        } else {
+          data.trivia = mergeTriviaMaps({}, migrateLocalTriviaOnly());
         }
       } catch(_) {}
       initIdentityPicker();
@@ -5274,6 +5316,7 @@
             data = {
               predictions: remote.predictions || {},
               results: remote.results || {},
+              trivia: mergeTriviaMaps(data.trivia || {}, remote.trivia || {}),
               updatedAt: remote.updatedAt,
               updatedBy: remote.updatedBy || null
             };
@@ -5283,6 +5326,7 @@
             renderLeaderboard();
             renderStats();
             renderPersonalBar();
+            if (document.getElementById('trivia')?.classList.contains('active') && !triviaState) renderTrivia();
             updateSyncStatus('synced');
             toast('Nuevos datos de ' + (remote.updatedBy || 'alguien'));
           }
