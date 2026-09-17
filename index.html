@@ -469,37 +469,38 @@
     .juego-back:hover { color: var(--text); border-color: #2a4a75; }
     .logo-race-score {
       text-align: center;
-      font-size: 0.75rem;
+      font-size: 0.68rem;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.04em;
       color: var(--muted);
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.1rem;
     }
     .logo-race-score strong {
       display: block;
-      font-size: 2rem;
+      font-size: 1.45rem;
       color: var(--gold);
       font-weight: 900;
-      margin-top: 0.15rem;
+      margin-top: 0.05rem;
+      line-height: 1.15;
     }
     .logo-reveal {
-      width: min(240px, 70vw);
-      height: min(240px, 70vw);
-      margin: 0.75rem auto 1rem;
+      width: min(140px, 38vw);
+      height: min(140px, 38vw);
+      margin: 0.35rem auto 0.45rem;
       position: relative;
       background: #fff;
-      border-radius: 16px;
+      border-radius: 12px;
       border: 1px solid var(--border);
       overflow: hidden;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
     }
     .logo-reveal img {
       width: 100%;
       height: 100%;
       object-fit: contain;
       display: block;
-      padding: 0.5rem;
+      padding: 0.3rem;
       box-sizing: border-box;
     }
     .logo-mask-grid {
@@ -520,10 +521,44 @@
     }
     .logo-race-meta {
       text-align: center;
-      font-size: 0.85rem;
+      font-size: 0.75rem;
       color: var(--muted);
       font-weight: 600;
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.35rem;
+    }
+    /* Compact play layout — everything above the fold */
+    .logo-race-play {
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 0.35rem 0.25rem 0.5rem;
+    }
+    .logo-race-play .trivia-options {
+      grid-template-columns: 1fr 1fr;
+      gap: 0.35rem;
+    }
+    .logo-race-play .trivia-opt {
+      padding: 0.45rem 0.55rem;
+      font-size: 0.82rem;
+      border-radius: 8px;
+      line-height: 1.25;
+    }
+    .logo-race-play .trivia-opt .letter {
+      width: 1.1rem;
+      font-size: 0.8rem;
+    }
+    #juegoLogo .rules.logo-rules-compact {
+      margin: 0.35rem 0 0.45rem;
+      padding: 0.45rem 0.65rem;
+      font-size: 0.78rem;
+      line-height: 1.35;
+    }
+    @media (max-height: 700px) {
+      .logo-reveal {
+        width: min(120px, 34vw);
+        height: min(120px, 34vw);
+      }
+      .logo-race-score strong { font-size: 1.25rem; }
+      .logo-race-play .trivia-opt { padding: 0.38rem 0.5rem; font-size: 0.78rem; }
     }
 
     /* Trivia millonario */
@@ -2539,10 +2574,9 @@
       </div>
       <div id="juegoLogo" class="juego-view" hidden>
         <button type="button" class="juego-back" onclick="closeJuego()">← Volver a juegos</button>
-        <div class="rules" style="margin:0.75rem 0 1rem;">
+        <div class="rules logo-rules-compact">
           <strong>¡Quiubo, pues, apúrele con el escudo!</strong> —
-          El escudo se revela en 9 partes · rejilla 3×3 (cada 5 s). Empiezas con 1000 pts y bajan hasta 0.
-          ¡Acierta antes de que se complete!
+          9 piezas (3×3) · cada 5 s · 1000 pts → 0. ¡Acierta antes!
         </div>
         <div id="logoRaceApp"></div>
       </div>
@@ -5650,7 +5684,7 @@ const TRIVIA_BANK = {"version":3,"currency":"pesos","ladder":[{"step":1,"prize":
         return '<button type="button" class="trivia-opt" onclick="answerLogoRace(\'' + t.replace(/'/g, "\\'") + '\')"><span class="letter">' + letters[i] + '</span> ' + logoDisp(t) + '</button>';
       }).join('');
 
-      el.innerHTML = '<div class="trivia-main" style="max-width:520px;margin:0 auto;"><div class="logo-race-score">Puntos en juego<strong id="logoRaceScoreVal">' + logoRaceCurrentScore() + '</strong></div><div class="logo-race-meta">Piezas visibles: ' + logoRaceState.revealed + ' / 9</div><div class="logo-reveal"><img src="' + src + '" alt="Escudo" onerror="this.style.opacity=0.2"/><div class="logo-mask-grid">' + tiles + '</div></div><div class="trivia-options">' + opts + '</div></div>';
+      el.innerHTML = '<div class="logo-race-play"><div class="logo-race-score">Puntos<strong id="logoRaceScoreVal">' + logoRaceCurrentScore() + '</strong></div><div class="logo-race-meta">' + logoRaceState.revealed + ' / 9 piezas</div><div class="logo-reveal"><img src="' + src + '" alt="Escudo" onerror="this.style.opacity=0.2"/><div class="logo-mask-grid">' + tiles + '</div></div><div class="trivia-options">' + opts + '</div></div>';
     }
 
 
