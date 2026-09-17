@@ -2524,7 +2524,7 @@
           </button>
           <button type="button" class="juego-card" onclick="openJuego('logo')">
             <div class="juego-card-icon">⏱️</div>
-            <div class="juego-card-title">Apúrele, pues, con el logo</div>
+            <div class="juego-card-title">¡Quiubo, pues, apúrele con el escudo!</div>
             <div class="juego-card-desc">Escudo a trozos · 4 opciones · puntos que bajan cada segundo</div>
           </button>
         </div>
@@ -2540,7 +2540,7 @@
       <div id="juegoLogo" class="juego-view" hidden>
         <button type="button" class="juego-back" onclick="closeJuego()">← Volver a juegos</button>
         <div class="rules" style="margin:0.75rem 0 1rem;">
-          <strong>Apúrele, pues, con el logo</strong> —
+          <strong>¡Quiubo, pues, apúrele con el escudo!</strong> —
           El escudo se revela en 9 partes · rejilla 3×3 (cada 5 s). Empiezas con 1000 pts y bajan hasta 0.
           ¡Acierta antes de que se complete!
         </div>
@@ -5625,7 +5625,7 @@ const TRIVIA_BANK = {"version":3,"currency":"pesos","ladder":[{"step":1,"prize":
           if (!r || !r.plays) return '<li><span class="player-name ' + p + '">' + PLAYER_NAMES[p] + '</span><span style="color:var(--muted)">Sin partidas</span></li>';
           return '<li><span class="player-name ' + p + '">' + PLAYER_NAMES[p] + '</span><span><strong>' + r.best + '</strong> pts · ' + r.plays + ' partidas</span></li>';
         }).join('');
-        el.innerHTML = '<div class="trivia-home"><h2>⏱️ Apúrele, pues, con el logo</h2><p>El escudo se destapa en <strong>9 partes (3×3)</strong> (una cada 5 s).<br>Empiezas con <strong>1000 puntos</strong> y van bajando. Acierta entre 4 opciones antes de que se complete.</p><button class="primary" onclick="startLogoRace()">▶ Jugar ahora</button><div class="trivia-records"><h3>Récords del grupo (mejor puntuación)</h3><ul style="list-style:none;padding:0;margin:0;">' + rows + '</ul></div></div>';
+        el.innerHTML = '<div class="trivia-home"><h2>⏱️ ¡Quiubo, pues, apúrele con el escudo!</h2><p>El escudo se destapa en <strong>9 partes (3×3)</strong> (una cada 5 s).<br>Empiezas con <strong>1000 puntos</strong> y van bajando. Acierta entre 4 opciones antes de que se complete.</p><button class="primary" onclick="startLogoRace()">▶ Jugar ahora</button><div class="trivia-records"><h3>Récords del grupo (mejor puntuación)</h3><ul style="list-style:none;padding:0;margin:0;">' + rows + '</ul></div></div>';
         return;
       }
 
