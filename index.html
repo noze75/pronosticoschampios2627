@@ -414,6 +414,118 @@
       .pb-avatar { width: 38px; height: 38px; }
     }
 
+
+    .trivia-logo-wrap {
+      display: flex;
+      justify-content: center;
+      margin: 0.5rem 0 0.85rem;
+    }
+    .trivia-logo {
+      width: 96px;
+      height: 96px;
+      object-fit: contain;
+      background: #fff;
+      border-radius: 14px;
+      padding: 0.45rem;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+    }
+
+
+    .juegos-hub { max-width: 820px; margin: 0 auto; }
+    .juegos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+    .juego-card {
+      text-align: left;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem 1.2rem;
+      cursor: pointer;
+      color: var(--text);
+      transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+    }
+    .juego-card:hover {
+      border-color: rgba(0,230,118,0.45);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    }
+    .juego-card-icon { font-size: 2rem; margin-bottom: 0.45rem; }
+    .juego-card-title { font-weight: 900; font-size: 1.1rem; margin-bottom: 0.35rem; }
+    .juego-card-desc { font-size: 0.88rem; color: var(--muted); font-weight: 600; line-height: 1.4; }
+    .juego-back {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 0.35rem 0.7rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .juego-back:hover { color: var(--text); border-color: #2a4a75; }
+    .logo-race-score {
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 0.25rem;
+    }
+    .logo-race-score strong {
+      display: block;
+      font-size: 2rem;
+      color: var(--gold);
+      font-weight: 900;
+      margin-top: 0.15rem;
+    }
+    .logo-reveal {
+      width: min(240px, 70vw);
+      height: min(240px, 70vw);
+      margin: 0.75rem auto 1rem;
+      position: relative;
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    .logo-reveal img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      padding: 0.5rem;
+      box-sizing: border-box;
+    }
+    .logo-mask-grid {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      pointer-events: none;
+    }
+    .logo-mask-grid .tile {
+      background: #0a1628;
+      border: 1px solid rgba(30,58,95,0.5);
+      transition: opacity 0.35s ease;
+    }
+    .logo-mask-grid .tile.revealed {
+      opacity: 0;
+    }
+    .logo-race-meta {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
     /* Trivia millonario */
     .trivia-layout {
       display: grid;
@@ -2115,7 +2227,7 @@
       <button data-panel="historico">Histórico</button>
       <button data-panel="rondas">Rondas finales</button>
       <button data-panel="mapa">Mapa</button>
-      <button data-panel="trivia">Trivia</button>
+      <button data-panel="juegos">Juegos</button>
       <button data-panel="reglas">Reglas</button>
     </nav>
   </header>
@@ -2398,14 +2510,42 @@
       </div>
     </div>
 
-    <!-- TRIVIA -->
-    <div id="trivia" class="panel">
-      <div class="rules" style="margin-bottom:1rem;">
-        <strong>Trivia Champions · Quién quiere ser millonario</strong> —
-        15 escalones de $100 a $10.000. Elige <strong>Soy</strong> para guardar tu récord.
-        Seguros en $1.000 y $5.000. Fallar = te quedas con el último seguro (o $0).
+    <!-- JUEGOS -->
+    <div id="juegos" class="panel">
+      <div id="juegosHub" class="juegos-hub">
+        <div class="rules" style="margin-bottom:1rem;">
+          <strong>Juegos Champions</strong> — Elige un modo. Con <strong>Soy</strong> se guardan tus récords en la nube.
+        </div>
+        <div class="juegos-grid">
+          <button type="button" class="juego-card" onclick="openJuego('trivia')">
+            <div class="juego-card-icon">🧠</div>
+            <div class="juego-card-title">Trivia millonario</div>
+            <div class="juego-card-desc">15 escalones · $100 a $10.000 · comodines · 300 preguntas</div>
+          </button>
+          <button type="button" class="juego-card" onclick="openJuego('logo')">
+            <div class="juego-card-icon">⏱️</div>
+            <div class="juego-card-title">Apúrele, pues, con el logo</div>
+            <div class="juego-card-desc">Escudo a trozos · 4 opciones · puntos que bajan cada segundo</div>
+          </button>
+        </div>
       </div>
-      <div id="triviaApp"></div>
+      <div id="juegoTrivia" class="juego-view" hidden>
+        <button type="button" class="juego-back" onclick="closeJuego()">← Volver a juegos</button>
+        <div class="rules" style="margin:0.75rem 0 1rem;">
+          <strong>Trivia · Quién quiere ser millonario</strong> —
+          300 preguntas · seguros en $1.000 y $5.000.
+        </div>
+        <div id="triviaApp"></div>
+      </div>
+      <div id="juegoLogo" class="juego-view" hidden>
+        <button type="button" class="juego-back" onclick="closeJuego()">← Volver a juegos</button>
+        <div class="rules" style="margin:0.75rem 0 1rem;">
+          <strong>Apúrele, pues, con el logo</strong> —
+          El escudo se revela en 9 partes · rejilla 3×3 (cada 5 s). Empiezas con 1000 pts y bajan hasta 0.
+          ¡Acierta antes de que se complete!
+        </div>
+        <div id="logoRaceApp"></div>
+      </div>
     </div>
 
     <!-- REGLAS -->
@@ -2473,7 +2613,7 @@
     // ========== DATA ==========
     const PLAYERS = ['baez', 'juan', 'marrugo', 'mauricio'];
     const PLAYER_NAMES = { baez: 'Báez', juan: 'Juan', marrugo: 'Marrugo', mauricio: 'Mauricio' };
-    const TRIVIA_BANK = {"version":1,"currency":"pesos","ladder":[{"step":1,"prize":100,"safe":false},{"step":2,"prize":200,"safe":false},{"step":3,"prize":300,"safe":false},{"step":4,"prize":500,"safe":false},{"step":5,"prize":1000,"safe":true},{"step":6,"prize":1500,"safe":false},{"step":7,"prize":2000,"safe":false},{"step":8,"prize":3000,"safe":false},{"step":9,"prize":4000,"safe":false},{"step":10,"prize":5000,"safe":true},{"step":11,"prize":6000,"safe":false},{"step":12,"prize":7000,"safe":false},{"step":13,"prize":8000,"safe":false},{"step":14,"prize":9000,"safe":false},{"step":15,"prize":10000,"safe":false}],"lifelines":["fifty","group","pelmazo"],"rules":{"steps":15,"questions_per_game":15,"walk_away":true,"wrong_answer":"Caes al último seguro alcanzado (0 si no hay seguro)","selection":"Por cada escalón se elige 1 pregunta aleatoria del pool de ese nivel (1-5, 6-10, 11-15) sin repetir en la misma partida"},"questions":[{"id":1,"q":"¿Qué club tiene más títulos de Champions League / Copa de Europa?","options":["Bayern Múnich","Real Madrid","Milan","Liverpool"],"answer":1,"level":1,"topic":"titulos"},{"id":2,"q":"¿Cuántas Champions ha ganado el Real Madrid (hasta 2024 inclusive)?","options":["12","13","14","15"],"answer":3,"level":1,"topic":"titulos"},{"id":3,"q":"¿Quién es el máximo goleador histórico de la Champions League?","options":["Lionel Messi","Robert Lewandowski","Cristiano Ronaldo","Karim Benzema"],"answer":2,"level":1,"topic":"goleadores"},{"id":4,"q":"¿Qué equipo inglés ganó la Champions 2018/19?","options":["Chelsea","Manchester City","Liverpool","Tottenham"],"answer":2,"level":1,"topic":"finales"},{"id":5,"q":"¿Cómo se llama popularmente el trofeo de la Champions?","options":["La Copa Grande","La Orejona","El Balón de Europa","La Jarra"],"answer":1,"level":1,"topic":"cultura"},{"id":6,"q":"¿En qué ciudad está el estadio Anfield?","options":["Manchester","Londres","Liverpool","Birmingham"],"answer":2,"level":1,"topic":"estadios"},{"id":7,"q":"¿Qué club ganó la primera edición de la Copa de Europa (1955/56)?","options":["Benfica","Real Madrid","Milan","Ajax"],"answer":1,"level":1,"topic":"historia"},{"id":8,"q":"¿Qué país ha ganado más Champions sumando todos sus clubes?","options":["Inglaterra","Italia","España","Alemania"],"answer":2,"level":1,"topic":"titulos"},{"id":9,"q":"¿Qué equipo ganó la Champions 2022/23, su primera orejona?","options":["Chelsea","Manchester City","Arsenal","Tottenham"],"answer":1,"level":1,"topic":"finales"},{"id":10,"q":"¿Quién marcó el gol de la final 2014 (Real Madrid 4-1 Atlético) en la prórroga?","options":["Bale","Ronaldo","Ramos","Di María"],"answer":2,"level":2,"topic":"finales"},{"id":11,"q":"¿Qué club es apodado 'Los Rojos' y tiene 6 Champions?","options":["Manchester United","Liverpool","Bayern","Milan"],"answer":1,"level":1,"topic":"clubes"},{"id":12,"q":"¿En qué estadio juega el Barcelona como local?","options":["Wanda Metropolitano","Camp Nou","San Mamés","Mestalla"],"answer":1,"level":1,"topic":"estadios"},{"id":13,"q":"¿Qué entrenador ganó la Champions 2009 y 2011 con el Barcelona?","options":["Luis Enrique","Frank Rijkaard","Pep Guardiola","Ronald Koeman"],"answer":2,"level":2,"topic":"entrenadores"},{"id":14,"q":"¿Qué equipo ganó la Champions 2019/20 en Lisboa?","options":["PSG","Bayern Múnich","Lyon","RB Leipzig"],"answer":1,"level":2,"topic":"finales"},{"id":15,"q":"Himno oficial de la Champions: ¿en qué idioma se canta principalmente el estribillo famoso?","options":["Inglés","Latín","Italiano","Francés"],"answer":1,"level":1,"topic":"cultura"},{"id":16,"q":"¿Qué club italiano tiene 7 Champions?","options":["Inter","Juventus","Milan","Roma"],"answer":2,"level":1,"topic":"titulos"},{"id":17,"q":"¿Qué jugador es conocido como 'CR7'?","options":["Carlo Ronaldo","Cristiano Ronaldo","Carlos Ruiz","Cesc Ronaldo"],"answer":1,"level":1,"topic":"jugadores"},{"id":18,"q":"Final 2005 en Estambul: ¿quién remontó de 0-3 a ganar en penaltis?","options":["Milan","Liverpool","Juventus","Chelsea"],"answer":1,"level":2,"topic":"finales"},{"id":19,"q":"¿Qué color es el dorsal típico asociado al ' Balón de Oro' que muchos asocian con Messi/Ronaldo en Champions?","options":["Es un trofeo, no un dorsal","Siempre el 10","Siempre el 7","Siempre el 9"],"answer":0,"level":1,"topic":"cultura"},{"id":20,"q":"¿Qué equipo ganó la Champions 2023/24 en Wembley?","options":["Dortmund","Real Madrid","Bayern","PSG"],"answer":1,"level":1,"topic":"finales"},{"id":21,"q":"¿Qué club neerlandés ganó tres Champions seguidas en los 70?","options":["Feyenoord","PSV","Ajax","AZ"],"answer":2,"level":2,"topic":"historia"},{"id":22,"q":"¿En qué país se inventó y se juega el Real Madrid?","options":["Portugal","España","México","Argentina"],"answer":1,"level":1,"topic":"clubes"},{"id":23,"q":"¿Qué final se recuerda por el 'gol de Ramos' de cabeza en el 93'?","options":["2014 vs Atlético","2016 vs Atlético","2018 vs Liverpool","2002 vs Leverkusen"],"answer":0,"level":2,"topic":"finales"},{"id":24,"q":"¿Qué equipo ganó la Champions 2011/12 en penaltis ante el Bayern?","options":["Chelsea","Manchester United","Arsenal","Tottenham"],"answer":0,"level":2,"topic":"finales"},{"id":25,"q":"Estadio del Bayern Múnich:","options":["Signal Iduna Park","Allianz Arena","Olympiastadion Berlín","Volkswagen Arena"],"answer":1,"level":1,"topic":"estadios"},{"id":26,"q":"¿Qué club portugués ganó la Champions con Mourinho en 2004?","options":["Benfica","Sporting","Porto","Braga"],"answer":2,"level":2,"topic":"finales"},{"id":27,"q":"¿Cuántas Champions consecutivas ganó el Real Madrid entre 2016 y 2018?","options":["Dos","Tres","Cuatro","Una"],"answer":1,"level":2,"topic":"titulos"},{"id":28,"q":"¿Qué jugador argentino es el segundo máximo goleador histórico de la Champions?","options":["Di María","Messi","Agüero","Higuain"],"answer":1,"level":1,"topic":"goleadores"},{"id":29,"q":"Final 1999: United remontó en el descuento ante…","options":["Juventus","Bayern Múnich","Dortmund","Milan"],"answer":1,"level":2,"topic":"finales"},{"id":30,"q":"¿Qué club escocés ganó la Copa de Europa en 1967?","options":["Rangers","Celtic","Aberdeen","Hearts"],"answer":1,"level":2,"topic":"historia"},{"id":31,"q":"¿Qué equipo es 'La Vecchia Signora'?","options":["Inter","Milan","Juventus","Napoli"],"answer":2,"level":1,"topic":"clubes"},{"id":32,"q":"¿En qué ciudad se jugó la final 2024?","options":["París","Estambul","Londres","Múnich"],"answer":2,"level":1,"topic":"finales"},{"id":33,"q":"¿Qué club ganó la Champions 2024/25 con un 5-0 en la final?","options":["Real Madrid","PSG","Bayern","Inter"],"answer":1,"level":1,"topic":"finales"},{"id":34,"q":"Máximo goleador en una sola edición de Champions (récord): ¿quién hizo 17 goles?","options":["Messi","Lewandowski","Cristiano Ronaldo","Benzema"],"answer":2,"level":3,"topic":"goleadores"},{"id":35,"q":"¿Qué significa UCL en inglés?","options":["United Club League","UEFA Champions League","Ultra Club League","Union of Champions List"],"answer":1,"level":1,"topic":"cultura"},{"id":36,"q":"¿Quién entrenaba al Inter campeón de 2010?","options":["Mourinho","Conte","Spalletti","Mancini"],"answer":0,"level":3,"topic":"entrenadores"},{"id":37,"q":"Final 2008 en Moscú: ¿quién ganó en penaltis?","options":["Chelsea","Manchester United","Liverpool","Arsenal"],"answer":1,"level":3,"topic":"finales"},{"id":38,"q":"¿Qué club inglés ganó dos Champions seguidas a finales de los 70?","options":["Nottingham Forest","Liverpool","Aston Villa","United"],"answer":1,"level":3,"topic":"historia"},{"id":39,"q":"¿Nottingham Forest cuántas Copas de Europa tiene?","options":["1","2","3","0"],"answer":1,"level":3,"topic":"titulos"},{"id":40,"q":"Final 2013: Bayern vs Dortmund. ¿Marcador?","options":["1-0","2-1","3-2","2-0"],"answer":1,"level":3,"topic":"finales"},{"id":41,"q":"¿Qué estadio ha alojado más finales de Champions/Copa de Europa?","options":["San Siro","Bernabéu","Wembley","Olimpico de Roma"],"answer":2,"level":3,"topic":"estadios"},{"id":42,"q":"¿Quién marcó el gol de la final 2022 (Madrid 1-0 Liverpool)?","options":["Benzema","Vinícius Jr.","Modrić","Valverde"],"answer":1,"level":3,"topic":"finales"},{"id":43,"q":"¿Qué club ganó la primera Champions con el formato actual de 'Champions League' (1992/93)?","options":["Milan","Marsella","Barcelona","Ajax"],"answer":1,"level":4,"topic":"historia"},{"id":44,"q":"Zinedine Zidane como entrenador: ¿cuántas Champions ganó seguidas con el Madrid?","options":["1","2","3","4"],"answer":2,"level":3,"topic":"entrenadores"},{"id":45,"q":"¿Qué jugador tiene el récord de más partidos en Champions?","options":["Casillas","Messi","Cristiano Ronaldo","Xavi"],"answer":2,"level":3,"topic":"jugadores"},{"id":46,"q":"Final 2006: Barcelona ganó a…","options":["Arsenal","Milan","Chelsea","United"],"answer":0,"level":3,"topic":"finales"},{"id":47,"q":"¿Qué club rumano ganó la Copa de Europa en 1986?","options":["Dinamo Bucarest","Steaua Bucarest","CFR Cluj","Rapid"],"answer":1,"level":4,"topic":"historia"},{"id":48,"q":"¿Quién fue el técnico del Chelsea campeón en 2021?","options":["Lampard","Tuchel","Sarri","Conte"],"answer":1,"level":3,"topic":"entrenadores"},{"id":49,"q":"El 'Milagro de Estambul' enfrentó a Liverpool con…","options":["Juventus","Milan","Inter","Roma"],"answer":1,"level":2,"topic":"finales"},{"id":50,"q":"¿Qué equipo alemán ganó tres Copas de Europa seguidas en los 70?","options":["Dortmund","Hamburgo","Bayern Múnich","Mönchengladbach"],"answer":2,"level":3,"topic":"historia"},{"id":51,"q":"Final 2018 en Kiev: Madrid 3-1 Liverpool. ¿Quién hizo doblete?","options":["Ronaldo","Bale","Benzema","Asensio"],"answer":1,"level":4,"topic":"finales"},{"id":52,"q":"¿Qué club ganó la Champions 1994 goleando 4-0 al Barcelona?","options":["Milan","Ajax","Juventus","Porto"],"answer":0,"level":4,"topic":"finales"},{"id":53,"q":"Raúl González es histórico goleador de la Champions con el…","options":["Atlético","Real Madrid","Schalke solo","Barcelona"],"answer":1,"level":2,"topic":"goleadores"},{"id":54,"q":"¿En qué final debutó el 'trampolín' de Bale con chilena?","options":["2014","2016","2017","2018"],"answer":3,"level":4,"topic":"finales"},{"id":55,"q":"¿Qué país no tenía campeón de Champions hasta 2025 (club)?","options":["Francia (Marsella 1993)","Francia solo tenía Marsella hasta PSG 2025","Portugal","Países Bajos"],"answer":1,"level":4,"topic":"titulos"},{"id":56,"q":"Clarificación: antes de PSG 2025, el único campeón francés era…","options":["PSG","Lyon","Marsella","Monaco"],"answer":2,"level":3,"topic":"historia"},{"id":57,"q":"¿Qué club ganó la Champions 2003/04 contra el Monaco?","options":["Porto","Milan","Deportivo","Chelsea"],"answer":0,"level":3,"topic":"finales"},{"id":58,"q":"Steven Gerrard es leyenda de…","options":["Chelsea","Liverpool","United","Aston Villa"],"answer":1,"level":1,"topic":"jugadores"},{"id":59,"q":"¿Qué final se jugó en el Atatürk de Estambul en 2023?","options":["Madrid vs Liverpool","City vs Inter","Bayern vs PSG","Chelsea vs City"],"answer":1,"level":3,"topic":"finales"},{"id":60,"q":"¿Quién anotó el único gol de la final 2023 (City 1-0 Inter)?","options":["Haaland","Rodri","De Bruyne","Mahrez"],"answer":1,"level":4,"topic":"finales"},{"id":61,"q":"Ajax de 1995: ¿qué joven estrella holandesa destacaba (luego del Barça/United)?","options":["Seedorf","Davids","Kluivert","Bergkamp"],"answer":2,"level":5,"topic":"historia"},{"id":62,"q":"¿Qué club tiene el récord de más finales perdidas (7)?","options":["Bayern","Benfica","Juventus","Atlético"],"answer":2,"level":4,"topic":"titulos"},{"id":63,"q":"Final 2015: Barcelona 3-1 Juventus. ¿Quién entrenaba al Barça?","options":["Guardiola","Luis Enrique","Valverde","Setién"],"answer":1,"level":3,"topic":"entrenadores"},{"id":64,"q":"¿Qué portero es el que más partidos ha jugado en Champions tras Ronaldo (entre los históricos top)?","options":["Buffon","Casillas","Neuer solo","Navas"],"answer":1,"level":4,"topic":"jugadores"},{"id":65,"q":"El 'Triple' del United 1999 lo logró con técnico…","options":["Van Gaal","Ferguson","Moyes","Busby"],"answer":1,"level":2,"topic":"entrenadores"},{"id":66,"q":"¿Qué equipo ganó la Champions 1987 ante el Bayern?","options":["Porto","Benfica","PSV","Ajax"],"answer":0,"level":4,"topic":"historia"},{"id":67,"q":"Dani Carvajal: ¿cuántas Champions ha ganado con el Madrid (hasta 2024)?","options":["4","5","6","3"],"answer":2,"level":4,"topic":"jugadores"},{"id":68,"q":"Final 2020: ¿en qué ciudad (a puerta cerrada)?","options":["Madrid","Lisboa","Múnich","París"],"answer":1,"level":3,"topic":"finales"},{"id":69,"q":"¿Qué club belga fue finalista en 1978?","options":["Anderlecht","Club Brujas","Standard","Genk"],"answer":1,"level":5,"topic":"historia"},{"id":70,"q":"Lewandowski marcó 5 goles en un partido de Champions ante el…","options":["Arsenal","Real Madrid","Wolfsburgo","Chelsea"],"answer":2,"level":4,"topic":"goleadores"},{"id":71,"q":"¿Qué equipo ganó la Copa de Europa 1982 en De Kuip?","options":["Hamburgo","Aston Villa","Bayern","Juventus"],"answer":1,"level":4,"topic":"historia"},{"id":72,"q":"Xavi Hernández jugó toda su carrera de club profesional europea principalmente en…","options":["Madrid","Barcelona","PSG","Milan"],"answer":1,"level":1,"topic":"jugadores"},{"id":73,"q":"¿Qué final terminó 4-1 a favor del Madrid en Lisboa 2014?","options":["vs Bayern","vs Atlético","vs Juventus","vs Liverpool"],"answer":1,"level":2,"topic":"finales"},{"id":74,"q":"PSV Eindhoven ganó la Champions en…","options":["1986","1988","1990","1992"],"answer":1,"level":5,"topic":"historia"},{"id":75,"q":"¿Qué jugador marcó 2 goles en la final 2025 (PSG 5-0 Inter)?","options":["Mbappé","Désiré Doué","Hakimi","Dembélé"],"answer":1,"level":4,"topic":"finales"},{"id":76,"q":"¿Quién ganó la Bota de Oro de la Champions 2013/14 con 17 goles?","options":["Messi","Cristiano Ronaldo","Benzema","Bale"],"answer":1,"level":5,"topic":"goleadores"},{"id":77,"q":"Red Star Belgrado ganó la Copa de Europa en…","options":["1989","1991","1993","1987"],"answer":1,"level":5,"topic":"historia"},{"id":78,"q":"Final 1977: Liverpool 3-1… ¿rival?","options":["Bayern","Borussia Mönchengladbach","Hamburgo","Juventus"],"answer":1,"level":5,"topic":"historia"},{"id":79,"q":"¿Qué estadio acogió la final 2002 (Madrid 2-1 Leverkusen)?","options":["Old Trafford","Hampden Park","San Siro","De Kuip"],"answer":1,"level":5,"topic":"estadios"},{"id":80,"q":"Clarence Seedorf ganó Champions con…","options":["Solo Milan","Ajax, Madrid y Milan","Ajax y Milan","Madrid y Milan"],"answer":1,"level":5,"topic":"jugadores"},{"id":81,"q":"¿Qué club soviético/ucraniano es histórico en participaciones (Dinamo…)?","options":["Moscú","Kiev","Tbilisi","Minsk"],"answer":1,"level":4,"topic":"clubes"},{"id":82,"q":"Final 1989: Milan 4-0 Steaua. Técnico del Milan:","options":["Capello","Sacchi","Trapattoni","Lippi"],"answer":1,"level":5,"topic":"entrenadores"},{"id":83,"q":"¿En qué año se introdujo el nombre 'UEFA Champions League'?","options":["1990/91","1991/92","1992/93","1993/94"],"answer":2,"level":5,"topic":"historia"},{"id":84,"q":"Marseille campeón 1993: ¿ante qué equipo?","options":["Barcelona","Milan","Ajax","Monaco"],"answer":1,"level":4,"topic":"finales"},{"id":85,"q":"¿Qué jugador marcó el gol de la final 2013 para el Bayern (2-1 Dortmund)?","options":["Robben","Müller","Ribéry","Mandzukic"],"answer":0,"level":5,"topic":"finales"},{"id":86,"q":"Francisco Gento tiene un récord clásico de…","options":["Más goles en finales","Más Copas de Europa como jugador (6)","Más tarjetas","Más penaltis parados"],"answer":1,"level":5,"topic":"jugadores"},{"id":87,"q":"Final 2003: Milan vs Juventus en Old Trafford. ¿Cómo se decidió?","options":["1-0 en el 90'","Prórroga y gol de oro","Penaltis","2-1"],"answer":2,"level":5,"topic":"finales"},{"id":88,"q":"¿Qué club sueco fue finalista en 1979?","options":["IFK Göteborg","Malmö FF","AIK","Hammarby"],"answer":1,"level":5,"topic":"historia"},{"id":89,"q":"Samuel Eto'o ganó Champions con…","options":["Solo Barça","Barça e Inter","Barça y Madrid","Inter y Milan"],"answer":1,"level":4,"topic":"jugadores"},{"id":90,"q":"Final 1997: Dortmund 3-1 Juventus. ¿Quién entrenaba al Dortmund?","options":["Klopp","Ottmar Hitzfeld","Favre","Sacchi"],"answer":1,"level":5,"topic":"entrenadores"},{"id":91,"q":"¿Qué final se jugó en el Luzhniki de Moscú?","options":["2007","2008","2009","2010"],"answer":1,"level":4,"topic":"estadios"},{"id":92,"q":"Hamburgo campeón de Europa: año…","options":["1981","1983","1985","1979"],"answer":1,"level":5,"topic":"historia"},{"id":93,"q":"¿Qué jugador anotó el gol de la victoria del Chelsea en la final 2012 (tiempo reglamentario, empate 1-1)?","options":["Drogba","Lampard","Mata","Terry"],"answer":0,"level":4,"topic":"finales"},{"id":94,"q":"La final 2016 Madrid-Atlético se decidió en penaltis. ¿Quién falló un penalti decisivo del Atlético?","options":["Griezmann","Juanfran","Gabi","Koke"],"answer":1,"level":5,"topic":"finales"},{"id":95,"q":"¿Qué club ganó la última Copa de Europa antes del nombre Champions League (1991/92)?","options":["Estrella Roja","Marsella","Barcelona","Milan"],"answer":2,"level":5,"topic":"historia"},{"id":96,"q":"Paolo Maldini jugó cuántas finales de Champions/Copa de Europa (récord compartido era)?","options":["4","5","6","7"],"answer":2,"level":5,"topic":"jugadores"},{"id":97,"q":"Final 2007 Atenas: Milan 2-1 Liverpool. ¿Quién marcó primero para el Milan?","options":["Inzaghi","Kaká","Seedorf","Pirlo"],"answer":0,"level":5,"topic":"finales"},{"id":98,"q":"¿Qué estadio acogió la final 2017 (Madrid 4-1 Juventus)?","options":["Wembley","Cardiff (National Stadium of Wales)","San Siro","Berlín"],"answer":1,"level":4,"topic":"estadios"},{"id":99,"q":"Bob Paisley cuántas Copas de Europa ganó como técnico del Liverpool?","options":["1","2","3","4"],"answer":2,"level":5,"topic":"entrenadores"},{"id":100,"q":"En la final 2024, ¿quién marcó el 1-0 del Real Madrid ante el Dortmund?","options":["Vinícius","Carvajal","Bellingham","Rodrygo"],"answer":1,"level":3,"topic":"finales"}]};
+const TRIVIA_BANK = {"version":3,"currency":"pesos","ladder":[{"step":1,"prize":100,"safe":false},{"step":2,"prize":200,"safe":false},{"step":3,"prize":300,"safe":false},{"step":4,"prize":500,"safe":false},{"step":5,"prize":1000,"safe":true},{"step":6,"prize":1500,"safe":false},{"step":7,"prize":2000,"safe":false},{"step":8,"prize":3000,"safe":false},{"step":9,"prize":4000,"safe":false},{"step":10,"prize":5000,"safe":true},{"step":11,"prize":6000,"safe":false},{"step":12,"prize":7000,"safe":false},{"step":13,"prize":8000,"safe":false},{"step":14,"prize":9000,"safe":false},{"step":15,"prize":10000,"safe":false}],"levelMap":{"1-2":1,"3-6":2,"7-11":3,"12-15":4},"lifelines":["fifty","group","pelmazo"],"rules":{"steps":15,"distribution":"50% fácil (1-6: niv 1+2), 30% media (7-11: niv 3), 20% difícil (12-15: niv 4); fácil subdividido 1-2 / 3-6"},"questions":[{"q":"¿De qué equipo es este escudo?","options":["Porto","Barcelona","Real Madrid","PSG"],"answer":2,"level":1,"topic":"escudos","logo":"Real Madrid","id":1},{"q":"¿De qué equipo es este escudo?","options":["Barcelona","Porto","Roma","Atlético de Madrid"],"answer":0,"level":1,"topic":"escudos","logo":"Barcelona","id":2},{"q":"¿De qué equipo es este escudo?","options":["Inter","Liverpool","Manchester United","Porto"],"answer":1,"level":1,"topic":"escudos","logo":"Liverpool","id":3},{"q":"¿De qué equipo es este escudo?","options":["Borussia Dortmund","Arsenal","Atlético de Madrid","Bayern Múnich"],"answer":3,"level":1,"topic":"escudos","logo":"Bayern München","id":4},{"q":"¿De qué equipo es este escudo?","options":["Roma","Barcelona","Manchester United","Real Madrid"],"answer":2,"level":1,"topic":"escudos","logo":"Manchester United","id":5},{"q":"¿De qué equipo es este escudo?","options":["Bayern Múnich","Liverpool","Arsenal","Napoli"],"answer":2,"level":1,"topic":"escudos","logo":"Arsenal","id":6},{"q":"¿De qué equipo es este escudo?","options":["PSG","Borussia Dortmund","Inter","Liverpool"],"answer":0,"level":1,"topic":"escudos","logo":"Paris Saint-Germain","id":7},{"q":"¿De qué equipo es este escudo?","options":["Manchester City","Barcelona","Atlético de Madrid","Napoli"],"answer":0,"level":1,"topic":"escudos","logo":"Manchester City","id":8},{"q":"¿De qué equipo es este escudo?","options":["Bayern Múnich","Inter","Atlético de Madrid","Manchester United"],"answer":1,"level":1,"topic":"escudos","logo":"Inter","id":9},{"q":"¿De qué equipo es este escudo?","options":["Manchester United","Roma","Manchester City","Borussia Dortmund"],"answer":3,"level":1,"topic":"escudos","logo":"Borussia Dortmund","id":10},{"id":11,"q":"¿La Vecchia Signora es…?","options":["Inter","Milan","Juventus","Napoli"],"answer":2,"level":1,"topic":"clubes"},{"id":12,"q":"¿Tres Champions seguidas en los 70 (Alemania)?","options":["Dortmund","Hamburgo","Bayern Múnich","Gladbach"],"answer":2,"level":1,"topic":"historia"},{"id":13,"q":"¿Campeón 2023/24?","options":["Dortmund","Real Madrid","Bayern","City"],"answer":1,"level":1,"topic":"finales"},{"id":14,"q":"¿Bayern es de…?","options":["Berlín","Múnich","Hamburgo","Dortmund"],"answer":1,"level":1,"topic":"clubes"},{"id":15,"q":"¿Qué club fundado en Madrid viste de blanco y es el máximo ganador de la Champions?","options":["Atlético de Madrid","Real Madrid","Rayo Vallecano","Getafe"],"answer":1,"level":1,"topic":"clubes"},{"id":16,"q":"¿Milagro de Estambul es una final de…?","options":["Mundial","Champions","Eurocopa","Copa América"],"answer":1,"level":1,"topic":"finales"},{"id":17,"q":"¿Cómo se llama popularmente el trofeo de la Champions?","options":["La Copa Grande","La Orejona","El Balón de Europa","La Jarra"],"answer":1,"level":1,"topic":"cultura"},{"id":18,"q":"¿Ajax es club de qué país?","options":["Bélgica","Países Bajos","Alemania","Dinamarca"],"answer":1,"level":1,"topic":"clubes"},{"id":19,"q":"¿Campeón 2024/25 con 5-0 en la final?","options":["Real Madrid","PSG","Bayern","Inter"],"answer":1,"level":1,"topic":"finales"},{"id":20,"q":"¿Campeón 2019 ante Tottenham?","options":["Chelsea","Liverpool","Arsenal","City"],"answer":1,"level":1,"topic":"finales"},{"id":21,"q":"¿Haaland brilló en Champions con City y antes…?","options":["Bayern","Dortmund","United","Chelsea"],"answer":1,"level":1,"topic":"jugadores"},{"id":22,"q":"¿En qué ciudad juega el Liverpool?","options":["Manchester","Londres","Liverpool","Birmingham"],"answer":2,"level":1,"topic":"clubes"},{"id":23,"q":"¿Himno asociado a la Champions?","options":["We Are the Champions","Himno de la UEFA Champions League","YNWA","Seven Nation Army"],"answer":1,"level":1,"topic":"cultura"},{"id":24,"q":"¿Bernabéu es estadio de…?","options":["Atlético","Real Madrid","Sevilla","Valencia"],"answer":1,"level":1,"topic":"estadios"},{"id":25,"q":"¿Qué significa UCL?","options":["United Club League","UEFA Champions League","Ultra Club League","Union Champions List"],"answer":1,"level":1,"topic":"cultura"},{"id":26,"q":"¿Final 2024 en qué ciudad?","options":["París","Estambul","Londres","Múnich"],"answer":2,"level":1,"topic":"finales"},{"id":27,"q":"¿Benzema brilló años en…?","options":["PSG","Real Madrid","Marsella","Chelsea"],"answer":1,"level":1,"topic":"jugadores"},{"id":28,"q":"¿PSG es club de…?","options":["Londres","París","Marsella","Lyon"],"answer":1,"level":1,"topic":"clubes"},{"id":29,"q":"¿San Siro está en…?","options":["Roma","Milán","Nápoles","Turín"],"answer":1,"level":1,"topic":"estadios"},{"id":30,"q":"¿Gunners es apodo de…?","options":["Chelsea","Arsenal","Tottenham","West Ham"],"answer":1,"level":1,"topic":"clubes"},{"id":31,"q":"¿Guardiola es leyenda como técnico del…?","options":["Espanyol","Barcelona","Girona","Madrid"],"answer":1,"level":1,"topic":"entrenadores"},{"id":32,"q":"¿Vinícius Jr. juega en…?","options":["Barcelona","Real Madrid","PSG","Milan"],"answer":1,"level":1,"topic":"jugadores"},{"id":33,"q":"¿Campeón 2022/23 (primera orejona)?","options":["Chelsea","Manchester City","Arsenal","Tottenham"],"answer":1,"level":1,"topic":"finales"},{"id":34,"q":"¿Atlético de Madrid es de…?","options":["Barcelona","Madrid","Valencia","Sevilla"],"answer":1,"level":1,"topic":"clubes"},{"id":35,"q":"¿Dortmund es club…?","options":["Francés","Alemán","Italiano","Español"],"answer":1,"level":1,"topic":"clubes"},{"id":36,"q":"¿Zidane campeón como técnico del…?","options":["Juventus","Real Madrid","Marsella","Bayern"],"answer":1,"level":1,"topic":"entrenadores"},{"id":37,"q":"¿Old Trafford es de…?","options":["Liverpool","Manchester United","Manchester City","Chelsea"],"answer":1,"level":1,"topic":"estadios"},{"id":38,"q":"¿En qué continente se juega la Champions?","options":["América","Europa","Asia","África"],"answer":1,"level":1,"topic":"cultura"},{"id":39,"q":"¿Colores clásicos del Milan?","options":["Azul","Rojo y negro","Verde","Blanco"],"answer":1,"level":1,"topic":"clubes"},{"id":40,"q":"¿Técnico del City campeón 2023?","options":["Gallardo","Pep Guardiola","Simeone","Pochettino"],"answer":1,"level":1,"topic":"entrenadores"},{"id":41,"q":"¿Inter se refiere a…?","options":["Inter de Milán","Inter de Madrid","Inter de París","Inter de Londres"],"answer":0,"level":1,"topic":"clubes"},{"id":42,"q":"¿Juventus es de…?","options":["Milán","Turín","Roma","Nápoles"],"answer":1,"level":1,"topic":"clubes"},{"id":43,"q":"¿Porto es club de…?","options":["España","Portugal","Brasil","Francia"],"answer":1,"level":1,"topic":"clubes"},{"id":44,"q":"¿Lewandowski es…?","options":["Alemán","Polaco","Ruso","Checo"],"answer":1,"level":1,"topic":"jugadores"},{"id":45,"q":"¿UEFA es la confederación de…?","options":["Sudamérica","Europa","Asia","África"],"answer":1,"level":1,"topic":"cultura"},{"id":46,"q":"¿Casillas es leyenda de…?","options":["Barcelona","Real Madrid","Atlético","Sevilla"],"answer":1,"level":1,"topic":"jugadores"},{"id":47,"q":"¿Anfield es de…?","options":["Everton","Liverpool","United","City"],"answer":1,"level":1,"topic":"estadios"},{"id":48,"q":"¿Quién es el máximo goleador histórico de la Champions?","options":["Messi","Lewandowski","Cristiano Ronaldo","Benzema"],"answer":2,"level":1,"topic":"goleadores"},{"id":49,"q":"¿País con más títulos de clubes en Champions?","options":["Inglaterra","Italia","España","Alemania"],"answer":2,"level":1,"topic":"titulos"},{"id":50,"q":"¿Qué club tiene más títulos de Champions / Copa de Europa?","options":["Bayern Múnich","Real Madrid","Milan","Liverpool"],"answer":1,"level":1,"topic":"titulos"},{"q":"¿De qué equipo es este escudo?","options":["Roma","Real Madrid","Manchester United","Inter"],"answer":1,"level":2,"topic":"escudos","logo":"Real Madrid","id":51},{"q":"¿De qué equipo es este escudo?","options":["Galatasaray","PSG","Aston Villa","Barcelona"],"answer":3,"level":2,"topic":"escudos","logo":"Barcelona","id":52},{"q":"¿De qué equipo es este escudo?","options":["Barcelona","Bayern Múnich","Liverpool","Arsenal"],"answer":2,"level":2,"topic":"escudos","logo":"Liverpool","id":53},{"q":"¿De qué equipo es este escudo?","options":["Bayern Múnich","Roma","Atlético de Madrid","Manchester United"],"answer":0,"level":2,"topic":"escudos","logo":"Bayern München","id":54},{"q":"¿De qué equipo es este escudo?","options":["Leipzig","Sporting de Lisboa","Napoli","Manchester United"],"answer":3,"level":2,"topic":"escudos","logo":"Manchester United","id":55},{"q":"¿De qué equipo es este escudo?","options":["PSG","Arsenal","Stuttgart","Manchester United"],"answer":1,"level":2,"topic":"escudos","logo":"Arsenal","id":56},{"q":"¿De qué equipo es este escudo?","options":["PSV Eindhoven","PSG","Leipzig","Bayern Múnich"],"answer":1,"level":2,"topic":"escudos","logo":"Paris Saint-Germain","id":57},{"q":"¿De qué equipo es este escudo?","options":["Manchester City","Manchester United","Inter","Barcelona"],"answer":0,"level":2,"topic":"escudos","logo":"Manchester City","id":58},{"q":"¿De qué equipo es este escudo?","options":["Bayern Múnich","Aston Villa","Inter","Atlético de Madrid"],"answer":2,"level":2,"topic":"escudos","logo":"Inter","id":59},{"q":"¿De qué equipo es este escudo?","options":["PSV Eindhoven","Borussia Dortmund","PSG","Arsenal"],"answer":1,"level":2,"topic":"escudos","logo":"Borussia Dortmund","id":60},{"q":"¿De qué equipo es este escudo?","options":["Leipzig","Napoli","Liverpool","Atlético de Madrid"],"answer":1,"level":2,"topic":"escudos","logo":"Napoli","id":61},{"q":"¿De qué equipo es este escudo?","options":["Borussia Dortmund","Roma","Bayern Múnich","Porto"],"answer":1,"level":2,"topic":"escudos","logo":"Roma","id":62},{"q":"¿De qué equipo es este escudo?","options":["Atlético de Madrid","PSV Eindhoven","Feyenoord","Borussia Dortmund"],"answer":0,"level":2,"topic":"escudos","logo":"Atlético de Madrid","id":63},{"q":"¿De qué equipo es este escudo?","options":["Galatasaray","Barcelona","Porto","Atlético de Madrid"],"answer":2,"level":2,"topic":"escudos","logo":"Porto","id":64},{"q":"¿De qué equipo es este escudo?","options":["Borussia Dortmund","Manchester City","PSV Eindhoven","Aston Villa"],"answer":2,"level":2,"topic":"escudos","logo":"PSV Eindhoven","id":65},{"q":"¿De qué equipo es este escudo?","options":["Inter","Feyenoord","Aston Villa","Manchester City"],"answer":1,"level":2,"topic":"escudos","logo":"Feyenoord","id":66},{"q":"¿De qué equipo es este escudo?","options":["Stuttgart","Arsenal","Galatasaray","Atlético de Madrid"],"answer":2,"level":2,"topic":"escudos","logo":"Galatasaray","id":67},{"q":"¿De qué equipo es este escudo?","options":["Liverpool","Aston Villa","PSV Eindhoven","Leipzig"],"answer":1,"level":2,"topic":"escudos","logo":"Aston Villa","id":68},{"q":"¿De qué equipo es este escudo?","options":["Villarreal","PSG","Liverpool","Manchester City"],"answer":0,"level":2,"topic":"escudos","logo":"Villarreal","id":69},{"q":"¿De qué equipo es este escudo?","options":["PSG","Barcelona","Sporting de Lisboa","Atlético de Madrid"],"answer":2,"level":2,"topic":"escudos","logo":"Sporting CP","id":70},{"q":"¿De qué equipo es este escudo?","options":["PSG","Manchester United","Villarreal","Leipzig"],"answer":3,"level":2,"topic":"escudos","logo":"Leipzig","id":71},{"q":"¿De qué equipo es este escudo?","options":["Stuttgart","PSG","Liverpool","Manchester United"],"answer":0,"level":2,"topic":"escudos","logo":"Stuttgart","id":72},{"id":73,"q":"¿Subcampeón de 2011?","options":["Manchester United","Leeds United","Arsenal","Chelsea"],"answer":0,"level":2,"topic":"finales"},{"id":74,"q":"¿Campeón 2017 ante Juventus?","options":["Atlético","Real Madrid","Monaco","Bayern"],"answer":1,"level":2,"topic":"finales"},{"id":75,"q":"¿Subcampeón de 2000?","options":["Bayer Leverkusen","Valencia","Sampdoria","Panathinaikos"],"answer":1,"level":2,"topic":"finales"},{"id":76,"q":"¿Subcampeón de 1991?","options":["Hamburgo","Marsella","Steaua Bucarest","Celtic"],"answer":1,"level":2,"topic":"finales"},{"id":77,"q":"¿Subcampeón de 1999?","options":["Panathinaikos","Bayern Múnich","Barcelona","Valencia"],"answer":1,"level":2,"topic":"finales"},{"id":78,"q":"¿Aston Villa campeón en…?","options":["1980","1982","1984","1978"],"answer":1,"level":2,"topic":"historia"},{"id":79,"q":"¿Quién remontó 0-3 en Estambul 2005?","options":["Milan","Liverpool","Juventus","Chelsea"],"answer":1,"level":2,"topic":"finales"},{"id":80,"q":"¿United 1999 remontó ante…?","options":["Juventus","Bayern Múnich","Dortmund","Milan"],"answer":1,"level":2,"topic":"finales"},{"id":81,"q":"¿Gol de la final 2022 Madrid-Liverpool?","options":["Benzema","Vinícius Jr.","Modrić","Valverde"],"answer":1,"level":2,"topic":"finales"},{"id":82,"q":"¿Hamburgo campeón en…?","options":["1981","1983","1985","1979"],"answer":1,"level":2,"topic":"historia"},{"id":83,"q":"¿Subcampeón de 2006?","options":["Reims","Tottenham","Real Madrid","Arsenal"],"answer":3,"level":2,"topic":"finales"},{"id":84,"q":"¿Campeón 2004 ante Monaco?","options":["Milan","Porto","Deportivo","Chelsea"],"answer":1,"level":2,"topic":"finales"},{"id":85,"q":"¿Paisley títulos con Liverpool?","options":["1","2","3","4"],"answer":2,"level":2,"topic":"entrenadores"},{"id":86,"q":"¿Más finales perdidas?","options":["Bayern","Benfica","Juventus","Atlético"],"answer":2,"level":2,"topic":"titulos"},{"id":87,"q":"¿Técnico Chelsea campeón 2021?","options":["Lampard","Tuchel","Sarri","Conte"],"answer":1,"level":2,"topic":"entrenadores"},{"id":88,"q":"¿Triplete del Inter de Mourinho?","options":["2009","2010","2011","2008"],"answer":1,"level":2,"topic":"finales"},{"id":89,"q":"¿Drogba decisivo en final 2012 con…?","options":["Chelsea","United","Arsenal","City"],"answer":0,"level":2,"topic":"finales"},{"id":90,"q":"¿Campeón rumano 1986?","options":["Dinamo","Steaua Bucarest","CFR Cluj","Rapid"],"answer":1,"level":2,"topic":"historia"},{"id":91,"q":"¿Subcampeón de 2009?","options":["Chelsea","Arsenal","Manchester United","Leeds United"],"answer":2,"level":2,"topic":"finales"},{"id":92,"q":"¿Campeón 2015 ante Juventus?","options":["Madrid","Barcelona","Bayern","Atlético"],"answer":1,"level":2,"topic":"finales"},{"id":93,"q":"¿Subcampeón de 1998?","options":["Borussia Mönchengladbach","Roma","Juventus","Tottenham"],"answer":2,"level":2,"topic":"finales"},{"id":94,"q":"¿Subcampeón de 2003?","options":["Tottenham","Juventus","Borussia Mönchengladbach","Roma"],"answer":1,"level":2,"topic":"finales"},{"id":95,"q":"¿Final 2013 Bayern-Dortmund?","options":["1-0","2-1","3-2","2-0"],"answer":1,"level":2,"topic":"finales"},{"id":96,"q":"¿Gento Copas de Europa?","options":["3","4","5","6"],"answer":3,"level":2,"topic":"jugadores"},{"id":97,"q":"¿Récord 17 goles en una edición?","options":["Messi","Cristiano Ronaldo","Lewandowski","Benzema"],"answer":1,"level":2,"topic":"goleadores"},{"id":98,"q":"¿Doblete final 2018 Kiev?","options":["Ronaldo","Bale","Benzema","Asensio"],"answer":1,"level":2,"topic":"finales"},{"id":99,"q":"¿Barça campeón 2006 ante…?","options":["Arsenal","Milan","Chelsea","United"],"answer":0,"level":2,"topic":"finales"},{"id":100,"q":"¿Campeón 2025 ante Inter?","options":["Madrid","PSG","Bayern","Arsenal"],"answer":1,"level":2,"topic":"finales"},{"id":101,"q":"¿Cabezazo del 93' final 2014?","options":["Bale","Ronaldo","Ramos","Benzema"],"answer":2,"level":2,"topic":"finales"},{"id":102,"q":"¿Primera Champions del Chelsea?","options":["2008","2012","2021","2005"],"answer":1,"level":2,"topic":"finales"},{"id":103,"q":"¿Subcampeón de 2001?","options":["Valencia","Bayer Leverkusen","Sampdoria","Panathinaikos"],"answer":0,"level":2,"topic":"finales"},{"id":104,"q":"¿Chilena de Bale en final de…?","options":["2014","2016","2017","2018"],"answer":3,"level":2,"topic":"finales"},{"id":105,"q":"¿Subcampeón de 2008?","options":["Chelsea","PSG","Manchester City","Monaco"],"answer":0,"level":2,"topic":"finales"},{"id":106,"q":"¿Tres seguidas en los 70 (Países Bajos)?","options":["Feyenoord","PSV","Ajax","AZ"],"answer":2,"level":2,"topic":"historia"},{"id":107,"q":"¿Luis Enrique campeón con PSG en…?","options":["2023","2024","2025","2021"],"answer":2,"level":2,"topic":"entrenadores"},{"id":108,"q":"¿Campeón 2018 ante Liverpool?","options":["Bayern","Real Madrid","Roma","City"],"answer":1,"level":2,"topic":"finales"},{"id":109,"q":"¿Técnico Inter 2010?","options":["Mourinho","Conte","Spalletti","Mancini"],"answer":0,"level":2,"topic":"entrenadores"},{"id":110,"q":"¿Nottingham Forest títulos europeos?","options":["1","2","3","0"],"answer":1,"level":2,"topic":"titulos"},{"id":111,"q":"¿Subcampeón de 1990?","options":["Partizan","Tottenham","Benfica","Barcelona"],"answer":2,"level":2,"topic":"finales"},{"id":112,"q":"¿Subcampeón de 1993?","options":["Milan","Hamburgo","Manchester United","Saint-Étienne"],"answer":0,"level":2,"topic":"finales"},{"id":113,"q":"¿Mourinho Champions 2004 con…?","options":["Chelsea","Inter","Porto","Madrid"],"answer":2,"level":2,"topic":"entrenadores"},{"id":114,"q":"¿Marsella campeón en…?","options":["1991","1993","1995","1989"],"answer":1,"level":2,"topic":"historia"},{"id":115,"q":"¿Técnico del Barça 2009 y 2011?","options":["Luis Enrique","Rijkaard","Pep Guardiola","Koeman"],"answer":2,"level":2,"topic":"entrenadores"},{"id":116,"q":"¿Milan 4-0 al Barça en final…?","options":["1992","1994","1995","2003"],"answer":1,"level":2,"topic":"finales"},{"id":117,"q":"¿Seedorf ganó con Ajax, Madrid y…?","options":["Inter","Milan","Juventus","Chelsea"],"answer":1,"level":2,"topic":"jugadores"},{"id":118,"q":"¿Campeón 2021 ante City?","options":["United","Chelsea","Villarreal","Madrid"],"answer":1,"level":2,"topic":"finales"},{"id":119,"q":"¿Subcampeón de 1994?","options":["Bayern Múnich","PSG","Barcelona","Chelsea"],"answer":2,"level":2,"topic":"finales"},{"id":120,"q":"¿Campeón 2012 en penaltis en Múnich?","options":["Chelsea","United","Arsenal","Dortmund"],"answer":0,"level":2,"topic":"finales"},{"id":121,"q":"¿Subcampeón de 2014?","options":["Sampdoria","Partizan","Panathinaikos","Atlético de Madrid"],"answer":3,"level":2,"topic":"finales"},{"id":122,"q":"¿Campeón escocés 1967?","options":["Rangers","Celtic","Aberdeen","Hearts"],"answer":1,"level":2,"topic":"historia"},{"id":123,"q":"¿1-0 final 2024 Madrid-Dortmund lo marcó…?","options":["Vinícius","Carvajal","Bellingham","Rodrygo"],"answer":1,"level":2,"topic":"finales"},{"id":124,"q":"¿Subcampeón de 2007?","options":["Leeds United","Juventus","Liverpool","Manchester City"],"answer":2,"level":2,"topic":"finales"},{"id":125,"q":"¿Subcampeón de 1995?","options":["Saint-Étienne","Hamburgo","Manchester United","Milan"],"answer":3,"level":2,"topic":"finales"},{"id":126,"q":"¿Campeón 2008 en Moscú (penaltis)?","options":["Chelsea","Manchester United","Liverpool","Arsenal"],"answer":1,"level":2,"topic":"finales"},{"id":127,"q":"¿Subcampeón de 1996?","options":["Steaua Bucarest","Celtic","Ajax","Bayern Múnich"],"answer":2,"level":2,"topic":"finales"},{"id":128,"q":"¿Subcampeón de 2013?","options":["Fiorentina","Inter","Benfica","Dortmund"],"answer":3,"level":2,"topic":"finales"},{"id":129,"q":"¿Lewandowski 5 goles ante…?","options":["Arsenal","Madrid","Wolfsburgo","Chelsea"],"answer":2,"level":2,"topic":"goleadores"},{"id":130,"q":"¿Estrella Roja campeón en…?","options":["1989","1991","1993","1987"],"answer":1,"level":2,"topic":"historia"},{"id":131,"q":"¿Zidane Champions seguidas como míster?","options":["1","2","3","4"],"answer":2,"level":2,"topic":"entrenadores"},{"id":132,"q":"¿PSV campeón en…?","options":["1986","1988","1990","1992"],"answer":1,"level":2,"topic":"historia"},{"id":133,"q":"¿Subcampeón de 2010?","options":["Valencia","Barcelona","Bayern Múnich","Panathinaikos"],"answer":2,"level":2,"topic":"finales"},{"id":134,"q":"¿Subcampeón de 2005?","options":["Manchester United","Milan","Saint-Étienne","Hamburgo"],"answer":1,"level":2,"topic":"finales"},{"id":135,"q":"¿Gol final 2023 City-Inter?","options":["Haaland","Rodri","De Bruyne","Mahrez"],"answer":1,"level":2,"topic":"finales"},{"id":136,"q":"¿Estadio con más finales?","options":["San Siro","Bernabéu","Wembley","Olímpico Roma"],"answer":2,"level":2,"topic":"estadios"},{"id":137,"q":"¿Subcampeón de 1997?","options":["Tottenham","Juventus","Borussia Mönchengladbach","Roma"],"answer":1,"level":2,"topic":"finales"},{"id":138,"q":"¿Carvajal Champions hasta 2024?","options":["4","5","6","3"],"answer":2,"level":2,"topic":"jugadores"},{"id":139,"q":"¿Subcampeón de 1992?","options":["Manchester City","Tottenham","Sampdoria","Eintracht Frankfurt"],"answer":2,"level":2,"topic":"finales"},{"id":140,"q":"¿Feyenoord campeón en…?","options":["1968","1970","1972","1966"],"answer":1,"level":2,"topic":"historia"},{"id":141,"q":"¿Más partidos en la historia de la Champions?","options":["Casillas","Messi","Cristiano Ronaldo","Xavi"],"answer":2,"level":2,"topic":"jugadores"},{"id":142,"q":"¿Madrid Champions seguidas 2016-2018?","options":["2","3","4","1"],"answer":1,"level":2,"topic":"titulos"},{"id":143,"q":"¿Subcampeón de 2002?","options":["Celtic","Bayer Leverkusen","Leeds United","Monaco"],"answer":1,"level":2,"topic":"finales"},{"id":144,"q":"¿Subcampeón de 2004?","options":["Monaco","Manchester City","Valencia","Sampdoria"],"answer":0,"level":2,"topic":"finales"},{"id":145,"q":"¿Campeón 2026 (penales) ante…?","options":["Inter","Arsenal","Madrid","City"],"answer":1,"level":2,"topic":"finales"},{"id":146,"q":"¿Subcampeón de 2012?","options":["Bayern Múnich","Valencia","Barcelona","Panathinaikos"],"answer":0,"level":2,"topic":"finales"},{"id":147,"q":"¿Final 2020 (Lisboa) campeón…?","options":["PSG","Bayern Múnich","Lyon","Leipzig"],"answer":1,"level":2,"topic":"finales"},{"id":148,"q":"¿Qué club se coronó en 1995?","options":["Nottingham Forest","Ajax","Marsella","Bayern Múnich"],"answer":1,"level":2,"topic":"finales"},{"id":149,"q":"¿Qué club se coronó en 2011?","options":["Chelsea","PSG","Marsella","Barcelona"],"answer":3,"level":2,"topic":"finales"},{"id":150,"q":"¿Qué club se coronó en 1997?","options":["Manchester United","Dortmund","Real Madrid","Ajax"],"answer":1,"level":2,"topic":"finales"},{"q":"¿De qué equipo es este escudo?","options":["Napoli","Slovan Bratislava","Real Betis","Lens"],"answer":0,"level":3,"topic":"escudos","logo":"Napoli","id":151},{"q":"¿De qué equipo es este escudo?","options":["Galatasaray","Roma","Porto","Sporting de Lisboa"],"answer":1,"level":3,"topic":"escudos","logo":"Roma","id":152},{"q":"¿De qué equipo es este escudo?","options":["Como","Atlético de Madrid","Club Brujas","Slovan Bratislava"],"answer":1,"level":3,"topic":"escudos","logo":"Atlético de Madrid","id":153},{"q":"¿De qué equipo es este escudo?","options":["Porto","LASK","Slavia Praha","Bodø/Glimt"],"answer":0,"level":3,"topic":"escudos","logo":"Porto","id":154},{"q":"¿De qué equipo es este escudo?","options":["Shakhtar Donetsk","Lens","PSV Eindhoven","Club Brujas"],"answer":2,"level":3,"topic":"escudos","logo":"PSV Eindhoven","id":155},{"q":"¿De qué equipo es este escudo?","options":["PSV Eindhoven","Feyenoord","Atlético de Madrid","Viking"],"answer":1,"level":3,"topic":"escudos","logo":"Feyenoord","id":156},{"q":"¿De qué equipo es este escudo?","options":["Stuttgart","Galatasaray","Aston Villa","Porto"],"answer":1,"level":3,"topic":"escudos","logo":"Galatasaray","id":157},{"q":"¿De qué equipo es este escudo?","options":["LASK","Aston Villa","Slavia Praha","Real Betis"],"answer":1,"level":3,"topic":"escudos","logo":"Aston Villa","id":158},{"q":"¿De qué equipo es este escudo?","options":["Sabah","Villarreal","Lille","PSV Eindhoven"],"answer":1,"level":3,"topic":"escudos","logo":"Villarreal","id":159},{"q":"¿De qué equipo es este escudo?","options":["Viking","Sporting de Lisboa","PSV Eindhoven","Lille"],"answer":1,"level":3,"topic":"escudos","logo":"Sporting CP","id":160},{"q":"¿De qué equipo es este escudo?","options":["LASK","Stuttgart","Porto","Leipzig"],"answer":3,"level":3,"topic":"escudos","logo":"Leipzig","id":161},{"q":"¿De qué equipo es este escudo?","options":["Galatasaray","Stuttgart","Napoli","Lens"],"answer":1,"level":3,"topic":"escudos","logo":"Stuttgart","id":162},{"q":"¿De qué equipo es este escudo?","options":["Porto","Sporting de Lisboa","AEK Athens","Real Betis"],"answer":2,"level":3,"topic":"escudos","logo":"AEK Athens","id":163},{"q":"¿De qué equipo es este escudo?","options":["AEK Athens","Slavia Praha","LASK","Shakhtar Donetsk"],"answer":2,"level":3,"topic":"escudos","logo":"LASK","id":164},{"q":"¿De qué equipo es este escudo?","options":["Bodø/Glimt","Lens","Club Brujas","Galatasaray"],"answer":2,"level":3,"topic":"escudos","logo":"Club Brugge","id":165},{"q":"¿De qué equipo es este escudo?","options":["Villarreal","Lille","Stuttgart","Club Brujas"],"answer":1,"level":3,"topic":"escudos","logo":"Lille","id":166},{"q":"¿De qué equipo es este escudo?","options":["Lille","Club Brujas","Slovan Bratislava","Real Betis"],"answer":3,"level":3,"topic":"escudos","logo":"Real Betis","id":167},{"q":"¿De qué equipo es este escudo?","options":["Slavia Praha","Feyenoord","Real Betis","Viking"],"answer":3,"level":3,"topic":"escudos","logo":"Viking","id":168},{"q":"¿De qué equipo es este escudo?","options":["Lille","Viking","Slovan Bratislava","Lens"],"answer":2,"level":3,"topic":"escudos","logo":"Slovan Bratislava","id":169},{"q":"¿De qué equipo es este escudo?","options":["Fenerbahçe","Leipzig","Feyenoord","Slovan Bratislava"],"answer":0,"level":3,"topic":"escudos","logo":"Fenerbahçe","id":170},{"id":171,"q":"¿Panathinaikos finalista en…?","options":["1969","1971","1973","1967"],"answer":1,"level":3,"topic":"historia"},{"id":172,"q":"¿Valencia dos finales seguidas en…?","options":["1999-2000","2000-2001","2001-2002","1998-1999"],"answer":1,"level":3,"topic":"finales"},{"id":173,"q":"¿Atatürk 2023 campeón…?","options":["Inter","Manchester City","Madrid","Milan"],"answer":1,"level":3,"topic":"finales"},{"id":174,"q":"¿Cardiff 2017 campeón…?","options":["Juventus","Real Madrid","Atlético","Monaco"],"answer":1,"level":3,"topic":"finales"},{"id":175,"q":"¿Penalti decisivo fallado Atlético final 2016?","options":["Griezmann","Juanfran","Gabi","Koke"],"answer":1,"level":3,"topic":"finales"},{"id":176,"q":"¿Gol de la final 2013 (2-1 Bayern)?","options":["Robben","Müller","Ribéry","Mandzukic"],"answer":0,"level":3,"topic":"finales"},{"id":177,"q":"¿De Kuip 1982 campeón…?","options":["Hamburgo","Aston Villa","Bayern","Liverpool"],"answer":1,"level":3,"topic":"finales"},{"id":178,"q":"¿Monaco finalista en…?","options":["2003","2004","2005","2002"],"answer":1,"level":3,"topic":"finales"},{"id":179,"q":"¿Inzaghi dos goles final 2007 con…?","options":["Liverpool","Milan","Inter","Juventus"],"answer":1,"level":3,"topic":"finales"},{"id":180,"q":"¿Roma 2009 campeón…?","options":["United","Barcelona","Chelsea","Milan"],"answer":1,"level":3,"topic":"finales"},{"id":181,"q":"¿Modrić Champions sobre todo con…?","options":["Tottenham","Real Madrid","Inter","Milan"],"answer":1,"level":3,"topic":"jugadores"},{"id":182,"q":"¿San Siro 2016 campeón…?","options":["Atlético","Real Madrid","Juventus","City"],"answer":1,"level":3,"topic":"finales"},{"id":183,"q":"¿Sampdoria finalista en…?","options":["1990","1992","1994","1988"],"answer":1,"level":3,"topic":"historia"},{"id":184,"q":"¿Eto'o Champions con Barça e…?","options":["Madrid","Inter","Milan","Chelsea"],"answer":1,"level":3,"topic":"jugadores"},{"id":185,"q":"¿Kiev 2018 campeón…?","options":["Liverpool","Real Madrid","Roma","Bayern"],"answer":1,"level":3,"topic":"finales"},{"id":186,"q":"¿Gelsenkirchen 2004 campeón…?","options":["Monaco","Porto","Chelsea","Madrid"],"answer":1,"level":3,"topic":"finales"},{"id":187,"q":"¿Maldini finales CL (récord alto)?","options":["4","5","6","7"],"answer":2,"level":3,"topic":"jugadores"},{"id":188,"q":"¿Xavi casi toda su carrera CL en…?","options":["Madrid","Barcelona","PSG","Milan"],"answer":1,"level":3,"topic":"jugadores"},{"id":189,"q":"¿Atenas 2007 campeón…?","options":["Liverpool","Milan","United","Chelsea"],"answer":1,"level":3,"topic":"finales"},{"id":190,"q":"¿Shevchenko Champions con…?","options":["Milan","Chelsea","Inter","Roma"],"answer":0,"level":3,"topic":"jugadores"},{"id":191,"q":"¿Ronaldinho Champions 2006 con…?","options":["PSG","Barcelona","Milan","Flamengo"],"answer":1,"level":3,"topic":"jugadores"},{"id":192,"q":"¿van der Sar Champions con Ajax y…?","options":["Barça","Manchester United","Juventus","Milan"],"answer":1,"level":3,"topic":"jugadores"},{"id":193,"q":"¿Dragão 2021 campeón…?","options":["City","Chelsea","United","Villarreal"],"answer":1,"level":3,"topic":"finales"},{"id":194,"q":"¿Scholes one-club man de…?","options":["United","City","Liverpool","Arsenal"],"answer":0,"level":3,"topic":"jugadores"},{"id":195,"q":"¿Pirlo Champions con…?","options":["Inter","Milan","Roma","Fiorentina"],"answer":1,"level":3,"topic":"jugadores"},{"id":196,"q":"¿Neuer portero histórico de…?","options":["Dortmund","Bayern","Leipzig","Gladbach"],"answer":1,"level":3,"topic":"jugadores"},{"id":197,"q":"¿Kaká Champions sobre todo con…?","options":["Madrid","Milan","Inter","Roma"],"answer":1,"level":3,"topic":"jugadores"},{"id":198,"q":"¿Wembley 2011 campeón…?","options":["United","Barcelona","Madrid","Inter"],"answer":1,"level":3,"topic":"finales"},{"id":199,"q":"¿Técnico Dortmund 1997?","options":["Klopp","Ottmar Hitzfeld","Favre","Sacchi"],"answer":1,"level":3,"topic":"entrenadores"},{"id":200,"q":"¿Glasgow 2002 campeón…?","options":["Leverkusen","Real Madrid","Barça","United"],"answer":1,"level":3,"topic":"finales"},{"id":201,"q":"¿Stade de France 2022 campeón…?","options":["Liverpool","Real Madrid","City","Bayern"],"answer":1,"level":3,"topic":"finales"},{"id":202,"q":"¿Doué marcó dos en la final 2025 con…?","options":["Inter","PSG","Arsenal","Bayern"],"answer":1,"level":3,"topic":"finales"},{"id":203,"q":"¿Buffon finales CL con…?","options":["Parma","Juventus","PSG","Milan"],"answer":1,"level":3,"topic":"jugadores"},{"id":204,"q":"¿Müller one-club man de…?","options":["Dortmund","Bayern Múnich","Leipzig","Schalke"],"answer":1,"level":3,"topic":"jugadores"},{"id":205,"q":"¿Bernabéu 2010 campeón…?","options":["Bayern","Inter","Madrid","Barça"],"answer":1,"level":3,"topic":"finales"},{"id":206,"q":"¿Giggs one-club man de…?","options":["United","City","Liverpool","Chelsea"],"answer":0,"level":3,"topic":"jugadores"},{"id":207,"q":"¿Old Trafford 2003 campeón…?","options":["Juventus","Milan","Madrid","Inter"],"answer":1,"level":3,"topic":"finales"},{"id":208,"q":"¿Club Brujas finalista en…?","options":["1976","1978","1980","1974"],"answer":1,"level":3,"topic":"historia"},{"id":209,"q":"¿Malmö finalista en…?","options":["1977","1979","1981","1975"],"answer":1,"level":3,"topic":"historia"},{"id":210,"q":"¿Múnich 2012 campeón…?","options":["Bayern","Chelsea","Madrid","United"],"answer":1,"level":3,"topic":"finales"},{"id":211,"q":"¿París 2006 campeón…?","options":["Arsenal","Barcelona","Milan","Porto"],"answer":1,"level":3,"topic":"finales"},{"id":212,"q":"¿Metropolitano 2019 campeón…?","options":["Tottenham","Liverpool","Ajax","Barça"],"answer":1,"level":3,"topic":"finales"},{"id":213,"q":"¿Beckenbauer Copa de Europa con…?","options":["Hamburgo","Bayern","Dortmund","Gladbach"],"answer":1,"level":3,"topic":"historia"},{"id":214,"q":"¿Final 2008 sede…?","options":["Wembley","Luzhniki (Moscú)","San Siro","Bernabéu"],"answer":1,"level":3,"topic":"estadios"},{"id":215,"q":"¿Lisboa 2014 campeón…?","options":["Atlético","Real Madrid","Bayern","Chelsea"],"answer":1,"level":3,"topic":"finales"},{"id":216,"q":"¿Berlín 2015 campeón…?","options":["Juventus","Barcelona","Bayern","Madrid"],"answer":1,"level":3,"topic":"finales"},{"id":217,"q":"¿Cruyff tres seguidas como jugador con…?","options":["Barça","Ajax","Feyenoord","United"],"answer":1,"level":3,"topic":"historia"},{"id":218,"q":"¿Wembley 2013 campeón…?","options":["Dortmund","Bayern Múnich","Madrid","Barça"],"answer":1,"level":3,"topic":"finales"},{"id":219,"q":"¿Técnico Milan 1989?","options":["Capello","Sacchi","Trapattoni","Lippi"],"answer":1,"level":3,"topic":"entrenadores"},{"id":220,"q":"¿Di Stéfano mito de las cinco primeras del…?","options":["Barça","Real Madrid","Milan","Inter"],"answer":1,"level":3,"topic":"historia"},{"id":221,"q":"¿Final 2002 sede…?","options":["Old Trafford","Hampden Park","San Siro","De Kuip"],"answer":1,"level":3,"topic":"estadios"},{"id":222,"q":"¿Año debut nombre Champions League?","options":["1990/91","1991/92","1992/93","1993/94"],"answer":2,"level":3,"topic":"historia"},{"id":223,"q":"¿Del Piero leyenda de…?","options":["Milan","Juventus","Inter","Fiorentina"],"answer":1,"level":3,"topic":"jugadores"},{"id":224,"q":"¿Leverkusen finalista en…?","options":["2000","2002","2004","1998"],"answer":1,"level":3,"topic":"finales"},{"id":225,"q":"¿Tottenham finalista en…?","options":["2017","2018","2019","2020"],"answer":2,"level":3,"topic":"finales"},{"id":226,"q":"¿Campeón de Europa en 1990?","options":["Hamburgo","Manchester City","Milan","Benfica"],"answer":2,"level":3,"topic":"historia"},{"id":227,"q":"¿Campeón de Europa en 1980?","options":["Nottingham Forest","Celtic","Chelsea","Manchester United"],"answer":0,"level":3,"topic":"historia"},{"id":228,"q":"¿Campeón de Europa en 1959?","options":["Real Madrid","Juventus","Manchester City","Milan"],"answer":0,"level":3,"topic":"historia"},{"id":229,"q":"¿Campeón de Europa en 1958?","options":["Manchester City","Juventus","Milan","Real Madrid"],"answer":3,"level":3,"topic":"historia"},{"id":230,"q":"¿Campeón de Europa en 1968?","options":["Nottingham Forest","Bayern Múnich","Manchester United","Manchester City"],"answer":2,"level":3,"topic":"historia"},{"id":231,"q":"¿Campeón de Europa en 1957?","options":["Manchester City","Juventus","Milan","Real Madrid"],"answer":3,"level":3,"topic":"historia"},{"id":232,"q":"¿Campeón de Europa en 1979?","options":["Manchester United","Chelsea","Celtic","Nottingham Forest"],"answer":3,"level":3,"topic":"historia"},{"id":233,"q":"¿Campeón de Europa en 1989?","options":["Milan","Benfica","Manchester City","Hamburgo"],"answer":0,"level":3,"topic":"historia"},{"id":234,"q":"¿Campeón de Europa en 1969?","options":["Manchester City","Milan","Hamburgo","Benfica"],"answer":1,"level":3,"topic":"historia"},{"id":235,"q":"¿Campeón de Europa en 1982?","options":["Aston Villa","Hamburgo","Dortmund","Liverpool"],"answer":0,"level":3,"topic":"historia"},{"id":236,"q":"¿Campeón de Europa en 1981?","options":["Manchester City","Benfica","Bayern Múnich","Liverpool"],"answer":3,"level":3,"topic":"historia"},{"id":237,"q":"¿Campeón de Europa en 1972?","options":["Marsella","Ajax","Bayern Múnich","Nottingham Forest"],"answer":1,"level":3,"topic":"historia"},{"id":238,"q":"¿Campeón de Europa en 1961?","options":["Benfica","Manchester United","Bayern Múnich","Barcelona"],"answer":0,"level":3,"topic":"historia"},{"id":239,"q":"¿Campeón de Europa en 1963?","options":["Milan","Benfica","Manchester City","Hamburgo"],"answer":0,"level":3,"topic":"historia"},{"id":240,"q":"¿Campeón de Europa en 1965?","options":["Marsella","Barcelona","Manchester United","Inter"],"answer":3,"level":3,"topic":"historia"},{"q":"¿De qué equipo es este escudo?","options":["AEK Athens","Porto","Viking","Atlético de Madrid"],"answer":0,"level":4,"topic":"escudos","logo":"AEK Athens","id":241},{"q":"¿De qué equipo es este escudo?","options":["LASK","Fenerbahçe","Porto","PSV Eindhoven"],"answer":0,"level":4,"topic":"escudos","logo":"LASK","id":242},{"q":"¿De qué equipo es este escudo?","options":["Sabah","Sporting de Lisboa","Club Brujas","Leipzig"],"answer":2,"level":4,"topic":"escudos","logo":"Club Brugge","id":243},{"q":"¿De qué equipo es este escudo?","options":["Porto","Lille","Villarreal","Leipzig"],"answer":1,"level":4,"topic":"escudos","logo":"Lille","id":244},{"q":"¿De qué equipo es este escudo?","options":["Roma","Lens","Fenerbahçe","Real Betis"],"answer":3,"level":4,"topic":"escudos","logo":"Real Betis","id":245},{"q":"¿De qué equipo es este escudo?","options":["Viking","Sporting de Lisboa","Sabah","Bodø/Glimt"],"answer":0,"level":4,"topic":"escudos","logo":"Viking","id":246},{"q":"¿De qué equipo es este escudo?","options":["LASK","Slovan Bratislava","Fenerbahçe","Sabah"],"answer":1,"level":4,"topic":"escudos","logo":"Slovan Bratislava","id":247},{"q":"¿De qué equipo es este escudo?","options":["Fenerbahçe","LASK","Lens","Aston Villa"],"answer":0,"level":4,"topic":"escudos","logo":"Fenerbahçe","id":248},{"q":"¿De qué equipo es este escudo?","options":["Porto","Lens","Stuttgart","Shakhtar Donetsk"],"answer":3,"level":4,"topic":"escudos","logo":"Shakhtar Donetsk","id":249},{"q":"¿De qué equipo es este escudo?","options":["Fenerbahçe","PSV Eindhoven","Galatasaray","Como"],"answer":3,"level":4,"topic":"escudos","logo":"Como","id":250},{"q":"¿De qué equipo es este escudo?","options":["Lille","Feyenoord","Sporting de Lisboa","Sabah"],"answer":3,"level":4,"topic":"escudos","logo":"Sabah","id":251},{"q":"¿De qué equipo es este escudo?","options":["Slavia Praha","Roma","Feyenoord","Villarreal"],"answer":0,"level":4,"topic":"escudos","logo":"Slavia Praha","id":252},{"q":"¿De qué equipo es este escudo?","options":["Lens","Roma","Shakhtar Donetsk","AEK Athens"],"answer":0,"level":4,"topic":"escudos","logo":"Lens","id":253},{"q":"¿De qué equipo es este escudo?","options":["Bodø/Glimt","Sabah","Sporting de Lisboa","Feyenoord"],"answer":0,"level":4,"topic":"escudos","logo":"Bodø/Glimt","id":254},{"id":255,"q":"¿Reims finalista 1956 y también…?","options":["1957","1959","1958","1960"],"answer":1,"level":4,"topic":"historia"},{"id":256,"q":"¿Único club yugoslavo campeón?","options":["Partizan","Estrella Roja","Dinamo Zagreb","Hajduk"],"answer":1,"level":4,"topic":"titulos"},{"id":257,"q":"¿Final 2012 penaltis: campeón Chelsea ante…?","options":["Dortmund","Bayern","Madrid","Barça"],"answer":1,"level":4,"topic":"finales"},{"id":258,"q":"¿Única final con replay…?","options":["Bayern-Atlético 1974","Madrid-Inter","Ajax-Juventus","Bayern-Leeds"],"answer":0,"level":4,"topic":"historia"},{"id":259,"q":"¿Capello 1994 4-0 al…?","options":["Ajax","Barcelona","Madrid","Marsella"],"answer":1,"level":4,"topic":"finales"},{"id":260,"q":"¿Bota de Oro Champions 2013/14 (17 goles)?","options":["Messi","Cristiano Ronaldo","Benzema","Bale"],"answer":1,"level":4,"topic":"goleadores"},{"id":261,"q":"¿Técnico Marsella 1993?","options":["Wenger","Raymond Goethals","Ferguson","Sacchi"],"answer":1,"level":4,"topic":"entrenadores"},{"id":262,"q":"¿Asistencia récord ~127.000 en Hampden año…?","options":["1958","1960","1976","2002"],"answer":1,"level":4,"topic":"historia"},{"id":263,"q":"¿Primera final por penaltis (Copa de Europa)?","options":["1982","1984","1986","1988"],"answer":1,"level":4,"topic":"historia"},{"id":264,"q":"¿Final 1986 penaltis: campeón Steaua ante…?","options":["Madrid","Barcelona","Milan","Porto"],"answer":1,"level":4,"topic":"finales"},{"id":265,"q":"¿Gol de Drogba en la final 2012 (reglamentario) hizo el…?","options":["0-1","1-1","2-1","1-0 Bayern"],"answer":1,"level":4,"topic":"finales"},{"id":266,"q":"¿Gol de Ramos final 2014 minuto…?","options":["90","91","92","93"],"answer":3,"level":4,"topic":"finales"},{"id":267,"q":"¿Final 1958 (Madrid-Milan) sede…?","options":["París","Bruselas","Madrid","Milán"],"answer":1,"level":4,"topic":"estadios"},{"id":268,"q":"¿Flick campeón 2020 con…?","options":["Dortmund","Bayern","Leipzig","Gladbach"],"answer":1,"level":4,"topic":"entrenadores"},{"id":269,"q":"¿Final 1988 penaltis: campeón PSV ante…?","options":["Madrid","Benfica","Milan","Steaua"],"answer":1,"level":4,"topic":"finales"},{"id":270,"q":"¿Ernst-Happel 1995 campeón…?","options":["Milan","Ajax","Juventus","Dortmund"],"answer":1,"level":4,"topic":"finales"},{"id":271,"q":"¿Del Bosque Champions en…?","options":["1998 y 2000","2000 y 2002","2002 y 2004","1998 y 2002"],"answer":1,"level":4,"topic":"entrenadores"},{"id":272,"q":"¿San Nicola Bari 1991 campeón…?","options":["Marsella","Estrella Roja","Madrid","Milan"],"answer":1,"level":4,"topic":"finales"},{"id":273,"q":"¿Partizan finalista en…?","options":["1964","1966","1968","1962"],"answer":1,"level":4,"topic":"historia"},{"id":274,"q":"¿Primer campeón con nombre Champions League?","options":["Barça","Marsella","Milan","Ajax"],"answer":1,"level":4,"topic":"historia"},{"id":275,"q":"¿Petrovic campeón con…?","options":["Partizan","Estrella Roja","Dinamo Zagreb","CSKA"],"answer":1,"level":4,"topic":"entrenadores"},{"id":276,"q":"¿Héroe de penaltis Steaua 1986?","options":["Zubizarreta","Duckadam","Prats","Urruti"],"answer":1,"level":4,"topic":"historia"},{"id":277,"q":"¿Único club rumano campeón?","options":["Dinamo","Steaua","CFR","Rapid"],"answer":1,"level":4,"topic":"titulos"},{"id":278,"q":"¿Drogba penalti clave final 2012; equipo…?","options":["Chelsea","United","Arsenal","City"],"answer":0,"level":4,"topic":"finales"},{"id":279,"q":"¿Hiddink campeón con…?","options":["Ajax","PSV","Valencia","Chelsea"],"answer":1,"level":4,"topic":"entrenadores"},{"id":280,"q":"¿Final 1991 penaltis: campeón Estrella Roja ante…?","options":["Madrid","Marsella","Milan","Barça"],"answer":1,"level":4,"topic":"finales"},{"id":281,"q":"¿Final 2001 penaltis: campeón Bayern ante…?","options":["Madrid","Valencia","Leverkusen","United"],"answer":1,"level":4,"topic":"finales"},{"id":282,"q":"¿Sheringham y Solskjaer goles final…?","options":["1997","1999","2008","2009"],"answer":1,"level":4,"topic":"finales"},{"id":283,"q":"¿Benítez campeón 2005 con…?","options":["Valencia","Liverpool","Inter","Chelsea"],"answer":1,"level":4,"topic":"entrenadores"},{"id":284,"q":"¿Replay final 1974: Bayern ante…?","options":["Madrid","Atlético de Madrid","Leeds","Saint-Étienne"],"answer":1,"level":4,"topic":"historia"},{"id":285,"q":"¿Final 2005 penaltis: falló Shevchenko; campeón…?","options":["Milan","Liverpool","Inter","Juventus"],"answer":1,"level":4,"topic":"finales"},{"id":286,"q":"¿Gol de Robben final 2013 minuto aproximado famoso…?","options":["primer tiempo","segundo tiempo (victoria)","prórroga","penalti"],"answer":1,"level":4,"topic":"finales"},{"id":287,"q":"¿Final 2026 PSG campeón ante…?","options":["Inter","Arsenal","Madrid","City"],"answer":1,"level":4,"topic":"finales"},{"id":288,"q":"¿Gol de Aguero… no; ¿gol de Iniesta semifinal 2009 ante…?","options":["Chelsea","United","Madrid","Bayern"],"answer":0,"level":4,"topic":"historia"},{"id":289,"q":"¿Crespo marcó en final 2005 con…?","options":["Liverpool","Milan","Inter","Chelsea"],"answer":1,"level":4,"topic":"finales"},{"id":290,"q":"¿Final 2008 penaltis: Anelka falló; campeón…?","options":["Chelsea","United","Liverpool","Arsenal"],"answer":1,"level":4,"topic":"finales"},{"id":291,"q":"¿Heysel 1985 campeón…?","options":["Liverpool","Juventus","Madrid","Milan"],"answer":1,"level":4,"topic":"historia"},{"id":292,"q":"¿Final 1977 Liverpool ante…?","options":["Bayern","Borussia Mönchengladbach","Hamburgo","Juventus"],"answer":1,"level":4,"topic":"historia"},{"id":293,"q":"¿Doué figura final 2025 con…?","options":["Inter","PSG","Arsenal","Bayern"],"answer":1,"level":4,"topic":"finales"},{"id":294,"q":"¿Puskás Aréna final 2026 en…?","options":["Bucarest","Budapest","Belgrado","Praga"],"answer":1,"level":4,"topic":"estadios"},{"id":295,"q":"¿Ancelotti Champions como míster con Milan y…?","options":["Chelsea solo","Real Madrid (varias)","PSG","Bayern"],"answer":1,"level":4,"topic":"entrenadores"},{"id":296,"q":"¿Liverpool-Roma 1984 se decidió por…?","options":["Prórroga","Penaltis","Gol de oro","1-0"],"answer":1,"level":4,"topic":"finales"},{"id":297,"q":"¿PSV-Benfica 1988 se decidió por…?","options":["1-0","Penaltis","Prórroga","3-2"],"answer":1,"level":4,"topic":"finales"},{"id":298,"q":"¿Van Gaal campeón 1995 con…?","options":["Barça","Ajax","Bayern","United"],"answer":1,"level":4,"topic":"entrenadores"},{"id":299,"q":"¿Único club escocés campeón?","options":["Rangers","Celtic","Aberdeen","Hibernian"],"answer":1,"level":4,"topic":"titulos"},{"id":300,"q":"¿Heynckes campeón técnico 1998 y…?","options":["2012","2013","2014","2011"],"answer":1,"level":4,"topic":"entrenadores"}]};
 
     // Contraseña de administrador para editar resultados reales.
     // Cámbiala por la que tú quieras:
@@ -2789,6 +2929,7 @@
       predictions: {}, // matchId -> { baez: {h,a}, juan:..., ... }
       results: {},     // matchId -> {h, a}
       trivia: {},      // playerId -> { best, bestStep, plays, name }
+      logoRace: {},    // playerId -> { best, plays, total, name }
       updatedAt: null,
       updatedBy: null
     };
@@ -2812,6 +2953,22 @@
           bestStep,
           plays: Math.max(x.plays || 0, y.plays || 0),
           name: y.name || x.name || (PLAYER_NAMES[id] || id)
+        };
+      });
+      return out;
+    }
+
+    
+    function mergeLogoRaceMaps(a, b) {
+      const out = Object.assign({}, a || {});
+      Object.keys(b || {}).forEach(id => {
+        const x = out[id] || { best: 0, plays: 0, total: 0 };
+        const y = b[id] || {};
+        out[id] = {
+          best: Math.max(x.best || 0, y.best || 0),
+          plays: Math.max(x.plays || 0, y.plays || 0),
+          total: Math.max(x.total || 0, y.total || 0),
+          name: y.name || x.name
         };
       });
       return out;
@@ -2864,6 +3021,7 @@
               predictions: local.predictions || {},
               results: local.results || {},
               trivia: mergeTriviaMaps(local.trivia || {}, migrateLocalTriviaOnly()),
+              logoRace: local.logoRace || {},
               updatedAt: local.updatedAt || null,
               updatedBy: local.updatedBy || null
             };
@@ -2883,6 +3041,7 @@
             predictions: remote.predictions || data.predictions || {},
             results: remote.results || data.results || {},
             trivia: mergeTriviaMaps(data.trivia || {}, remote.trivia || {}),
+            logoRace: mergeLogoRaceMaps(data.logoRace || {}, remote.logoRace || {}),
             updatedAt: remote.updatedAt || null,
             updatedBy: remote.updatedBy || null
           };
@@ -2925,6 +3084,7 @@
         predictions: data.predictions,
         results: data.results,
         trivia: data.trivia || {},
+        logoRace: data.logoRace || {},
         updatedAt: new Date().toISOString(),
         updatedBy: currentUser() || 'anon'
       };
@@ -2978,7 +3138,7 @@
       renderLeaderboard();
       renderStats();
       renderPersonalBar();
-      if (document.getElementById('trivia')?.classList.contains('active')) renderTrivia();
+      if (document.getElementById('juegos')?.classList.contains('active')) renderTrivia();
       toast('Datos actualizados desde la nube');
     }
 
@@ -5080,9 +5240,11 @@
     }
 
     function triviaLevelForStep(step) {
-      if (step <= 5) return [1, 2];
-      if (step <= 10) return [3, 4];
-      return [4, 5];
+      // 1-2 muy fácil (nivel 1) | 3-6 fácil (2) | 7-11 media (3) | 12-15 difícil (4)
+      if (step <= 2) return [1];
+      if (step <= 6) return [2];
+      if (step <= 11) return [3];
+      return [4];
     }
 
     function pickQuestion(step, usedIds) {
@@ -5095,6 +5257,27 @@
 
     function startTriviaGame() {
       const user = currentUser();
+      if (!user) {
+        const okGuest = confirm(
+          'No has elegido quién eres en Soy.\n\n' +
+          'Si sigues, la partida NO guardará récord en el ranking del grupo.\n\n' +
+          '¿Jugar igual como invitado?'
+        );
+        if (!okGuest) {
+          toast('Elige quién eres en Soy y vuelve a pulsar Jugar');
+          return;
+        }
+      } else {
+        const name = PLAYER_NAMES[user] || user;
+        const ok = confirm(
+          '¿Confirmas que juegas como ' + name + '?\n\n' +
+          'El récord de esta partida se guardará a nombre de ' + name + '.'
+        );
+        if (!ok) {
+          toast('Cambia Soy arriba si no eres ' + name);
+          return;
+        }
+      }
       triviaState = {
         step: 1,
         usedIds: new Set(),
@@ -5217,6 +5400,10 @@
 
       const q = triviaState.question;
       const letters = ['A', 'B', 'C', 'D'];
+      const logoSrc = q.logo && LOGO_MAP[q.logo] ? LOGO_MAP[q.logo] : null;
+      const logoHtml = logoSrc
+        ? '<div class="trivia-logo-wrap"><img class="trivia-logo" src="' + logoSrc + '" alt="Escudo" onerror="this.parentNode.style.display=\'none\'" /></div>'
+        : '';
       const ladderHtml = TRIVIA_BANK.ladder.slice().reverse().map(l => {
         let cls = '';
         if (l.step === triviaState.step) cls = 'current';
@@ -5240,8 +5427,232 @@
       }).join('');
 
       const walkPrize = triviaState.step > 1 ? ((TRIVIA_BANK.ladder.find(l => l.step === triviaState.step - 1) || {}).prize || 0) : 0;
-      el.innerHTML = '<div class="trivia-layout"><ul class="trivia-ladder">' + ladderHtml + '</ul><div class="trivia-main"><div class="trivia-prize-now">En juego<strong>' + formatPesos(triviaCurrentPrize()) + '</strong></div><div class="trivia-q">' + q.q + '</div><div class="trivia-options">' + opts + '</div><div class="trivia-lifelines"><button type="button" class="' + (triviaState.lifelines.fifty ? '' : 'used') + '" onclick="useFifty()">50:50</button><button type="button" class="' + (triviaState.lifelines.group ? '' : 'used') + '" onclick="useGroup()">Pregunta al grupo</button><button type="button" class="' + (triviaState.lifelines.pelmazo ? '' : 'used') + '" onclick="usePelmazo()">Llamada al Pelmazo</button></div><div class="trivia-actions"><button type="button" onclick="walkAwayTrivia()" ' + (triviaState.step <= 1 || triviaState.locked ? 'disabled' : '') + '>Plantarse (' + formatPesos(walkPrize) + ')</button></div></div></div>';
+      el.innerHTML = '<div class="trivia-layout"><ul class="trivia-ladder">' + ladderHtml + '</ul><div class="trivia-main"><div class="trivia-prize-now">En juego<strong>' + formatPesos(triviaCurrentPrize()) + '</strong></div>' + logoHtml + '<div class="trivia-q">' + q.q + '</div><div class="trivia-options">' + opts + '</div><div class="trivia-lifelines"><button type="button" class="' + (triviaState.lifelines.fifty ? '' : 'used') + '" onclick="useFifty()">50:50</button><button type="button" class="' + (triviaState.lifelines.group ? '' : 'used') + '" onclick="useGroup()">Pregunta al grupo</button><button type="button" class="' + (triviaState.lifelines.pelmazo ? '' : 'used') + '" onclick="usePelmazo()">Llamada al Pelmazo</button></div><div class="trivia-actions"><button type="button" onclick="walkAwayTrivia()" ' + (triviaState.step <= 1 || triviaState.locked ? 'disabled' : '') + '>Plantarse (' + formatPesos(walkPrize) + ')</button></div></div></div>';
     }
+
+
+    // ========== JUEGOS HUB ==========
+    function openJuego(which) {
+      document.getElementById('juegosHub').hidden = true;
+      document.getElementById('juegoTrivia').hidden = which !== 'trivia';
+      document.getElementById('juegoLogo').hidden = which !== 'logo';
+      if (which === 'trivia') {
+        triviaState = null;
+        renderTrivia();
+      }
+      if (which === 'logo') {
+        stopLogoRaceTimer();
+        logoRaceState = null;
+        renderLogoRace();
+      }
+    }
+
+    function closeJuego() {
+      stopLogoRaceTimer();
+      logoRaceState = null;
+      triviaState = null;
+      document.getElementById('juegosHub').hidden = false;
+      document.getElementById('juegoTrivia').hidden = true;
+      document.getElementById('juegoLogo').hidden = true;
+    }
+
+    // ========== APÚRELE CON EL LOGO ==========
+    const LOGO_RACE_TEAMS = Object.keys(LOGO_MAP);
+    const LOGO_RACE_DISPLAY = {
+      "Bayern München": "Bayern Múnich",
+      "Paris Saint-Germain": "PSG",
+      "Club Brugge": "Club Brujas",
+      "Sporting CP": "Sporting Lisboa",
+      "Bodø/Glimt": "Bodø/Glimt"
+    };
+    let logoRaceState = null;
+    let logoRaceTimer = null;
+    let logoRaceTick = null;
+
+    function logoDisp(t) {
+      return LOGO_RACE_DISPLAY[t] || t;
+    }
+
+    function stopLogoRaceTimer() {
+      if (logoRaceTimer) { clearInterval(logoRaceTimer); logoRaceTimer = null; }
+      if (logoRaceTick) { clearInterval(logoRaceTick); logoRaceTick = null; }
+    }
+
+    function loadLogoRaceRecords() {
+      return (data && data.logoRace) ? data.logoRace : {};
+    }
+
+    function saveLogoRaceRecord(playerId, score) {
+      if (!playerId) return;
+      if (!data.logoRace) data.logoRace = {};
+      const prev = data.logoRace[playerId] || { best: 0, plays: 0, total: 0 };
+      prev.plays = (prev.plays || 0) + 1;
+      prev.total = (prev.total || 0) + (score || 0);
+      if (score > (prev.best || 0)) prev.best = score;
+      prev.name = PLAYER_NAMES[playerId] || playerId;
+      data.logoRace[playerId] = prev;
+      try { localStorage.setItem('cl_preds_2026', JSON.stringify(data)); } catch (_) {}
+      pushToRemote(false);
+    }
+
+    function pickLogoRaceRound() {
+      const team = LOGO_RACE_TEAMS[Math.floor(Math.random() * LOGO_RACE_TEAMS.length)];
+      const others = LOGO_RACE_TEAMS.filter(t => t !== team);
+      // shuffle others
+      for (let i = others.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [others[i], others[j]] = [others[j], others[i]];
+      }
+      const opts = others.slice(0, 3).concat([team]);
+      for (let i = opts.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [opts[i], opts[j]] = [opts[j], opts[i]];
+      }
+      // reveal order of 8 tiles
+      const order = [0,1,2,3,4,5,6,7,8];
+      for (let i = order.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [order[i], order[j]] = [order[j], order[i]];
+      }
+      return { team, options: opts, revealOrder: order };
+    }
+
+    function logoRaceCurrentScore() {
+      if (!logoRaceState || logoRaceState.ended) return 0;
+      // 1000 pts at t=0, 0 at t=40s (8 intervals of 5s after first tile → 9 pieces)
+      const elapsed = Math.min(40, (Date.now() - logoRaceState.startedAt) / 1000);
+      return Math.max(0, Math.round(1000 * (1 - elapsed / 40)));
+    }
+
+    function startLogoRace() {
+      const user = currentUser();
+      if (!user) {
+        const okGuest = confirm(
+          'No has elegido quién eres en Soy.\n\n' +
+          'Si sigues, la partida NO guardará récord.\n\n' +
+          '¿Jugar igual como invitado?'
+        );
+        if (!okGuest) {
+          toast('Elige quién eres en Soy y vuelve a pulsar Jugar');
+          return;
+        }
+      } else {
+        const name = PLAYER_NAMES[user] || user;
+        const ok = confirm(
+          '¿Confirmas que juegas como ' + name + '?\n\n' +
+          'El récord de esta partida se guardará a nombre de ' + name + '.'
+        );
+        if (!ok) {
+          toast('Cambia Soy arriba si no eres ' + name);
+          return;
+        }
+      }
+
+      stopLogoRaceTimer();
+      const round = pickLogoRaceRound();
+      logoRaceState = {
+        team: round.team,
+        options: round.options,
+        revealOrder: round.revealOrder,
+        revealed: 1, // first tile visible
+        startedAt: Date.now(),
+        locked: false,
+        ended: false,
+        player: user || null,
+        resultScore: null,
+        correct: null
+      };
+
+      // Reveal one more tile every 5s
+      logoRaceTimer = setInterval(() => {
+        if (!logoRaceState || logoRaceState.locked || logoRaceState.ended) return;
+        if (logoRaceState.revealed >= 9) {
+          // time up
+          endLogoRace(false, 0);
+          return;
+        }
+        logoRaceState.revealed += 1;
+        renderLogoRace();
+        if (logoRaceState.revealed >= 9) {
+          // brief moment then auto-fail if no answer
+          setTimeout(() => {
+            if (logoRaceState && !logoRaceState.locked && !logoRaceState.ended) {
+              endLogoRace(false, 0);
+            }
+          }, 1500);
+        }
+      }, 5000);
+
+      // Tick score display every 200ms
+      logoRaceTick = setInterval(() => {
+        if (!logoRaceState || logoRaceState.ended) return;
+        const el = document.getElementById('logoRaceScoreVal');
+        if (el) el.textContent = String(logoRaceCurrentScore());
+      }, 200);
+
+      renderLogoRace();
+    }
+
+    function answerLogoRace(optTeam) {
+      if (!logoRaceState || logoRaceState.locked || logoRaceState.ended) return;
+      logoRaceState.locked = true;
+      stopLogoRaceTimer();
+      const score = logoRaceCurrentScore();
+      const correct = optTeam === logoRaceState.team;
+      endLogoRace(correct, correct ? score : 0);
+    }
+
+    function endLogoRace(correct, score) {
+      stopLogoRaceTimer();
+      if (!logoRaceState) return;
+      logoRaceState.ended = true;
+      logoRaceState.locked = true;
+      logoRaceState.correct = correct;
+      logoRaceState.resultScore = score;
+      logoRaceState.revealed = 9; // show full logo
+      if (logoRaceState.player) saveLogoRaceRecord(logoRaceState.player, score);
+      renderLogoRace();
+    }
+
+    function renderLogoRace() {
+      const el = document.getElementById('logoRaceApp');
+      if (!el) return;
+
+      if (!logoRaceState) {
+        const rec = loadLogoRaceRecords();
+        const rows = PLAYERS.map(p => {
+          const r = rec[p];
+          if (!r || !r.plays) return '<li><span class="player-name ' + p + '">' + PLAYER_NAMES[p] + '</span><span style="color:var(--muted)">Sin partidas</span></li>';
+          return '<li><span class="player-name ' + p + '">' + PLAYER_NAMES[p] + '</span><span><strong>' + r.best + '</strong> pts · ' + r.plays + ' partidas</span></li>';
+        }).join('');
+        el.innerHTML = '<div class="trivia-home"><h2>⏱️ Apúrele, pues, con el logo</h2><p>El escudo se destapa en <strong>9 partes (3×3)</strong> (una cada 5 s).<br>Empiezas con <strong>1000 puntos</strong> y van bajando. Acierta entre 4 opciones antes de que se complete.</p><button class="primary" onclick="startLogoRace()">▶ Jugar ahora</button><div class="trivia-records"><h3>Récords del grupo (mejor puntuación)</h3><ul style="list-style:none;padding:0;margin:0;">' + rows + '</ul></div></div>';
+        return;
+      }
+
+      const src = LOGO_MAP[logoRaceState.team];
+      const order = logoRaceState.revealOrder;
+      const revealedSet = new Set(order.slice(0, logoRaceState.revealed));
+      let tiles = '';
+      for (let i = 0; i < 9; i++) {
+        tiles += '<div class="tile' + (revealedSet.has(i) ? ' revealed' : '') + '"></div>';
+      }
+
+      if (logoRaceState.ended) {
+        const msg = logoRaceState.correct
+          ? '¡Bien ahí!'
+          : 'Se te fue el logo… era ' + logoDisp(logoRaceState.team);
+        el.innerHTML = '<div class="trivia-result"><div style="color:var(--muted);font-weight:700;">' + msg + '</div><div class="big">' + (logoRaceState.resultScore || 0) + ' pts</div><div class="logo-reveal" style="margin-top:1rem;"><img src="' + src + '" alt="" onerror="this.style.opacity=0.3"/><div class="logo-mask-grid">' + tiles + '</div></div><p style="color:var(--muted);margin:0.75rem 0 1rem;">' + (logoRaceState.player ? (PLAYER_NAMES[logoRaceState.player] || '') : 'Invitado') + '</p><button class="primary" onclick="logoRaceState=null;renderLogoRace();">Volver</button> <button class="secondary" onclick="startLogoRace()">Otra ronda</button></div>';
+        return;
+      }
+
+      const letters = ['A', 'B', 'C', 'D'];
+      const opts = logoRaceState.options.map((t, i) => {
+        return '<button type="button" class="trivia-opt" onclick="answerLogoRace(\'' + t.replace(/'/g, "\\'") + '\')"><span class="letter">' + letters[i] + '</span> ' + logoDisp(t) + '</button>';
+      }).join('');
+
+      el.innerHTML = '<div class="trivia-main" style="max-width:520px;margin:0 auto;"><div class="logo-race-score">Puntos en juego<strong id="logoRaceScoreVal">' + logoRaceCurrentScore() + '</strong></div><div class="logo-race-meta">Piezas visibles: ' + logoRaceState.revealed + ' / 9</div><div class="logo-reveal"><img src="' + src + '" alt="Escudo" onerror="this.style.opacity=0.2"/><div class="logo-mask-grid">' + tiles + '</div></div><div class="trivia-options">' + opts + '</div></div>';
+    }
+
 
     // ========== INIT ==========
     document.getElementById('mainNav').addEventListener('click', e => {
@@ -5259,7 +5670,7 @@
       if (e.target.dataset.panel === 'historico') renderHistorico();
       if (e.target.dataset.panel === 'rondas') renderRondas();
       if (e.target.dataset.panel === 'mapa') initMap();
-      if (e.target.dataset.panel === 'trivia') renderTrivia();
+      if (e.target.dataset.panel === 'juegos') { closeJuego(); }
     });
 
     document.getElementById('clubSearch')?.addEventListener('input', e => {
@@ -5282,6 +5693,7 @@
               predictions: local.predictions || {},
               results: local.results || {},
               trivia: mergeTriviaMaps(local.trivia || {}, migrateLocalTriviaOnly()),
+              logoRace: local.logoRace || {},
               updatedAt: local.updatedAt || null,
               updatedBy: local.updatedBy || null
             };
@@ -5317,6 +5729,7 @@
               predictions: remote.predictions || {},
               results: remote.results || {},
               trivia: mergeTriviaMaps(data.trivia || {}, remote.trivia || {}),
+              logoRace: mergeLogoRaceMaps(data.logoRace || {}, remote.logoRace || {}),
               updatedAt: remote.updatedAt,
               updatedBy: remote.updatedBy || null
             };
@@ -5326,7 +5739,7 @@
             renderLeaderboard();
             renderStats();
             renderPersonalBar();
-            if (document.getElementById('trivia')?.classList.contains('active') && !triviaState) renderTrivia();
+            if (document.getElementById('juegos')?.classList.contains('active') && !triviaState) renderTrivia();
             updateSyncStatus('synced');
             toast('Nuevos datos de ' + (remote.updatedBy || 'alguien'));
           }
