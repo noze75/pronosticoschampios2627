@@ -570,19 +570,84 @@
     }
     #fifaPartidosView {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 0.55rem;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.65rem;
       align-items: stretch;
     }
-    @media (max-width: 1100px) {
-      #fifaPartidosView { grid-template-columns: repeat(3, 1fr); }
-    }
-    @media (max-width: 720px) {
+    @media (max-width: 980px) {
       #fifaPartidosView { grid-template-columns: repeat(2, 1fr); }
     }
-    @media (max-width: 420px) {
+    @media (max-width: 560px) {
       #fifaPartidosView { grid-template-columns: 1fr; }
     }
+    .fifa-preds-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.3rem;
+      margin-top: 0.35rem;
+      padding-top: 0.35rem;
+      border-top: 1px dashed var(--border);
+    }
+    .fifa-pred-box {
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 0.3rem 0.4rem;
+      border: 1px solid var(--border);
+      font-size: 0.72rem;
+    }
+    .fifa-pred-box .name {
+      font-weight: 800;
+      font-size: 0.68rem;
+      margin-bottom: 0.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .fifa-pred-box.baez .name { color: var(--baez); }
+    .fifa-pred-box.juan .name { color: var(--juan); }
+    .fifa-pred-box.marrugo .name { color: var(--marrugo); }
+    .fifa-pred-box.mauricio .name { color: var(--mauricio); }
+    .fifa-pred-box .score-line {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.2rem;
+    }
+    .fifa-pred-box input {
+      width: 32px;
+      height: 28px;
+      text-align: center;
+      font-weight: 800;
+      font-size: 0.85rem;
+      border-radius: 6px;
+      border: 1.5px solid var(--border);
+      background: #0a1628;
+      color: var(--text);
+      -moz-appearance: textfield;
+    }
+    .fifa-pred-box.can-edit input {
+      border-color: rgba(0, 230, 118, 0.55);
+    }
+    .fifa-pred-box input:disabled {
+      opacity: 0.7;
+      cursor: default;
+    }
+    .fifa-pred-box input::-webkit-outer-spin-button,
+    .fifa-pred-box input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .fifa-pred-box .pts-mini {
+      font-size: 0.62rem;
+      font-weight: 800;
+      padding: 0.05rem 0.3rem;
+      border-radius: 4px;
+      background: #152033;
+      color: var(--muted);
+    }
+    .fifa-pred-box .pts-mini.exact { color: var(--accent); background: rgba(0,230,118,0.12); }
+    .fifa-pred-box .pts-mini.has-pts { color: var(--gold); }
+
     .fifa-match {
       background: var(--card);
       border: 1px solid var(--border);
@@ -638,26 +703,50 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.25rem;
-      margin: 0.1rem 0;
+      gap: 0.3rem;
+      margin: 0.25rem 0 0.15rem;
+      padding: 0.3rem 0.25rem;
+      background: rgba(0, 230, 118, 0.06);
+      border: 1px dashed rgba(0, 230, 118, 0.35);
+      border-radius: 8px;
     }
     .fifa-inputs input {
-      width: 36px;
+      width: 40px;
+      height: 34px;
       text-align: center;
       font-weight: 800;
-      font-size: 0.9rem;
-      padding: 0.28rem 0.15rem;
+      font-size: 0.95rem;
+      padding: 0.2rem 0.1rem;
       border-radius: 7px;
-      border: 1px solid var(--border);
-      background: var(--bg);
+      border: 2px solid rgba(0, 230, 118, 0.55);
+      background: #0a1628;
       color: var(--text);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+      -moz-appearance: textfield;
+    }
+    .fifa-inputs input::-webkit-outer-spin-button,
+    .fifa-inputs input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .fifa-inputs input::placeholder {
+      color: rgba(148, 163, 184, 0.85);
+      font-weight: 700;
+      opacity: 1;
+    }
+    .fifa-inputs input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.2);
     }
     .fifa-inputs input:disabled {
-      opacity: 0.55;
+      opacity: 0.45;
       cursor: not-allowed;
+      border-color: var(--border);
+      background: #0d1a2e;
     }
     .fifa-real {
-      margin-top: 0.15rem;
+      margin-top: 0.2rem;
       font-size: 0.68rem;
       color: var(--muted);
       display: flex;
@@ -665,16 +754,34 @@
       justify-content: center;
       gap: 0.25rem;
       flex-wrap: wrap;
+      padding: 0.2rem 0.15rem;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(42, 74, 117, 0.45);
     }
     .fifa-real input {
-      width: 30px;
+      width: 32px;
+      height: 26px;
       text-align: center;
-      padding: 0.2rem;
+      padding: 0.15rem;
       border-radius: 5px;
-      border: 1px solid var(--border);
-      background: var(--bg);
+      border: 1.5px solid #2a4a75;
+      background: #0a1628;
       color: var(--text);
       font-weight: 700;
+      -moz-appearance: textfield;
+    }
+    .fifa-real input::-webkit-outer-spin-button,
+    .fifa-real input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .fifa-real input::placeholder {
+      color: rgba(148, 163, 184, 0.7);
+      opacity: 1;
+    }
+    .fifa-real input:disabled {
+      opacity: 0.5;
     }
     .fifa-pts-badge {
       font-size: 0.75rem;
@@ -6025,29 +6132,44 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       el.innerHTML = sorted.map(m => {
         const real = data.fifa.results[m.id] || {};
         const preds = data.fifa.predictions[m.id] || {};
-        const my = user ? (preds[user] || {}) : {};
-        const locked = !user;
-        const pts = user ? fifaScorePts(my, real) : null;
-        const ptsBadge = pts == null ? '' : '<span class="fifa-pts-badge' + (pts === 0 ? ' zero' : '') + '">' + pts + ' pts</span>';
+        const hasReal = real.h != null && real.a != null && real.h !== '' && real.a !== '';
         const realLocked = !adminUnlocked;
+        const dateShort = m.date.slice(5);
 
-        const dateShort = m.date.slice(5); // MM-DD
+        const predBoxes = PLAYERS.map(p => {
+          const pred = preds[p] || {};
+          const canEdit = !!user && user === p;
+          let badge = '';
+          if (hasReal && pred.h != null && pred.a != null && pred.h !== '' && pred.a !== '') {
+            const pts = fifaScorePts(pred, real);
+            if (pts != null) {
+              const cls = pts === 2 ? 'exact' : (pts === 1 ? 'has-pts' : '');
+              badge = '<span class="pts-mini ' + cls + '">' + pts + ' pts</span>';
+            }
+          }
+          const boxCls = 'fifa-pred-box ' + p + (canEdit ? ' can-edit' : '');
+          return '<div class="' + boxCls + '">' +
+            '<div class="name">' + PLAYER_NAMES[p] + ' ' + badge + '</div>' +
+            '<div class="score-line">' +
+              '<input type="number" min="0" max="20" inputmode="numeric" data-fifa-pred="' + m.id + '" data-fifa-player="' + p + '" data-side="h" value="' + (pred.h != null && pred.h !== '' ? pred.h : '') + '" placeholder="-" ' + (canEdit ? '' : 'disabled') + ' />' +
+              '<span style="color:var(--muted);font-weight:800">:</span>' +
+              '<input type="number" min="0" max="20" inputmode="numeric" data-fifa-pred="' + m.id + '" data-fifa-player="' + p + '" data-side="a" value="' + (pred.a != null && pred.a !== '' ? pred.a : '') + '" placeholder="-" ' + (canEdit ? '' : 'disabled') + ' />' +
+            '</div></div>';
+        }).join('');
+
         return '<div class="fifa-match" data-fifa-id="' + m.id + '">' +
-          '<div class="fifa-meta">' + dateShort + ' · ' + m.comp + ' ' + ptsBadge + '</div>' +
+          '<div class="fifa-meta">' + dateShort + ' · ' + m.comp + '</div>' +
           '<div class="fifa-teams-row">' +
             '<div class="fifa-team">' + fifaFlagHtml(m.local) + '<span>' + m.local + '</span></div>' +
-            '<div class="fifa-inputs">' +
-              '<input type="number" min="0" max="20" inputmode="numeric" data-fifa-pred="' + m.id + '" data-side="h" value="' + (my.h != null && my.h !== '' ? my.h : '') + '" placeholder="-" ' + (locked ? 'disabled' : '') + ' />' +
-              '<span style="font-weight:900;color:var(--muted)">:</span>' +
-              '<input type="number" min="0" max="20" inputmode="numeric" data-fifa-pred="' + m.id + '" data-side="a" value="' + (my.a != null && my.a !== '' ? my.a : '') + '" placeholder="-" ' + (locked ? 'disabled' : '') + ' />' +
-            '</div>' +
             '<div class="fifa-team">' + fifaFlagHtml(m.visitante) + '<span>' + m.visitante + '</span></div>' +
           '</div>' +
           '<div class="fifa-real">Real' + (realLocked ? ' 🔒' : '') + ' ' +
-            '<input type="number" min="0" max="20" data-fifa-real="' + m.id + '" data-side="h" value="' + (real.h != null && real.h !== '' ? real.h : '') + '" ' + (realLocked ? 'disabled' : '') + ' />' +
+            '<input type="number" min="0" max="20" data-fifa-real="' + m.id + '" data-side="h" value="' + (real.h != null && real.h !== '' ? real.h : '') + '" placeholder="-" ' + (realLocked ? 'disabled' : '') + ' />' +
             '<span>:</span>' +
-            '<input type="number" min="0" max="20" data-fifa-real="' + m.id + '" data-side="a" value="' + (real.a != null && real.a !== '' ? real.a : '') + '" ' + (realLocked ? 'disabled' : '') + ' />' +
-          '</div></div>';
+            '<input type="number" min="0" max="20" data-fifa-real="' + m.id + '" data-side="a" value="' + (real.a != null && real.a !== '' ? real.a : '') + '" placeholder="-" ' + (realLocked ? 'disabled' : '') + ' />' +
+          '</div>' +
+          '<div class="fifa-preds-grid">' + predBoxes + '</div>' +
+          '</div>';
       }).join('');
 
       el.querySelectorAll('[data-fifa-pred]').forEach(inp => {
@@ -6062,6 +6184,12 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
     function onFifaPredChange(e) {
       const user = currentUser();
       if (!user) return;
+      const player = e.target.dataset.fifaPlayer;
+      if (player && player !== user) {
+        toast('Solo puedes editar tus propios pronósticos');
+        renderFifaMatches();
+        return;
+      }
       ensureFifaData();
       const id = e.target.dataset.fifaPred;
       const side = e.target.dataset.side;
