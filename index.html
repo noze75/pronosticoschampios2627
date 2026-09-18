@@ -561,6 +561,108 @@
       .logo-race-play .trivia-opt { padding: 0.38rem 0.5rem; font-size: 0.78rem; }
     }
 
+
+    .fifa-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 0.85rem;
+    }
+    .fifa-match {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.75rem 0.9rem;
+      margin-bottom: 0.55rem;
+    }
+    .fifa-match .fifa-meta {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-bottom: 0.4rem;
+    }
+    .fifa-teams-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .fifa-team {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-weight: 800;
+      min-width: 120px;
+    }
+    .fifa-team.right { flex-direction: row-reverse; text-align: right; }
+    .fifa-flag {
+      width: 28px;
+      height: 20px;
+      object-fit: cover;
+      border-radius: 3px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: #122640;
+    }
+    .fifa-flag-emoji { font-size: 1.35rem; line-height: 1; }
+    .fifa-inputs {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .fifa-inputs input {
+      width: 42px;
+      text-align: center;
+      font-weight: 800;
+      font-size: 1rem;
+      padding: 0.35rem 0.2rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+    }
+    .fifa-inputs input:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    .fifa-real {
+      margin-top: 0.45rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+    .fifa-real input {
+      width: 36px;
+      text-align: center;
+      padding: 0.25rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-weight: 700;
+    }
+    .fifa-pts-badge {
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 0.15rem 0.45rem;
+      border-radius: 6px;
+      background: rgba(0,230,118,0.12);
+      color: var(--accent);
+    }
+    .fifa-pts-badge.zero { background: rgba(239,83,80,0.12); color: #ef5350; }
+    #fifaRankingView table { width: 100%; border-collapse: collapse; }
+    #fifaRankingView th, #fifaRankingView td {
+      padding: 0.55rem 0.65rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    #fifaRankingView th { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; }
+
     /* Trivia millonario */
     .trivia-layout {
       display: grid;
@@ -2263,6 +2365,7 @@
       <button data-panel="rondas">Rondas finales</button>
       <button data-panel="mapa">Mapa</button>
       <button data-panel="juegos">Juegos</button>
+      <button data-panel="futbol">+ Fútbol</button>
       <button data-panel="reglas">Reglas</button>
     </nav>
   </header>
@@ -2582,6 +2685,23 @@
       </div>
     </div>
 
+
+    <!-- + FÚTBOL (Fecha FIFA) -->
+    <div id="futbol" class="panel">
+      <div class="rules" style="margin-bottom:0.75rem;">
+        <strong id="fifaWindowTitle">+ Fútbol · Fecha FIFA</strong>
+        <span id="fifaWindowDates" style="color:var(--muted)"></span>
+        — Pronósticos de selecciones. Ranking aparte de la Champions.
+        Solo el <strong>admin</strong> carga resultados reales. Elige <strong>Soy</strong> para tipar.
+      </div>
+      <div class="fifa-toolbar">
+        <button type="button" class="map-chip active" data-fifa-view="partidos" id="fifaViewPartidos">Partidos</button>
+        <button type="button" class="map-chip" data-fifa-view="ranking" id="fifaViewRanking">Ranking Fecha FIFA</button>
+      </div>
+      <div id="fifaPartidosView"></div>
+      <div id="fifaRankingView" hidden></div>
+    </div>
+
     <!-- REGLAS -->
     <div id="reglas" class="panel">
       <div class="rules">
@@ -2653,6 +2773,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
     // Cámbiala por la que tú quieras:
     const ADMIN_PASSWORD = 'pelmazo2026';
     let adminUnlocked = false;
+        if (document.getElementById('futbol')?.classList.contains('active')) renderFifaPanel();
 
     // Fotos de los jugadores (carpeta fotos/ junto al HTML)
     // Se prueban varios nombres por si hay mayúsculas/minúsculas distintas en GitHub
@@ -2964,6 +3085,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       results: {},     // matchId -> {h, a}
       trivia: {},      // playerId -> { best, bestStep, plays, name }
       logoRace: {},    // playerId -> { best, plays, total, name }
+      fifa: { predictions: {}, results: {}, windowId: null },
       updatedAt: null,
       updatedBy: null
     };
@@ -3056,6 +3178,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
               results: local.results || {},
               trivia: mergeTriviaMaps(local.trivia || {}, migrateLocalTriviaOnly()),
               logoRace: local.logoRace || {},
+              fifa: local.fifa || { predictions: {}, results: {}, windowId: null },
               updatedAt: local.updatedAt || null,
               updatedBy: local.updatedBy || null
             };
@@ -3076,6 +3199,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
             results: remote.results || data.results || {},
             trivia: mergeTriviaMaps(data.trivia || {}, remote.trivia || {}),
             logoRace: mergeLogoRaceMaps(data.logoRace || {}, remote.logoRace || {}),
+            fifa: remote.fifa || data.fifa || { predictions: {}, results: {}, windowId: null },
             updatedAt: remote.updatedAt || null,
             updatedBy: remote.updatedBy || null
           };
@@ -3119,6 +3243,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
         results: data.results,
         trivia: data.trivia || {},
         logoRace: data.logoRace || {},
+        fifa: data.fifa || { predictions: {}, results: {}, windowId: null },
         updatedAt: new Date().toISOString(),
         updatedBy: currentUser() || 'anon'
       };
@@ -3291,6 +3416,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       if (pwd === null) return;
       if (pwd === ADMIN_PASSWORD) {
         adminUnlocked = true;
+        if (document.getElementById('futbol')?.classList.contains('active')) renderFifaPanel();
         toast('Modo admin activado · puedes editar resultados reales');
         updateAdminButton();
         renderMatches();
@@ -3494,6 +3620,8 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       }
 
       const phraseEl = document.getElementById('pbPhrase');
+      if (document.getElementById('futbol')?.classList.contains('active')) renderFifaPanel();
+
       if (phraseEl) {
         let pool = PERSONAL_PHRASES.empty;
         if ((me.played || 0) > 0) {
@@ -5702,6 +5830,243 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
     }
 
 
+
+    // ========== + FÚTBOL · FECHA FIFA (plantilla reutilizable) ==========
+    // Cambia FIFA_WINDOW + FIFA_MATCHES en cada ventana internacional.
+    const FIFA_WINDOW = {
+      id: '2026-sep-oct',
+      name: 'Fecha FIFA · Sep–Oct 2026',
+      from: '2026-09-21',
+      to: '2026-10-06'
+    };
+
+    // name -> ISO 3166-1 alpha-2 for flagcdn
+    const FIFA_FLAGS = {
+      'Colombia': 'co', 'España': 'es', 'Francia': 'fr', 'Inglaterra': 'gb-eng',
+      'Italia': 'it', 'Brasil': 'br', 'Argentina': 'ar', 'Alemania': 'de',
+      'Portugal': 'pt', 'Países Bajos': 'nl', 'Bélgica': 'be', 'Croacia': 'hr',
+      'Turquía': 'tr', 'República Checa': 'cz', 'Serbia': 'rs', 'Grecia': 'gr',
+      'Dinamarca': 'dk', 'Noruega': 'no', 'Gales': 'gb-wls', 'Escocia': 'gb-sct',
+      'Suiza': 'ch', 'Uruguay': 'uy', 'México': 'mx', 'Estados Unidos': 'us',
+      'Japón': 'jp', 'Corea del Sur': 'kr', 'Marruecos': 'ma', 'Ecuador': 'ec',
+      'Chile': 'cl', 'Perú': 'pe', 'Bolivia': 'bo', 'Paraguay': 'py',
+      'Australia': 'au', 'India': 'in', 'Burkina Faso': 'bf', 'Benín': 'bj',
+      'Hungría': 'hu', 'Ucrania': 'ua', 'Polonia': 'pl', 'Suecia': 'se',
+      'Austria': 'at', 'Rumanía': 'ro', 'Georgia': 'ge'
+    };
+
+    const FIFA_FLAG_EMOJI = {
+      'Colombia': '🇨🇴', 'España': '🇪🇸', 'Francia': '🇫🇷', 'Inglaterra': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+      'Italia': '🇮🇹', 'Brasil': '🇧🇷', 'Argentina': '🇦🇷', 'Alemania': '🇩🇪',
+      'Portugal': '🇵🇹', 'Países Bajos': '🇳🇱', 'Bélgica': '🇧🇪', 'Croacia': '🇭🇷',
+      'Turquía': '🇹🇷', 'República Checa': '🇨🇿', 'Serbia': '🇷🇸', 'Grecia': '🇬🇷',
+      'Dinamarca': '🇩🇰', 'Noruega': '🇳🇴', 'Gales': '🏴󠁧󠁢󠁷󠁬󠁳󠁿', 'Escocia': '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+      'Suiza': '🇨🇭', 'Uruguay': '🇺🇾', 'México': '🇲🇽', 'Estados Unidos': '🇺🇸',
+      'Japón': '🇯🇵', 'Corea del Sur': '🇰🇷', 'Marruecos': '🇲🇦', 'Ecuador': '🇪🇨',
+      'Chile': '🇨🇱', 'Perú': '🇵🇪', 'Bolivia': '🇧🇴', 'Paraguay': '🇵🇾',
+      'Australia': '🇦🇺', 'India': '🇮🇳', 'Burkina Faso': '🇧🇫', 'Benín': '🇧🇯',
+      'Hungría': '🇭🇺', 'Ucrania': '🇺🇦', 'Polonia': '🇵🇱', 'Suecia': '🇸🇪',
+      'Austria': '🇦🇹', 'Rumanía': '🇷🇴', 'Georgia': '🇬🇪'
+    };
+
+    // ~30 partidos · siempre incluyen COL, ESP, FRA, ING, ITA, BRA, ARG, ALE
+    // Plantilla: id, date, local, visitante, comp
+    const FIFA_MATCHES = [
+      // Nations League · obligatorias europeas
+      { id: 'f01', date: '2026-09-24', local: 'Países Bajos', visitante: 'Alemania', comp: 'Nations League' },
+      { id: 'f02', date: '2026-09-24', local: 'Portugal', visitante: 'Gales', comp: 'Nations League' },
+      { id: 'f03', date: '2026-09-24', local: 'Noruega', visitante: 'Dinamarca', comp: 'Nations League' },
+      { id: 'f04', date: '2026-09-25', local: 'Turquía', visitante: 'Francia', comp: 'Nations League' },
+      { id: 'f05', date: '2026-09-25', local: 'Italia', visitante: 'Bélgica', comp: 'Nations League' },
+      { id: 'f06', date: '2026-09-25', local: 'Hungría', visitante: 'Ucrania', comp: 'Nations League' },
+      { id: 'f07', date: '2026-09-26', local: 'Inglaterra', visitante: 'España', comp: 'Nations League' },
+      { id: 'f08', date: '2026-09-26', local: 'República Checa', visitante: 'Croacia', comp: 'Nations League' },
+      { id: 'f09', date: '2026-09-27', local: 'Alemania', visitante: 'Grecia', comp: 'Nations League' },
+      { id: 'f10', date: '2026-09-27', local: 'Serbia', visitante: 'Países Bajos', comp: 'Nations League' },
+      { id: 'f11', date: '2026-09-27', local: 'Noruega', visitante: 'Portugal', comp: 'Nations League' },
+      { id: 'f12', date: '2026-09-28', local: 'Turquía', visitante: 'Italia', comp: 'Nations League' },
+      { id: 'f13', date: '2026-09-28', local: 'Bélgica', visitante: 'Francia', comp: 'Nations League' },
+      { id: 'f14', date: '2026-09-29', local: 'España', visitante: 'Croacia', comp: 'Nations League' },
+      { id: 'f15', date: '2026-09-29', local: 'Alemania', visitante: 'Serbia', comp: 'Nations League' },
+      { id: 'f16', date: '2026-10-02', local: 'Francia', visitante: 'Italia', comp: 'Nations League' },
+      { id: 'f17', date: '2026-10-02', local: 'Bélgica', visitante: 'Turquía', comp: 'Nations League' },
+      { id: 'f18', date: '2026-10-03', local: 'España', visitante: 'República Checa', comp: 'Nations League' },
+      { id: 'f19', date: '2026-10-03', local: 'Croacia', visitante: 'Inglaterra', comp: 'Nations League' },
+      { id: 'f20', date: '2026-10-06', local: 'Croacia', visitante: 'España', comp: 'Nations League' },
+      // Amistosos CONMEBOL / otros (ventana sep–oct 2026)
+      { id: 'f21', date: '2026-09-30', local: 'Argentina', visitante: 'Bolivia', comp: 'Amistoso' },
+      { id: 'f22', date: '2026-10-03', local: 'Argentina', visitante: 'Burkina Faso', comp: 'Amistoso' },
+      { id: 'f23', date: '2026-10-06', local: 'Argentina', visitante: 'Benín', comp: 'Amistoso' },
+      { id: 'f24', date: '2026-09-23', local: 'Brasil', visitante: 'Australia', comp: 'Amistoso' },
+      { id: 'f25', date: '2026-09-27', local: 'Brasil', visitante: 'India', comp: 'Amistoso' },
+      { id: 'f26', date: '2026-09-24', local: 'Colombia', visitante: 'México', comp: 'Amistoso' },
+      { id: 'f27', date: '2026-09-28', local: 'Estados Unidos', visitante: 'Colombia', comp: 'Amistoso' },
+      { id: 'f28', date: '2026-10-02', local: 'Colombia', visitante: 'Ecuador', comp: 'Amistoso' },
+      { id: 'f29', date: '2026-09-25', local: 'Uruguay', visitante: 'Paraguay', comp: 'Amistoso' },
+      { id: 'f30', date: '2026-09-29', local: 'Japón', visitante: 'Corea del Sur', comp: 'Amistoso' }
+    ];
+
+    function ensureFifaData() {
+      if (!data.fifa || typeof data.fifa !== 'object') {
+        data.fifa = { predictions: {}, results: {}, windowId: FIFA_WINDOW.id };
+      }
+      if (!data.fifa.predictions) data.fifa.predictions = {};
+      if (!data.fifa.results) data.fifa.results = {};
+      // Nueva ventana → no mezclar resultados viejos
+      if (data.fifa.windowId && data.fifa.windowId !== FIFA_WINDOW.id) {
+        data.fifa = { predictions: {}, results: {}, windowId: FIFA_WINDOW.id };
+      }
+      data.fifa.windowId = FIFA_WINDOW.id;
+    }
+
+    function fifaFlagHtml(team) {
+      const code = FIFA_FLAGS[team];
+      const emoji = FIFA_FLAG_EMOJI[team] || '🏳️';
+      if (code) {
+        return '<img class="fifa-flag" src="https://flagcdn.com/w40/' + code + '.png" alt="' + team + '" title="' + team + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'inline\'" /><span class="fifa-flag-emoji" style="display:none">' + emoji + '</span>';
+      }
+      return '<span class="fifa-flag-emoji">' + emoji + '</span>';
+    }
+
+    function fifaScorePts(pred, real) {
+      if (!pred || real == null || real.h == null || real.a == null || pred.h === '' || pred.a === '' || pred.h == null || pred.a == null) return null;
+      const ph = Number(pred.h), pa = Number(pred.a), rh = Number(real.h), ra = Number(real.a);
+      if (Number.isNaN(ph) || Number.isNaN(pa)) return null;
+      if (ph === rh && pa === ra) return 2;
+      const predRes = ph > pa ? 1 : ph < pa ? -1 : 0;
+      const realRes = rh > ra ? 1 : rh < ra ? -1 : 0;
+      return predRes === realRes ? 1 : 0;
+    }
+
+    function getFifaPlayerStats() {
+      ensureFifaData();
+      const out = {};
+      PLAYERS.forEach(p => { out[p] = { pts: 0, exact: 0, resultOnly: 0, played: 0 }; });
+      FIFA_MATCHES.forEach(m => {
+        const real = data.fifa.results[m.id];
+        if (!real || real.h == null || real.a == null || real.h === '' || real.a === '') return;
+        PLAYERS.forEach(p => {
+          const pred = (data.fifa.predictions[m.id] || {})[p];
+          const pts = fifaScorePts(pred, real);
+          if (pts == null) return;
+          out[p].played++;
+          out[p].pts += pts;
+          if (pts === 2) out[p].exact++;
+          else if (pts === 1) out[p].resultOnly++;
+        });
+      });
+      return out;
+    }
+
+    function renderFifaPanel() {
+      ensureFifaData();
+      const title = document.getElementById('fifaWindowTitle');
+      const dates = document.getElementById('fifaWindowDates');
+      if (title) title.textContent = '+ Fútbol · ' + FIFA_WINDOW.name;
+      if (dates) dates.textContent = ' (' + FIFA_WINDOW.from + ' → ' + FIFA_WINDOW.to + ')';
+
+      const view = document.querySelector('.fifa-toolbar .map-chip.active')?.dataset?.fifaView || 'partidos';
+      document.getElementById('fifaPartidosView').hidden = view !== 'partidos';
+      document.getElementById('fifaRankingView').hidden = view !== 'ranking';
+      if (view === 'ranking') renderFifaRanking();
+      else renderFifaMatches();
+    }
+
+    function renderFifaRanking() {
+      const el = document.getElementById('fifaRankingView');
+      if (!el) return;
+      const stats = getFifaPlayerStats();
+      const rows = PLAYERS.map(p => ({ id: p, ...stats[p] }))
+        .sort((a, b) => b.pts - a.pts || b.exact - a.exact);
+      el.innerHTML = '<div class="rules" style="margin-bottom:0.75rem;"><strong>Ranking Fecha FIFA</strong> — Solo cuenta esta ventana. 2 pts marcador exacto · 1 pt resultado · 0 fallo.</div>' +
+        '<table><thead><tr><th>#</th><th>Jugador</th><th>Pts</th><th>Exactos</th><th>Solo res.</th><th>Jugados</th></tr></thead><tbody>' +
+        rows.map((r, i) => '<tr><td>' + (i + 1) + '</td><td class="player-name ' + r.id + '">' + PLAYER_NAMES[r.id] + '</td><td><strong>' + r.pts + '</strong></td><td>' + r.exact + '</td><td>' + r.resultOnly + '</td><td>' + r.played + '</td></tr>').join('') +
+        '</tbody></table>';
+    }
+
+    function renderFifaMatches() {
+      const el = document.getElementById('fifaPartidosView');
+      if (!el) return;
+      ensureFifaData();
+      const user = currentUser();
+      const sorted = FIFA_MATCHES.slice().sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
+
+      el.innerHTML = sorted.map(m => {
+        const real = data.fifa.results[m.id] || {};
+        const preds = data.fifa.predictions[m.id] || {};
+        const my = user ? (preds[user] || {}) : {};
+        const locked = !user;
+        const pts = user ? fifaScorePts(my, real) : null;
+        const ptsBadge = pts == null ? '' : '<span class="fifa-pts-badge' + (pts === 0 ? ' zero' : '') + '">' + pts + ' pts</span>';
+        const realLocked = !adminUnlocked;
+
+        return '<div class="fifa-match" data-fifa-id="' + m.id + '">' +
+          '<div class="fifa-meta">' + m.date + ' · ' + m.comp + ' ' + ptsBadge + '</div>' +
+          '<div class="fifa-teams-row">' +
+            '<div class="fifa-team">' + fifaFlagHtml(m.local) + '<span>' + m.local + '</span></div>' +
+            '<div class="fifa-inputs">' +
+              '<input type="number" min="0" max="20" inputmode="numeric" data-fifa-pred="' + m.id + '" data-side="h" value="' + (my.h != null && my.h !== '' ? my.h : '') + '" placeholder="-" ' + (locked ? 'disabled' : '') + ' />' +
+              '<span style="font-weight:900;color:var(--muted)">:</span>' +
+              '<input type="number" min="0" max="20" inputmode="numeric" data-fifa-pred="' + m.id + '" data-side="a" value="' + (my.a != null && my.a !== '' ? my.a : '') + '" placeholder="-" ' + (locked ? 'disabled' : '') + ' />' +
+            '</div>' +
+            '<div class="fifa-team right">' + fifaFlagHtml(m.visitante) + '<span>' + m.visitante + '</span></div>' +
+          '</div>' +
+          '<div class="fifa-real">Resultado real' + (realLocked ? ' 🔒' : '') + ': ' +
+            '<input type="number" min="0" max="20" data-fifa-real="' + m.id + '" data-side="h" value="' + (real.h != null && real.h !== '' ? real.h : '') + '" ' + (realLocked ? 'disabled' : '') + ' />' +
+            '<span>:</span>' +
+            '<input type="number" min="0" max="20" data-fifa-real="' + m.id + '" data-side="a" value="' + (real.a != null && real.a !== '' ? real.a : '') + '" ' + (realLocked ? 'disabled' : '') + ' />' +
+          '</div></div>';
+      }).join('');
+
+      el.querySelectorAll('[data-fifa-pred]').forEach(inp => {
+        inp.addEventListener('change', onFifaPredChange);
+        inp.addEventListener('input', onFifaPredChange);
+      });
+      el.querySelectorAll('[data-fifa-real]').forEach(inp => {
+        inp.addEventListener('change', onFifaRealChange);
+      });
+    }
+
+    function onFifaPredChange(e) {
+      const user = currentUser();
+      if (!user) return;
+      ensureFifaData();
+      const id = e.target.dataset.fifaPred;
+      const side = e.target.dataset.side;
+      const val = e.target.value === '' ? null : Number(e.target.value);
+      if (!data.fifa.predictions[id]) data.fifa.predictions[id] = {};
+      if (!data.fifa.predictions[id][user]) data.fifa.predictions[id][user] = {};
+      data.fifa.predictions[id][user][side] = val;
+      saveData(false);
+    }
+
+    function onFifaRealChange(e) {
+      if (!adminUnlocked) {
+        toast('Solo el admin puede cargar resultados de + Fútbol');
+        renderFifaMatches();
+        return;
+      }
+      ensureFifaData();
+      const id = e.target.dataset.fifaReal;
+      const side = e.target.dataset.side;
+      const val = e.target.value === '' ? null : Number(e.target.value);
+      if (!data.fifa.results[id]) data.fifa.results[id] = {};
+      data.fifa.results[id][side] = val;
+      saveData(true);
+      renderFifaMatches();
+    }
+
+    function initFifaToolbar() {
+      document.querySelectorAll('[data-fifa-view]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('[data-fifa-view]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderFifaPanel();
+        });
+      });
+    }
+
+
     // ========== INIT ==========
     document.getElementById('mainNav').addEventListener('click', e => {
       if (e.target.tagName !== 'BUTTON') return;
@@ -5719,6 +6084,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       if (e.target.dataset.panel === 'rondas') renderRondas();
       if (e.target.dataset.panel === 'mapa') initMap();
       if (e.target.dataset.panel === 'juegos') { closeJuego(); }
+      if (e.target.dataset.panel === 'futbol') renderFifaPanel();
     });
 
     document.getElementById('clubSearch')?.addEventListener('input', e => {
@@ -5742,6 +6108,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
               results: local.results || {},
               trivia: mergeTriviaMaps(local.trivia || {}, migrateLocalTriviaOnly()),
               logoRace: local.logoRace || {},
+              fifa: local.fifa || { predictions: {}, results: {}, windowId: null },
               updatedAt: local.updatedAt || null,
               updatedBy: local.updatedBy || null
             };
@@ -5778,6 +6145,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
               results: remote.results || {},
               trivia: mergeTriviaMaps(data.trivia || {}, remote.trivia || {}),
               logoRace: mergeLogoRaceMaps(data.logoRace || {}, remote.logoRace || {}),
+              fifa: remote.fifa || data.fifa || { predictions: {}, results: {}, windowId: null },
               updatedAt: remote.updatedAt,
               updatedBy: remote.updatedBy || null
             };
