@@ -589,16 +589,16 @@
       border-top: 1px dashed var(--border);
     }
     .fifa-pred-box {
-      background: var(--bg);
+      background: #0d1a2e;
       border-radius: 8px;
-      padding: 0.3rem 0.4rem;
-      border: 1px solid var(--border);
+      padding: 0.4rem 0.45rem 0.45rem;
+      border: 1px solid #2a4a75;
       font-size: 0.72rem;
     }
     .fifa-pred-box .name {
       font-weight: 800;
-      font-size: 0.68rem;
-      margin-bottom: 0.2rem;
+      font-size: 0.72rem;
+      margin-bottom: 0.28rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -611,26 +611,60 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.2rem;
+      gap: 0.25rem;
+    }
+    .fifa-pred-box .score-line > span {
+      color: #94a3b8 !important;
+      font-weight: 900;
+      font-size: 0.95rem;
     }
     .fifa-pred-box input {
-      width: 32px;
-      height: 28px;
+      width: 40px;
+      height: 36px;
       text-align: center;
-      font-weight: 800;
-      font-size: 0.85rem;
-      border-radius: 6px;
-      border: 1.5px solid var(--border);
-      background: #0a1628;
-      color: var(--text);
+      font-weight: 900;
+      font-size: 1.15rem;
+      line-height: 1;
+      border-radius: 8px;
+      border: 2px solid #3d5a80;
+      background: #152033;
+      color: #f8fafc !important;
       -moz-appearance: textfield;
+      -webkit-text-fill-color: #f8fafc;
+      opacity: 1 !important;
+    }
+    .fifa-pred-box input:not(:placeholder-shown) {
+      background: #1a3d2a;
+      border-color: #00e676;
+      color: #ffffff !important;
+      -webkit-text-fill-color: #ffffff;
+      box-shadow: 0 0 0 1px rgba(0, 230, 118, 0.25);
     }
     .fifa-pred-box.can-edit input {
-      border-color: rgba(0, 230, 118, 0.55);
+      border-color: rgba(0, 230, 118, 0.75);
+      background: #0f2418;
+    }
+    .fifa-pred-box.can-edit input:focus {
+      outline: none;
+      border-color: #00e676;
+      box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.25);
+      background: #12301f;
     }
     .fifa-pred-box input:disabled {
-      opacity: 0.7;
       cursor: default;
+      opacity: 1 !important;
+    }
+    .fifa-pred-box input:disabled:not(:placeholder-shown) {
+      background: #1e3a5f;
+      border-color: #4a6fa5;
+      color: #ffffff !important;
+      -webkit-text-fill-color: #ffffff;
+    }
+    .fifa-pred-box input::placeholder {
+      color: #64748b;
+      opacity: 1;
+      font-weight: 700;
+      -webkit-text-fill-color: #64748b;
     }
     .fifa-pred-box input::-webkit-outer-spin-button,
     .fifa-pred-box input::-webkit-inner-spin-button {
