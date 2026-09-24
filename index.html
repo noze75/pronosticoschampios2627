@@ -2869,9 +2869,9 @@
         — Pronósticos de selecciones. Ranking aparte de la Champions.
         Solo el <strong>admin</strong> carga resultados reales. Elige <strong>Soy</strong> para introducir tus pronósticos.
       </div>
-      <div class="fifa-toolbar">
-        <button type="button" class="map-chip active" data-fifa-view="partidos" id="fifaViewPartidos">Partidos</button>
-        <button type="button" class="map-chip" data-fifa-view="ranking" id="fifaViewRanking">Ranking Fecha FIFA</button>
+      <div class="fifa-toolbar" id="fifaToolbar">
+        <button type="button" class="map-chip active" data-fifa-view="partidos" id="fifaViewPartidos" onclick="switchFifaView('partidos')">Partidos</button>
+        <button type="button" class="map-chip" data-fifa-view="ranking" id="fifaViewRanking" onclick="switchFifaView('ranking')">Ranking Fecha FIFA</button>
       </div>
       <div id="fifaPartidosView"></div>
       <div id="fifaRankingView" hidden></div>
@@ -6133,6 +6133,13 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       return out;
     }
 
+    function switchFifaView(view) {
+      document.querySelectorAll('[data-fifa-view]').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-fifa-view') === view);
+      });
+      renderFifaPanel();
+    }
+
     function renderFifaPanel() {
       ensureFifaData();
       const title = document.getElementById('fifaWindowTitle');
@@ -6140,9 +6147,12 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       if (title) title.textContent = '+ Fútbol · ' + FIFA_WINDOW.name;
       if (dates) dates.textContent = ' (' + FIFA_WINDOW.from + ' → ' + FIFA_WINDOW.to + ')';
 
-      const view = document.querySelector('.fifa-toolbar .map-chip.active')?.dataset?.fifaView || 'partidos';
-      document.getElementById('fifaPartidosView').hidden = view !== 'partidos';
-      document.getElementById('fifaRankingView').hidden = view !== 'ranking';
+      const activeBtn = document.querySelector('.fifa-toolbar .map-chip.active');
+      const view = (activeBtn && activeBtn.getAttribute('data-fifa-view')) || 'partidos';
+      const partidosEl = document.getElementById('fifaPartidosView');
+      const rankingEl = document.getElementById('fifaRankingView');
+      if (partidosEl) partidosEl.hidden = view !== 'partidos';
+      if (rankingEl) rankingEl.hidden = view !== 'ranking';
       if (view === 'ranking') renderFifaRanking();
       else renderFifaMatches();
     }
@@ -6153,6 +6163,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       const stats = getFifaPlayerStats();
       const rows = PLAYERS.map(p => ({ id: p, ...stats[p] }))
         .sort((a, b) => b.pts - a.pts || b.exact - a.exact);
+      el.hidden = false;
       el.innerHTML = '<div class="rules" style="margin-bottom:0.75rem;"><strong>Ranking Fecha FIFA</strong> — Solo cuenta esta ventana. 2 pts marcador exacto · 1 pt resultado · 0 fallo.</div>' +
         '<table><thead><tr><th>#</th><th>Jugador</th><th>Pts</th><th>Exactos</th><th>Solo res.</th><th>Jugados</th></tr></thead><tbody>' +
         rows.map((r, i) => '<tr><td>' + (i + 1) + '</td><td class="player-name ' + r.id + '">' + PLAYER_NAMES[r.id] + '</td><td><strong>' + r.pts + '</strong></td><td>' + r.exact + '</td><td>' + r.resultOnly + '</td><td>' + r.played + '</td></tr>').join('') +
@@ -6283,11 +6294,11 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
     }
 
     function initFifaToolbar() {
+      // onclick en el HTML ya cubre el cambio de vista; esto es respaldo
       document.querySelectorAll('[data-fifa-view]').forEach(btn => {
         btn.addEventListener('click', () => {
-          document.querySelectorAll('[data-fifa-view]').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          renderFifaPanel();
+          const view = btn.getAttribute('data-fifa-view') || 'partidos';
+          switchFifaView(view);
         });
       });
     }
@@ -6346,6 +6357,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       } catch(_) {}
       initIdentityPicker();
       initPersonalBar();
+      initFifaToolbar();
       renderMatches();
       renderLeaderboard();
       renderStats();
