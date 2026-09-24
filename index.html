@@ -855,18 +855,25 @@
       color: var(--accent);
     }
     .fifa-pts-badge.zero { background: rgba(239,83,80,0.12); color: #ef5350; }
-    /* Ranking tabla compacta arriba */
+    /* Ranking + stickman líder */
     #fifaRankingView {
       margin-bottom: 0.9rem;
-      max-width: 520px;
     }
-    #fifaRankingView .fifa-rank-wrap {
+    .fifa-rank-layout {
+      display: flex;
+      align-items: stretch;
+      gap: 0.85rem;
+      flex-wrap: wrap;
+    }
+    .fifa-rank-wrap {
+      flex: 0 1 520px;
+      max-width: 100%;
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 12px;
       overflow: hidden;
     }
-    #fifaRankingView .fifa-rank-caption {
+    .fifa-rank-caption {
       font-size: 0.72rem;
       font-weight: 800;
       color: var(--muted);
@@ -874,7 +881,7 @@
       letter-spacing: 0.04em;
       padding: 0.45rem 0.75rem 0.2rem;
     }
-    #fifaRankingView .fifa-rank-caption strong {
+    .fifa-rank-caption strong {
       color: var(--text);
       text-transform: none;
       letter-spacing: 0;
@@ -888,7 +895,7 @@
       border-radius: 0;
     }
     #fifaRankingView th, #fifaRankingView td {
-      padding: 0.38rem 0.7rem;
+      padding: 0.38rem 0.65rem;
       text-align: left;
       border-bottom: 1px solid var(--border);
       font-size: 0.82rem;
@@ -912,6 +919,131 @@
       color: var(--gold);
       width: 28px;
       font-size: 0.85rem;
+    }
+    .fifa-leader-dance {
+      flex: 1 1 140px;
+      min-width: 120px;
+      max-width: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.55rem 0.5rem 0.65rem;
+    }
+    .fifa-leader-dance .dance-label {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      text-align: center;
+    }
+    .stick-dance {
+      width: 90px;
+      height: 120px;
+      position: relative;
+      animation: stick-bounce 0.55s ease-in-out infinite alternate;
+    }
+    .stick-dance .stick-head {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid var(--gold);
+      background: #0d1a2a;
+      position: absolute;
+      left: 50%;
+      top: 2px;
+      transform: translateX(-50%);
+      z-index: 2;
+      box-shadow: 0 0 10px rgba(255,213,79,0.35);
+    }
+    .stick-dance .stick-head img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .stick-dance .stick-head .identity-fallback {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      font-size: 1.1rem;
+    }
+    .stick-dance .stick-body {
+      position: absolute;
+      left: 50%;
+      top: 40px;
+      width: 3px;
+      height: 36px;
+      background: #e2e8f0;
+      transform: translateX(-50%);
+      border-radius: 2px;
+    }
+    .stick-dance .stick-arm {
+      position: absolute;
+      top: 46px;
+      width: 28px;
+      height: 3px;
+      background: #e2e8f0;
+      border-radius: 2px;
+      transform-origin: left center;
+    }
+    .stick-dance .stick-arm.left {
+      left: 50%;
+      transform: translateX(-100%) rotate(-35deg);
+      animation: arm-l 0.55s ease-in-out infinite alternate;
+    }
+    .stick-dance .stick-arm.right {
+      left: 50%;
+      transform: rotate(35deg);
+      animation: arm-r 0.55s ease-in-out infinite alternate;
+    }
+    .stick-dance .stick-leg {
+      position: absolute;
+      top: 74px;
+      width: 3px;
+      height: 30px;
+      background: #e2e8f0;
+      border-radius: 2px;
+      transform-origin: top center;
+    }
+    .stick-dance .stick-leg.left {
+      left: calc(50% - 6px);
+      animation: leg-l 0.55s ease-in-out infinite alternate;
+    }
+    .stick-dance .stick-leg.right {
+      left: calc(50% + 3px);
+      animation: leg-r 0.55s ease-in-out infinite alternate;
+    }
+    @keyframes stick-bounce {
+      from { transform: translateY(0); }
+      to { transform: translateY(-6px); }
+    }
+    @keyframes arm-l {
+      from { transform: translateX(-100%) rotate(-50deg); }
+      to { transform: translateX(-100%) rotate(-15deg); }
+    }
+    @keyframes arm-r {
+      from { transform: rotate(15deg); }
+      to { transform: rotate(50deg); }
+    }
+    @keyframes leg-l {
+      from { transform: rotate(18deg); }
+      to { transform: rotate(-12deg); }
+    }
+    @keyframes leg-r {
+      from { transform: rotate(-18deg); }
+      to { transform: rotate(12deg); }
+    }
+    @media (max-width: 640px) {
+      .fifa-leader-dance { max-width: 100%; width: 100%; }
     }
 
     /* Trivia millonario */
@@ -6176,31 +6308,42 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       return '<span class="fifa-flag-emoji">' + emoji + '</span>';
     }
 
-    function fifaScorePts(pred, real) {
+    function fifaScoreDetail(pred, real) {
       if (!pred || real == null || real.h == null || real.a == null || pred.h === '' || pred.a === '' || pred.h == null || pred.a == null) return null;
       const ph = Number(pred.h), pa = Number(pred.a), rh = Number(real.h), ra = Number(real.a);
-      if (Number.isNaN(ph) || Number.isNaN(pa)) return null;
-      if (ph === rh && pa === ra) return 2;
+      if (Number.isNaN(ph) || Number.isNaN(pa) || Number.isNaN(rh) || Number.isNaN(ra)) return null;
+      const exact = (ph === rh && pa === ra);
       const predRes = ph > pa ? 1 : ph < pa ? -1 : 0;
       const realRes = rh > ra ? 1 : rh < ra ? -1 : 0;
-      return predRes === realRes ? 1 : 0;
+      const resultOk = predRes === realRes;
+      let goalsHit = 0;
+      if (ph === rh) goalsHit++;
+      if (pa === ra) goalsHit++;
+      const pts = exact ? 2 : (resultOk ? 1 : 0);
+      return { pts, exact, resultOk, goalsHit };
+    }
+
+    function fifaScorePts(pred, real) {
+      const d = fifaScoreDetail(pred, real);
+      return d ? d.pts : null;
     }
 
     function getFifaPlayerStats() {
       ensureFifaData();
       const out = {};
-      PLAYERS.forEach(p => { out[p] = { pts: 0, exact: 0, resultOnly: 0, played: 0 }; });
+      PLAYERS.forEach(p => { out[p] = { pts: 0, exact: 0, resultOnly: 0, goalsHit: 0, played: 0 }; });
       FIFA_MATCHES.forEach(m => {
         const real = data.fifa.results[m.id];
         if (!real || real.h == null || real.a == null || real.h === '' || real.a === '') return;
         PLAYERS.forEach(p => {
           const pred = (data.fifa.predictions[m.id] || {})[p];
-          const pts = fifaScorePts(pred, real);
-          if (pts == null) return;
+          const d = fifaScoreDetail(pred, real);
+          if (!d) return;
           out[p].played++;
-          out[p].pts += pts;
-          if (pts === 2) out[p].exact++;
-          else if (pts === 1) out[p].resultOnly++;
+          out[p].pts += d.pts;
+          out[p].goalsHit += d.goalsHit;
+          if (d.exact) out[p].exact++;
+          else if (d.resultOk) out[p].resultOnly++;
         });
       });
       return out;
@@ -6220,14 +6363,38 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       const el = document.getElementById('fifaRankingView');
       if (!el) return;
       const stats = getFifaPlayerStats();
+      // Mismo rigor que Champions: Pts → Goles acertados → Exactos
       const rows = PLAYERS.map(p => ({ id: p, ...stats[p] }))
-        .sort((a, b) => b.pts - a.pts || b.exact - a.exact || b.resultOnly - a.resultOnly);
+        .sort((a, b) => {
+          if (b.pts !== a.pts) return b.pts - a.pts;
+          if (b.goalsHit !== a.goalsHit) return b.goalsHit - a.goalsHit;
+          return b.exact - a.exact;
+        });
+      const leader = rows[0];
+      const headHtml = leader
+        ? '<div class="stick-head">' + avatarHtml(leader.id) + '</div>'
+        : '<div class="stick-head"><span class="identity-fallback">👤</span></div>';
+      const danceName = leader ? (PLAYER_NAMES[leader.id] || leader.id) : '—';
       el.hidden = false;
-      el.innerHTML = '<div class="fifa-rank-wrap">' +
-        '<div class="fifa-rank-caption"><strong>Ranking Fecha FIFA</strong> · 2 pts exacto · 1 pt resultado</div>' +
-        '<table><thead><tr><th>#</th><th>Jugador</th><th>Pts</th><th>Exactos</th><th>Solo res.</th><th>Jug.</th></tr></thead><tbody>' +
-        rows.map((r, i) => '<tr><td class="rank">' + (i + 1) + '</td><td class="player-name ' + r.id + '">' + PLAYER_NAMES[r.id] + '</td><td class="pts-col">' + r.pts + '</td><td>' + r.exact + '</td><td>' + r.resultOnly + '</td><td>' + r.played + '</td></tr>').join('') +
-        '</tbody></table></div>';
+      el.innerHTML = '<div class="fifa-rank-layout">' +
+        '<div class="fifa-rank-wrap">' +
+          '<div class="fifa-rank-caption"><strong>Ranking Fecha FIFA</strong> · Pts → Goles acertados → Exactos</div>' +
+          '<table><thead><tr><th>#</th><th>Jugador</th><th>Pts</th><th>Goles</th><th>Exactos</th><th>Solo res.</th><th>Jug.</th></tr></thead><tbody>' +
+          rows.map((r, i) => '<tr><td class="rank">' + (i + 1) + '</td><td class="player-name ' + r.id + '">' + PLAYER_NAMES[r.id] + '</td><td class="pts-col">' + r.pts + '</td><td>' + r.goalsHit + '</td><td>' + r.exact + '</td><td>' + r.resultOnly + '</td><td>' + r.played + '</td></tr>').join('') +
+          '</tbody></table>' +
+        '</div>' +
+        '<div class="fifa-leader-dance">' +
+          '<div class="dance-label">👑 ' + danceName + '</div>' +
+          '<div class="stick-dance">' +
+            headHtml +
+            '<div class="stick-body"></div>' +
+            '<div class="stick-arm left"></div>' +
+            '<div class="stick-arm right"></div>' +
+            '<div class="stick-leg left"></div>' +
+            '<div class="stick-leg right"></div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
     }
 
     function renderFifaMatches(opts) {
