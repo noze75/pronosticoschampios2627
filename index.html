@@ -6294,40 +6294,58 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
 
     // ~30 partidos · siempre incluyen COL, ESP, FRA, ING, ITA, BRA, ARG, ALE
     // Plantilla: id, date, local, visitante, comp
+    // hora_col = hora en Colombia (COT, UTC-5). Típicas UEFA NL 14:45/20:45 CEST → 7:45am/1:45pm COT
     const FIFA_MATCHES = [
-      // Nations League · obligatorias europeas
-      { id: 'f01', date: '2026-09-24', local: 'Países Bajos', visitante: 'Alemania', comp: 'Nations League' },
-      { id: 'f02', date: '2026-09-24', local: 'Portugal', visitante: 'Gales', comp: 'Nations League' },
-      { id: 'f03', date: '2026-09-24', local: 'Noruega', visitante: 'Dinamarca', comp: 'Nations League' },
-      { id: 'f04', date: '2026-09-25', local: 'Turquía', visitante: 'Francia', comp: 'Nations League' },
-      { id: 'f05', date: '2026-09-25', local: 'Italia', visitante: 'Bélgica', comp: 'Nations League' },
-      { id: 'f06', date: '2026-09-25', local: 'Hungría', visitante: 'Ucrania', comp: 'Nations League' },
-      { id: 'f07', date: '2026-09-26', local: 'Inglaterra', visitante: 'España', comp: 'Nations League' },
-      { id: 'f08', date: '2026-09-26', local: 'República Checa', visitante: 'Croacia', comp: 'Nations League' },
-      { id: 'f09', date: '2026-09-27', local: 'Alemania', visitante: 'Grecia', comp: 'Nations League' },
-      { id: 'f10', date: '2026-09-27', local: 'Serbia', visitante: 'Países Bajos', comp: 'Nations League' },
-      { id: 'f11', date: '2026-09-27', local: 'Noruega', visitante: 'Portugal', comp: 'Nations League' },
-      { id: 'f12', date: '2026-09-28', local: 'Turquía', visitante: 'Italia', comp: 'Nations League' },
-      { id: 'f13', date: '2026-09-28', local: 'Bélgica', visitante: 'Francia', comp: 'Nations League' },
-      { id: 'f14', date: '2026-09-29', local: 'España', visitante: 'Croacia', comp: 'Nations League' },
-      { id: 'f15', date: '2026-09-29', local: 'Alemania', visitante: 'Serbia', comp: 'Nations League' },
-      { id: 'f16', date: '2026-10-02', local: 'Francia', visitante: 'Italia', comp: 'Nations League' },
-      { id: 'f17', date: '2026-10-02', local: 'Bélgica', visitante: 'Turquía', comp: 'Nations League' },
-      { id: 'f18', date: '2026-10-03', local: 'España', visitante: 'República Checa', comp: 'Nations League' },
-      { id: 'f19', date: '2026-10-03', local: 'Croacia', visitante: 'Inglaterra', comp: 'Nations League' },
-      { id: 'f20', date: '2026-10-06', local: 'Croacia', visitante: 'España', comp: 'Nations League' },
-      // Amistosos CONMEBOL / otros (ventana sep–oct 2026) — fechas según anuncios oficiales
-      { id: 'f21', date: '2026-09-30', local: 'Argentina', visitante: 'Bolivia', comp: 'Amistoso' },
-      { id: 'f22', date: '2026-10-03', local: 'Argentina', visitante: 'Burkina Faso', comp: 'Amistoso' },
-      { id: 'f23', date: '2026-10-06', local: 'Argentina', visitante: 'Benín', comp: 'Amistoso' },
-      { id: 'f24', date: '2026-09-25', local: 'Australia', visitante: 'Brasil', comp: 'Amistoso' },
-      { id: 'f25', date: '2026-09-29', local: 'Australia', visitante: 'Brasil', comp: 'Amistoso' },
-      { id: 'f26', date: '2026-10-04', local: 'India', visitante: 'Brasil', comp: 'Amistoso' },
-      { id: 'f27', date: '2026-09-26', local: 'México', visitante: 'Colombia', comp: 'Amistoso' },
-      { id: 'f28', date: '2026-10-02', local: 'Colombia', visitante: 'Paraguay', comp: 'Amistoso' },
-      { id: 'f29', date: '2026-10-06', local: 'Colombia', visitante: 'Perú', comp: 'Amistoso' },
-      { id: 'f30', date: '2026-09-29', local: 'Japón', visitante: 'Corea del Sur', comp: 'Amistoso' }
+      // Nations League
+      { id: 'f01', date: '2026-09-24', hora_col: '13:45', local: 'Países Bajos', visitante: 'Alemania', comp: 'Nations League' },
+      { id: 'f02', date: '2026-09-24', hora_col: '13:45', local: 'Portugal', visitante: 'Gales', comp: 'Nations League' },
+      { id: 'f03', date: '2026-09-24', hora_col: '13:45', local: 'Noruega', visitante: 'Dinamarca', comp: 'Nations League' },
+      { id: 'f04', date: '2026-09-25', hora_col: '13:45', local: 'Turquía', visitante: 'Francia', comp: 'Nations League' },
+      { id: 'f05', date: '2026-09-25', hora_col: '13:45', local: 'Italia', visitante: 'Bélgica', comp: 'Nations League' },
+      { id: 'f06', date: '2026-09-25', hora_col: '11:45', local: 'Hungría', visitante: 'Ucrania', comp: 'Nations League' },
+      { id: 'f07', date: '2026-09-26', hora_col: '13:45', local: 'Inglaterra', visitante: 'España', comp: 'Nations League' },
+      { id: 'f08', date: '2026-09-26', hora_col: '13:45', local: 'República Checa', visitante: 'Croacia', comp: 'Nations League' },
+      { id: 'f09', date: '2026-09-27', hora_col: '13:45', local: 'Alemania', visitante: 'Grecia', comp: 'Nations League' },
+      { id: 'f10', date: '2026-09-27', hora_col: '13:45', local: 'Serbia', visitante: 'Países Bajos', comp: 'Nations League' },
+      { id: 'f11', date: '2026-09-27', hora_col: '11:45', local: 'Noruega', visitante: 'Portugal', comp: 'Nations League' },
+      { id: 'f12', date: '2026-09-28', hora_col: '13:45', local: 'Turquía', visitante: 'Italia', comp: 'Nations League' },
+      { id: 'f13', date: '2026-09-28', hora_col: '13:45', local: 'Bélgica', visitante: 'Francia', comp: 'Nations League' },
+      { id: 'f14', date: '2026-09-29', hora_col: '13:45', local: 'España', visitante: 'Croacia', comp: 'Nations League' },
+      { id: 'f15', date: '2026-09-29', hora_col: '13:45', local: 'Alemania', visitante: 'Serbia', comp: 'Nations League' },
+      { id: 'f16', date: '2026-10-02', hora_col: '13:45', local: 'Francia', visitante: 'Italia', comp: 'Nations League' },
+      { id: 'f17', date: '2026-10-02', hora_col: '13:45', local: 'Bélgica', visitante: 'Turquía', comp: 'Nations League' },
+      { id: 'f18', date: '2026-10-03', hora_col: '13:45', local: 'España', visitante: 'República Checa', comp: 'Nations League' },
+      { id: 'f19', date: '2026-10-03', hora_col: '13:45', local: 'Croacia', visitante: 'Inglaterra', comp: 'Nations League' },
+      { id: 'f20', date: '2026-10-06', hora_col: '13:45', local: 'Croacia', visitante: 'España', comp: 'Nations League' },
+      // Amistosos
+      { id: 'f21', date: '2026-09-30', hora_col: '19:00', local: 'Argentina', visitante: 'Bolivia', comp: 'Amistoso' },
+      { id: 'f22', date: '2026-10-03', hora_col: '19:00', local: 'Argentina', visitante: 'Burkina Faso', comp: 'Amistoso' },
+      { id: 'f23', date: '2026-10-06', hora_col: '16:00', local: 'Argentina', visitante: 'Benín', comp: 'Amistoso' },
+      { id: 'f24', date: '2026-09-25', hora_col: '06:00', local: 'Australia', visitante: 'Brasil', comp: 'Amistoso' },
+      { id: 'f25', date: '2026-09-29', hora_col: '06:00', local: 'Australia', visitante: 'Brasil', comp: 'Amistoso' },
+      { id: 'f26', date: '2026-10-04', hora_col: '09:30', local: 'India', visitante: 'Brasil', comp: 'Amistoso' },
+      { id: 'f27', date: '2026-09-26', hora_col: '21:00', local: 'México', visitante: 'Colombia', comp: 'Amistoso' },
+      { id: 'f28', date: '2026-10-02', hora_col: '19:00', local: 'Colombia', visitante: 'Paraguay', comp: 'Amistoso' },
+      { id: 'f29', date: '2026-10-06', hora_col: '19:00', local: 'Colombia', visitante: 'Perú', comp: 'Amistoso' },
+      { id: 'f30', date: '2026-09-29', hora_col: '07:00', local: 'Japón', visitante: 'Corea del Sur', comp: 'Amistoso' }
     ];
+
+    const MES_CORTOS = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+    function formatFifaWhen(m) {
+      // "26-sep 1:45pm" en horario Colombia
+      const parts = (m.date || '').split('-');
+      if (parts.length < 3) return m.date || '';
+      const day = String(parseInt(parts[2], 10));
+      const mes = MES_CORTOS[parseInt(parts[1], 10) - 1] || parts[1];
+      let time = '';
+      if (m.hora_col) {
+        const [hh, mm] = m.hora_col.split(':').map(Number);
+        const h12 = ((hh + 11) % 12) + 1;
+        const ampm = hh < 12 ? 'am' : 'pm';
+        time = ' ' + h12 + ':' + String(mm).padStart(2, '0') + ampm;
+      }
+      return day + '-' + mes + time;
+    }
 
     function ensureFifaData() {
       if (!data.fifa || typeof data.fifa !== 'object') {
@@ -6352,7 +6370,6 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
     }
 
     let fifaDomChart = null;
-
     const PLAYER_CHART_COLORS = {
       baez: 'rgba(255,152,0,0.85)',
       juan: 'rgba(206,147,216,0.85)',
@@ -6435,8 +6452,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
           },
           scales: {
             x: {
-              min: 0,
-              max: 100,
+              min: 0, max: 100,
               ticks: { color: '#9bb0cc', font: { size: 10 }, callback: v => v + '%' },
               grid: { color: 'rgba(30,58,95,0.5)' }
             },
@@ -6518,14 +6534,14 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
           : null);
       ensureFifaData();
       const user = currentUser();
-      const sorted = FIFA_MATCHES.slice().sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
+      const sorted = FIFA_MATCHES.slice().sort((a, b) => a.date.localeCompare(b.date) || (a.hora_col || '').localeCompare(b.hora_col || '') || a.id.localeCompare(b.id));
 
       el.innerHTML = sorted.map(m => {
         const real = data.fifa.results[m.id] || {};
         const preds = data.fifa.predictions[m.id] || {};
         const hasReal = real.h != null && real.a != null && real.h !== '' && real.a !== '';
         const realLocked = !adminUnlocked;
-        const dateShort = m.date.slice(5);
+        const whenLabel = formatFifaWhen(m);
 
         const predBoxes = PLAYERS.map(p => {
           const pred = preds[p] || {};
@@ -6549,7 +6565,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
         }).join('');
 
         return '<div class="fifa-match" data-fifa-id="' + m.id + '">' +
-          '<div class="fifa-meta">' + dateShort + ' · ' + m.comp + '</div>' +
+          '<div class="fifa-meta">' + whenLabel + ' · ' + m.comp + '</div>' +
           '<div class="fifa-teams-row">' +
             '<div class="fifa-team">' + fifaFlagHtml(m.local) + '<span>' + m.local + '</span></div>' +
             '<div class="fifa-team">' + fifaFlagHtml(m.visitante) + '<span>' + m.visitante + '</span></div>' +
