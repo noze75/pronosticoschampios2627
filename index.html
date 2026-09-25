@@ -855,18 +855,16 @@
       color: var(--accent);
     }
     .fifa-pts-badge.zero { background: rgba(239,83,80,0.12); color: #ef5350; }
-    /* Ranking + stickman líder */
-    #fifaRankingView {
-      margin-bottom: 0.9rem;
-    }
+    /* Ranking FIFA: tabla + baile pro + dominio */
+    #fifaRankingView { margin-bottom: 0.9rem; }
     .fifa-rank-layout {
       display: flex;
       align-items: stretch;
-      gap: 0.85rem;
+      gap: 0.75rem;
       flex-wrap: wrap;
     }
     .fifa-rank-wrap {
-      flex: 0 1 520px;
+      flex: 1 1 420px;
       max-width: 100%;
       background: var(--card);
       border: 1px solid var(--border);
@@ -920,19 +918,23 @@
       width: 28px;
       font-size: 0.85rem;
     }
+    .fifa-side-fun {
+      flex: 0 1 200px;
+      min-width: 160px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
     .fifa-leader-dance {
-      flex: 1 1 140px;
-      min-width: 120px;
-      max-width: 200px;
+      background: var(--card);
+      border: 1px solid rgba(0,230,118,0.35);
+      border-radius: 12px;
+      padding: 0.5rem 0.45rem 0.55rem;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      gap: 0.35rem;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 0.55rem 0.5rem 0.65rem;
+      gap: 0.25rem;
+      box-shadow: 0 0 18px rgba(0,230,118,0.12);
     }
     .fifa-leader-dance .dance-label {
       font-size: 0.68rem;
@@ -942,108 +944,166 @@
       letter-spacing: 0.04em;
       text-align: center;
     }
-    .stick-dance {
-      width: 90px;
-      height: 120px;
+    /* Baile pro (figura + foto) */
+    .pro-dance {
+      width: 100px;
+      height: 130px;
       position: relative;
-      animation: stick-bounce 0.55s ease-in-out infinite alternate;
+      animation: pro-bounce 0.5s ease-in-out infinite alternate;
     }
-    .stick-dance .stick-head {
-      width: 36px;
-      height: 36px;
+    .pro-dance .pd-head {
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       overflow: hidden;
-      border: 2px solid var(--gold);
+      border: 2.5px solid var(--gold);
       background: #0d1a2a;
       position: absolute;
       left: 50%;
-      top: 2px;
+      top: 0;
       transform: translateX(-50%);
-      z-index: 2;
-      box-shadow: 0 0 10px rgba(255,213,79,0.35);
+      z-index: 3;
+      box-shadow: 0 0 12px rgba(255,213,79,0.4);
     }
-    .stick-dance .stick-head img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
+    .pro-dance .pd-head img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
     }
-    .stick-dance .stick-head .identity-fallback {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      height: 100%;
-      font-size: 1.1rem;
+    .pro-dance .pd-head .identity-fallback {
+      display: flex; align-items: center; justify-content: center;
+      width: 100%; height: 100%; font-size: 1.2rem;
     }
-    .stick-dance .stick-body {
+    .pro-dance .pd-hat {
       position: absolute;
       left: 50%;
-      top: 40px;
-      width: 3px;
-      height: 36px;
-      background: #e2e8f0;
+      top: -8px;
       transform: translateX(-50%);
-      border-radius: 2px;
+      z-index: 4;
+      font-size: 1.1rem;
+      animation: hat-wobble 0.5s ease-in-out infinite alternate;
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4));
     }
-    .stick-dance .stick-arm {
+    .pro-dance .pd-torso {
+      position: absolute;
+      left: 50%;
+      top: 42px;
+      width: 18px;
+      height: 34px;
+      margin-left: -9px;
+      background: linear-gradient(180deg, #00e676, #1b5e20);
+      border-radius: 6px 6px 4px 4px;
+      z-index: 1;
+    }
+    .pro-dance .pd-arm {
       position: absolute;
       top: 46px;
-      width: 28px;
-      height: 3px;
+      width: 26px;
+      height: 7px;
       background: #e2e8f0;
-      border-radius: 2px;
+      border-radius: 4px;
+      z-index: 2;
+    }
+    .pro-dance .pd-arm.left {
+      right: 50%;
+      margin-right: 6px;
+      transform-origin: right center;
+      animation: pro-arm-l 0.45s ease-in-out infinite alternate;
+    }
+    .pro-dance .pd-arm.right {
+      left: 50%;
+      margin-left: 6px;
       transform-origin: left center;
+      animation: pro-arm-r 0.45s ease-in-out infinite alternate;
     }
-    .stick-dance .stick-arm.left {
-      left: 50%;
-      transform: translateX(-100%) rotate(-35deg);
-      animation: arm-l 0.55s ease-in-out infinite alternate;
-    }
-    .stick-dance .stick-arm.right {
-      left: 50%;
-      transform: rotate(35deg);
-      animation: arm-r 0.55s ease-in-out infinite alternate;
-    }
-    .stick-dance .stick-leg {
+    .pro-dance .pd-leg {
       position: absolute;
       top: 74px;
-      width: 3px;
-      height: 30px;
-      background: #e2e8f0;
-      border-radius: 2px;
+      width: 8px;
+      height: 32px;
+      background: #94a3b8;
+      border-radius: 4px;
       transform-origin: top center;
+      z-index: 1;
     }
-    .stick-dance .stick-leg.left {
-      left: calc(50% - 6px);
-      animation: leg-l 0.55s ease-in-out infinite alternate;
+    .pro-dance .pd-leg.left {
+      left: calc(50% - 12px);
+      animation: pro-leg-l 0.45s ease-in-out infinite alternate;
     }
-    .stick-dance .stick-leg.right {
-      left: calc(50% + 3px);
-      animation: leg-r 0.55s ease-in-out infinite alternate;
+    .pro-dance .pd-leg.right {
+      left: calc(50% + 4px);
+      animation: pro-leg-r 0.45s ease-in-out infinite alternate;
     }
-    @keyframes stick-bounce {
-      from { transform: translateY(0); }
-      to { transform: translateY(-6px); }
+    .pro-dance .pd-shoe {
+      position: absolute;
+      bottom: -3px;
+      left: -3px;
+      width: 14px;
+      height: 6px;
+      background: #0a1628;
+      border: 1px solid #e2e8f0;
+      border-radius: 3px 6px 3px 3px;
     }
-    @keyframes arm-l {
-      from { transform: translateX(-100%) rotate(-50deg); }
-      to { transform: translateX(-100%) rotate(-15deg); }
+    @keyframes pro-bounce {
+      from { transform: translateY(0) rotate(-2deg); }
+      to { transform: translateY(-8px) rotate(2deg); }
     }
-    @keyframes arm-r {
-      from { transform: rotate(15deg); }
-      to { transform: rotate(50deg); }
+    @keyframes hat-wobble {
+      from { transform: translateX(-50%) rotate(-12deg); }
+      to { transform: translateX(-50%) rotate(12deg); }
     }
-    @keyframes leg-l {
-      from { transform: rotate(18deg); }
-      to { transform: rotate(-12deg); }
+    @keyframes pro-arm-l {
+      from { transform: rotate(40deg); }
+      to { transform: rotate(-55deg); }
     }
-    @keyframes leg-r {
-      from { transform: rotate(-18deg); }
-      to { transform: rotate(12deg); }
+    @keyframes pro-arm-r {
+      from { transform: rotate(-40deg); }
+      to { transform: rotate(55deg); }
     }
-    @media (max-width: 640px) {
-      .fifa-leader-dance { max-width: 100%; width: 100%; }
+    @keyframes pro-leg-l {
+      from { transform: rotate(22deg); }
+      to { transform: rotate(-18deg); }
+    }
+    @keyframes pro-leg-r {
+      from { transform: rotate(-22deg); }
+      to { transform: rotate(18deg); }
+    }
+    .fifa-dom-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.45rem 0.55rem 0.35rem;
+      flex: 1;
+      min-height: 120px;
+    }
+    .fifa-dom-card .dom-title {
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.25rem;
+    }
+    .fifa-dom-card canvas { width: 100% !important; max-height: 110px; }
+    /* Amigos: medidor de dominio bajo el stage */
+    .amigos-dom-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.65rem 0.85rem 0.5rem;
+      margin: 0 0 1rem;
+    }
+    .amigos-dom-wrap .dom-title {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.35rem;
+    }
+    .amigos-dom-wrap canvas { width: 100% !important; max-height: 140px; }
+    @media (max-width: 700px) {
+      .fifa-side-fun { flex: 1 1 100%; max-width: 100%; flex-direction: row; }
+      .fifa-leader-dance { flex: 0 0 auto; }
+      .fifa-dom-card { flex: 1; }
     }
 
     /* Trivia millonario */
@@ -2800,6 +2860,10 @@
     <!-- CLASIFICACIÓN -->
     <div id="clasificacion" class="panel">
       <div id="rankingStage" class="ranking-stage"></div>
+      <div id="amigosDomChart" class="amigos-dom-wrap" hidden>
+        <div class="dom-title">Dominio del grupo · % de puntos posibles</div>
+        <canvas id="amigosDomCanvas" height="120"></canvas>
+      </div>
       <div class="rules" style="margin-bottom:1.25rem;">
         <strong>Orden:</strong> 1º Puntos → 2º Goles acertados (marcador de cada equipo) → 3º Aciertos exactos
       </div>
@@ -4345,7 +4409,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       const stage = document.getElementById('rankingStage');
       if (stage) {
         const moods = [
-          { label: '1º · Volando, papi ✈️', mood: '¡Pfff, babosos!' },
+          { label: '1º · Bailando en la cima 👑', mood: '¡Pfff, babosos!' },
           { label: '2º · Sala de espera', mood: 'Esperando su momento…' },
           { label: '3º · Sala de espera', mood: 'Mirando de cerca al Pelmazo' },
           { label: '4º · Don Pelmazo', mood: '¡LLORANDO A MARES! 😭💦' }
@@ -4392,6 +4456,18 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
         } else {
           quoteEl.style.display = 'none';
           quoteEl.innerHTML = '';
+        }
+      }
+
+      // Medidor de dominio (misma lógica que + Fútbol)
+      const domWrap = document.getElementById('amigosDomChart');
+      const domCanvas = document.getElementById('amigosDomCanvas');
+      if (amigosDomChart) { try { amigosDomChart.destroy(); } catch (_) {} amigosDomChart = null; }
+      if (domWrap && domCanvas) {
+        const hasPlayed = ranking.some(r => r.played > 0);
+        domWrap.hidden = !hasPlayed;
+        if (hasPlayed) {
+          amigosDomChart = buildDomChart(domCanvas, ranking, { thick: 22 });
         }
       }
 
@@ -6308,6 +6384,16 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       return '<span class="fifa-flag-emoji">' + emoji + '</span>';
     }
 
+    let fifaDomChart = null;
+    let amigosDomChart = null;
+
+    const PLAYER_CHART_COLORS = {
+      baez: 'rgba(255,152,0,0.85)',
+      juan: 'rgba(206,147,216,0.85)',
+      marrugo: 'rgba(77,208,225,0.85)',
+      mauricio: 'rgba(244,143,177,0.85)'
+    };
+
     function fifaScoreDetail(pred, real) {
       if (!pred || real == null || real.h == null || real.a == null || pred.h === '' || pred.a === '' || pred.h == null || pred.a == null) return null;
       const ph = Number(pred.h), pa = Number(pred.a), rh = Number(real.h), ra = Number(real.a);
@@ -6349,6 +6435,55 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       return out;
     }
 
+    function buildDomChart(canvas, ranking, opts) {
+      if (!canvas || typeof Chart === 'undefined') return null;
+      const labels = ranking.map(r => PLAYER_NAMES[r.id] || r.id);
+      const maxPts = Math.max(1, ...ranking.map(r => r.played * 2));
+      const pcts = ranking.map(r => r.played > 0 ? Math.round((r.pts / (r.played * 2)) * 1000) / 10 : 0);
+      const colors = ranking.map(r => PLAYER_CHART_COLORS[r.id] || 'rgba(0,230,118,0.7)');
+      return new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: '% pts posibles',
+            data: pcts,
+            backgroundColor: colors,
+            borderRadius: 6,
+            maxBarThickness: opts && opts.thick ? opts.thick : 28
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => {
+                  const r = ranking[ctx.dataIndex];
+                  return (r.pts || 0) + ' pts · ' + ctx.parsed.x + '% del máximo';
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              min: 0,
+              max: 100,
+              ticks: { color: '#9bb0cc', font: { size: 10 }, callback: v => v + '%' },
+              grid: { color: 'rgba(30,58,95,0.5)' }
+            },
+            y: {
+              ticks: { color: '#f0f6ff', font: { size: 11, weight: '700' } },
+              grid: { display: false }
+            }
+          }
+        }
+      });
+    }
+
     function renderFifaPanel() {
       ensureFifaData();
       const title = document.getElementById('fifaWindowTitle');
@@ -6362,8 +6497,9 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
     function renderFifaRanking() {
       const el = document.getElementById('fifaRankingView');
       if (!el) return;
+      if (fifaDomChart) { try { fifaDomChart.destroy(); } catch (_) {} fifaDomChart = null; }
       const stats = getFifaPlayerStats();
-      // Mismo rigor que Champions: Pts → Goles acertados → Exactos
+      // Pts → Goles acertados → Exactos (igual que Champions)
       const rows = PLAYERS.map(p => ({ id: p, ...stats[p] }))
         .sort((a, b) => {
           if (b.pts !== a.pts) return b.pts - a.pts;
@@ -6372,29 +6508,38 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
         });
       const leader = rows[0];
       const headHtml = leader
-        ? '<div class="stick-head">' + avatarHtml(leader.id) + '</div>'
-        : '<div class="stick-head"><span class="identity-fallback">👤</span></div>';
+        ? '<div class="pd-head">' + avatarHtml(leader.id) + '</div>'
+        : '<div class="pd-head"><span class="identity-fallback">👤</span></div>';
       const danceName = leader ? (PLAYER_NAMES[leader.id] || leader.id) : '—';
       el.hidden = false;
       el.innerHTML = '<div class="fifa-rank-layout">' +
         '<div class="fifa-rank-wrap">' +
-          '<div class="fifa-rank-caption"><strong>Ranking Fecha FIFA</strong> · Pts → Goles acertados → Exactos</div>' +
+          '<div class="fifa-rank-caption"><strong>Ranking Fecha FIFA</strong> · Pts → Goles → Exactos</div>' +
           '<table><thead><tr><th>#</th><th>Jugador</th><th>Pts</th><th>Goles</th><th>Exactos</th><th>Solo res.</th><th>Jug.</th></tr></thead><tbody>' +
           rows.map((r, i) => '<tr><td class="rank">' + (i + 1) + '</td><td class="player-name ' + r.id + '">' + PLAYER_NAMES[r.id] + '</td><td class="pts-col">' + r.pts + '</td><td>' + r.goalsHit + '</td><td>' + r.exact + '</td><td>' + r.resultOnly + '</td><td>' + r.played + '</td></tr>').join('') +
           '</tbody></table>' +
         '</div>' +
-        '<div class="fifa-leader-dance">' +
-          '<div class="dance-label">👑 ' + danceName + '</div>' +
-          '<div class="stick-dance">' +
-            headHtml +
-            '<div class="stick-body"></div>' +
-            '<div class="stick-arm left"></div>' +
-            '<div class="stick-arm right"></div>' +
-            '<div class="stick-leg left"></div>' +
-            '<div class="stick-leg right"></div>' +
+        '<div class="fifa-side-fun">' +
+          '<div class="fifa-leader-dance">' +
+            '<div class="dance-label">👑 ' + danceName + '</div>' +
+            '<div class="pro-dance">' +
+              '<div class="pd-hat">👑</div>' +
+              headHtml +
+              '<div class="pd-torso"></div>' +
+              '<div class="pd-arm left"></div>' +
+              '<div class="pd-arm right"></div>' +
+              '<div class="pd-leg left"><div class="pd-shoe"></div></div>' +
+              '<div class="pd-leg right"><div class="pd-shoe"></div></div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="fifa-dom-card">' +
+            '<div class="dom-title">Dominio · % pts posibles</div>' +
+            '<canvas id="fifaDomCanvas" height="100"></canvas>' +
           '</div>' +
         '</div>' +
       '</div>';
+      const canvas = document.getElementById('fifaDomCanvas');
+      if (canvas) fifaDomChart = buildDomChart(canvas, rows, { thick: 18 });
     }
 
     function renderFifaMatches(opts) {
