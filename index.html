@@ -855,17 +855,23 @@
       color: var(--accent);
     }
     .fifa-pts-badge.zero { background: rgba(239,83,80,0.12); color: #ef5350; }
-    /* Ranking FIFA: tabla + baile pro + dominio */
+    /* Ranking FIFA: 50% tabla | 25% baile | 25% dominio */
     #fifaRankingView { margin-bottom: 0.9rem; }
     .fifa-rank-layout {
-      display: flex;
-      align-items: stretch;
+      display: grid;
+      grid-template-columns: 1fr 0.5fr 0.5fr;
       gap: 0.75rem;
-      flex-wrap: wrap;
+      align-items: stretch;
+    }
+    @media (max-width: 900px) {
+      .fifa-rank-layout { grid-template-columns: 1fr 1fr; }
+      .fifa-rank-wrap { grid-column: 1 / -1; }
+    }
+    @media (max-width: 560px) {
+      .fifa-rank-layout { grid-template-columns: 1fr; }
     }
     .fifa-rank-wrap {
-      flex: 1 1 420px;
-      max-width: 100%;
+      min-width: 0;
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 12px;
@@ -893,15 +899,15 @@
       border-radius: 0;
     }
     #fifaRankingView th, #fifaRankingView td {
-      padding: 0.38rem 0.65rem;
+      padding: 0.38rem 0.55rem;
       text-align: left;
       border-bottom: 1px solid var(--border);
-      font-size: 0.82rem;
+      font-size: 0.8rem;
     }
     #fifaRankingView th {
       background: transparent;
       color: var(--muted);
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       text-transform: uppercase;
       letter-spacing: 0.04em;
       font-weight: 700;
@@ -918,14 +924,8 @@
       width: 28px;
       font-size: 0.85rem;
     }
-    .fifa-side-fun {
-      flex: 0 1 200px;
-      min-width: 160px;
-      display: flex;
-      flex-direction: column;
-      gap: 0.55rem;
-    }
     .fifa-leader-dance {
+      min-width: 0;
       background: var(--card);
       border: 1px solid rgba(0,230,118,0.35);
       border-radius: 12px;
@@ -933,6 +933,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       gap: 0.25rem;
       box-shadow: 0 0 18px rgba(0,230,118,0.12);
     }
@@ -944,7 +945,6 @@
       letter-spacing: 0.04em;
       text-align: center;
     }
-    /* Baile pro (figura + foto) */
     .pro-dance {
       width: 100px;
       height: 130px;
@@ -1067,12 +1067,13 @@
       to { transform: rotate(18deg); }
     }
     .fifa-dom-card {
+      min-width: 0;
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 0.45rem 0.55rem 0.35rem;
-      flex: 1;
-      min-height: 120px;
+      display: flex;
+      flex-direction: column;
     }
     .fifa-dom-card .dom-title {
       font-size: 0.65rem;
@@ -1082,29 +1083,12 @@
       letter-spacing: 0.04em;
       margin-bottom: 0.25rem;
     }
-    .fifa-dom-card canvas { width: 100% !important; max-height: 110px; }
-    /* Amigos: medidor de dominio bajo el stage */
-    .amigos-dom-wrap {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 0.65rem 0.85rem 0.5rem;
-      margin: 0 0 1rem;
+    .fifa-dom-card .dom-canvas-wrap {
+      flex: 1;
+      min-height: 120px;
+      position: relative;
     }
-    .amigos-dom-wrap .dom-title {
-      font-size: 0.72rem;
-      font-weight: 800;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-bottom: 0.35rem;
-    }
-    .amigos-dom-wrap canvas { width: 100% !important; max-height: 140px; }
-    @media (max-width: 700px) {
-      .fifa-side-fun { flex: 1 1 100%; max-width: 100%; flex-direction: row; }
-      .fifa-leader-dance { flex: 0 0 auto; }
-      .fifa-dom-card { flex: 1; }
-    }
+    .fifa-dom-card canvas { width: 100% !important; height: 100% !important; }
 
     /* Trivia millonario */
     .trivia-layout {
@@ -2860,10 +2844,6 @@
     <!-- CLASIFICACIÓN -->
     <div id="clasificacion" class="panel">
       <div id="rankingStage" class="ranking-stage"></div>
-      <div id="amigosDomChart" class="amigos-dom-wrap" hidden>
-        <div class="dom-title">Dominio del grupo · % de puntos posibles</div>
-        <canvas id="amigosDomCanvas" height="120"></canvas>
-      </div>
       <div class="rules" style="margin-bottom:1.25rem;">
         <strong>Orden:</strong> 1º Puntos → 2º Goles acertados (marcador de cada equipo) → 3º Aciertos exactos
       </div>
@@ -4456,18 +4436,6 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
         } else {
           quoteEl.style.display = 'none';
           quoteEl.innerHTML = '';
-        }
-      }
-
-      // Medidor de dominio (misma lógica que + Fútbol)
-      const domWrap = document.getElementById('amigosDomChart');
-      const domCanvas = document.getElementById('amigosDomCanvas');
-      if (amigosDomChart) { try { amigosDomChart.destroy(); } catch (_) {} amigosDomChart = null; }
-      if (domWrap && domCanvas) {
-        const hasPlayed = ranking.some(r => r.played > 0);
-        domWrap.hidden = !hasPlayed;
-        if (hasPlayed) {
-          amigosDomChart = buildDomChart(domCanvas, ranking, { thick: 22 });
         }
       }
 
@@ -6385,7 +6353,6 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
     }
 
     let fifaDomChart = null;
-    let amigosDomChart = null;
 
     const PLAYER_CHART_COLORS = {
       baez: 'rgba(255,152,0,0.85)',
@@ -6438,7 +6405,6 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
     function buildDomChart(canvas, ranking, opts) {
       if (!canvas || typeof Chart === 'undefined') return null;
       const labels = ranking.map(r => PLAYER_NAMES[r.id] || r.id);
-      const maxPts = Math.max(1, ...ranking.map(r => r.played * 2));
       const pcts = ranking.map(r => r.played > 0 ? Math.round((r.pts / (r.played * 2)) * 1000) / 10 : 0);
       const colors = ranking.map(r => PLAYER_CHART_COLORS[r.id] || 'rgba(0,230,118,0.7)');
       return new Chart(canvas.getContext('2d'), {
@@ -6450,7 +6416,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
             data: pcts,
             backgroundColor: colors,
             borderRadius: 6,
-            maxBarThickness: opts && opts.thick ? opts.thick : 28
+            maxBarThickness: (opts && opts.thick) || 28
           }]
         },
         options: {
@@ -6499,7 +6465,6 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       if (!el) return;
       if (fifaDomChart) { try { fifaDomChart.destroy(); } catch (_) {} fifaDomChart = null; }
       const stats = getFifaPlayerStats();
-      // Pts → Goles acertados → Exactos (igual que Champions)
       const rows = PLAYERS.map(p => ({ id: p, ...stats[p] }))
         .sort((a, b) => {
           if (b.pts !== a.pts) return b.pts - a.pts;
@@ -6512,14 +6477,14 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
         : '<div class="pd-head"><span class="identity-fallback">👤</span></div>';
       const danceName = leader ? (PLAYER_NAMES[leader.id] || leader.id) : '—';
       el.hidden = false;
-      el.innerHTML = '<div class="fifa-rank-layout">' +
-        '<div class="fifa-rank-wrap">' +
-          '<div class="fifa-rank-caption"><strong>Ranking Fecha FIFA</strong> · Pts → Goles → Exactos</div>' +
-          '<table><thead><tr><th>#</th><th>Jugador</th><th>Pts</th><th>Goles</th><th>Exactos</th><th>Solo res.</th><th>Jug.</th></tr></thead><tbody>' +
-          rows.map((r, i) => '<tr><td class="rank">' + (i + 1) + '</td><td class="player-name ' + r.id + '">' + PLAYER_NAMES[r.id] + '</td><td class="pts-col">' + r.pts + '</td><td>' + r.goalsHit + '</td><td>' + r.exact + '</td><td>' + r.resultOnly + '</td><td>' + r.played + '</td></tr>').join('') +
-          '</tbody></table>' +
-        '</div>' +
-        '<div class="fifa-side-fun">' +
+      el.innerHTML =
+        '<div class="fifa-rank-layout">' +
+          '<div class="fifa-rank-wrap">' +
+            '<div class="fifa-rank-caption"><strong>Ranking Fecha FIFA</strong> · Pts → Goles → Exactos</div>' +
+            '<table><thead><tr><th>#</th><th>Jugador</th><th>Pts</th><th>Goles</th><th>Exactos</th><th>Solo res.</th><th>Jug.</th></tr></thead><tbody>' +
+            rows.map((r, i) => '<tr><td class="rank">' + (i + 1) + '</td><td class="player-name ' + r.id + '">' + PLAYER_NAMES[r.id] + '</td><td class="pts-col">' + r.pts + '</td><td>' + r.goalsHit + '</td><td>' + r.exact + '</td><td>' + r.resultOnly + '</td><td>' + r.played + '</td></tr>').join('') +
+            '</tbody></table>' +
+          '</div>' +
           '<div class="fifa-leader-dance">' +
             '<div class="dance-label">👑 ' + danceName + '</div>' +
             '<div class="pro-dance">' +
@@ -6534,10 +6499,9 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
           '</div>' +
           '<div class="fifa-dom-card">' +
             '<div class="dom-title">Dominio · % pts posibles</div>' +
-            '<canvas id="fifaDomCanvas" height="100"></canvas>' +
+            '<div class="dom-canvas-wrap"><canvas id="fifaDomCanvas"></canvas></div>' +
           '</div>' +
-        '</div>' +
-      '</div>';
+        '</div>';
       const canvas = document.getElementById('fifaDomCanvas');
       if (canvas) fifaDomChart = buildDomChart(canvas, rows, { thick: 18 });
     }
