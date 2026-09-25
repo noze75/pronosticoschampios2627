@@ -814,55 +814,35 @@
       box-shadow: 0 0 0 1px rgba(0,230,118,0.25);
     }
     .fifa-real input::-webkit-outer-spin-button,
-    .fifa-real input::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
+    .fifa-real input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     .fifa-real input::placeholder {
-      color: #64748b;
-      opacity: 1;
-      -webkit-text-fill-color: #64748b;
-      font-weight: 700;
-      font-size: 0.95rem;
+      color: #64748b; opacity: 1; -webkit-text-fill-color: #64748b; font-weight: 700; font-size: 0.95rem;
     }
     .fifa-real input:disabled {
-      cursor: default;
-      opacity: 1 !important;
-      background: #041a0e;
-      border-color: #00e676;
-      color: #ffffff !important;
-      -webkit-text-fill-color: #ffffff;
+      cursor: default; opacity: 1 !important; background: #041a0e; border-color: #00e676;
+      color: #ffffff !important; -webkit-text-fill-color: #ffffff;
     }
     .fifa-real input:disabled:placeholder-shown {
-      background: #0d1a2e;
-      border-color: #3d5a80;
-      color: #64748b !important;
-      -webkit-text-fill-color: #64748b;
-      box-shadow: none;
+      background: #0d1a2e; border-color: #3d5a80; color: #64748b !important;
+      -webkit-text-fill-color: #64748b; box-shadow: none;
     }
     .fifa-real input:not(:placeholder-shown) {
-      background: #062816;
-      border-color: #00e676;
-      color: #ffffff !important;
-      -webkit-text-fill-color: #ffffff;
+      background: #062816; border-color: #00e676; color: #ffffff !important; -webkit-text-fill-color: #ffffff;
     }
     .fifa-pts-badge {
-      font-size: 0.75rem;
-      font-weight: 800;
-      padding: 0.15rem 0.45rem;
-      border-radius: 6px;
-      background: rgba(0,230,118,0.12);
-      color: var(--accent);
+      font-size: 0.75rem; font-weight: 800; padding: 0.15rem 0.45rem; border-radius: 6px;
+      background: rgba(0,230,118,0.12); color: var(--accent);
     }
     .fifa-pts-badge.zero { background: rgba(239,83,80,0.12); color: #ef5350; }
+    /* 40% tabla | 20% baile | 20% dominio | 20% filtro */
     #fifaRankingView { margin-bottom: 0.9rem; }
     .fifa-rank-layout {
       display: grid;
-      grid-template-columns: 1fr 0.5fr 0.5fr;
-      gap: 0.75rem;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 0.65rem;
       align-items: stretch;
     }
-    @media (max-width: 900px) {
+    @media (max-width: 1100px) {
       .fifa-rank-layout { grid-template-columns: 1fr 1fr; }
       .fifa-rank-wrap { grid-column: 1 / -1; }
     }
@@ -870,176 +850,82 @@
       .fifa-rank-layout { grid-template-columns: 1fr; }
     }
     .fifa-rank-wrap {
-      min-width: 0;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
+      min-width: 0; background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
     }
     .fifa-rank-caption {
-      font-size: 0.72rem;
-      font-weight: 800;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      padding: 0.45rem 0.75rem 0.2rem;
+      font-size: 0.72rem; font-weight: 800; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.04em; padding: 0.45rem 0.75rem 0.2rem;
     }
     .fifa-rank-caption strong {
-      color: var(--text);
-      text-transform: none;
-      letter-spacing: 0;
-      font-size: 0.85rem;
+      color: var(--text); text-transform: none; letter-spacing: 0; font-size: 0.85rem;
     }
     #fifaRankingView table {
-      width: 100%;
-      border-collapse: collapse;
-      background: transparent;
-      border: none;
-      border-radius: 0;
+      width: 100%; border-collapse: collapse; background: transparent; border: none; border-radius: 0;
     }
     #fifaRankingView th, #fifaRankingView td {
-      padding: 0.38rem 0.55rem;
-      text-align: left;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.8rem;
+      padding: 0.35rem 0.5rem; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.78rem;
     }
     #fifaRankingView th {
-      background: transparent;
-      color: var(--muted);
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      font-weight: 700;
+      background: transparent; color: var(--muted); font-size: 0.62rem;
+      text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700;
     }
     #fifaRankingView tr:last-child td { border-bottom: none; }
-    #fifaRankingView td.pts-col {
-      font-weight: 900;
-      color: var(--accent);
-      font-size: 0.95rem;
-    }
-    #fifaRankingView .rank {
-      font-weight: 900;
-      color: var(--gold);
-      width: 28px;
-      font-size: 0.85rem;
-    }
+    #fifaRankingView td.pts-col { font-weight: 900; color: var(--accent); font-size: 0.92rem; }
+    #fifaRankingView .rank { font-weight: 900; color: var(--gold); width: 26px; font-size: 0.82rem; }
     .fifa-leader-dance {
-      min-width: 0;
-      background: var(--card);
-      border: 1px solid rgba(0,230,118,0.35);
-      border-radius: 12px;
-      padding: 0.5rem 0.45rem 0.55rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.25rem;
+      min-width: 0; background: var(--card); border: 1px solid rgba(0,230,118,0.35);
+      border-radius: 12px; padding: 0.45rem; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 0.2rem;
       box-shadow: 0 0 18px rgba(0,230,118,0.12);
     }
     .fifa-leader-dance .dance-label {
-      font-size: 0.68rem;
-      font-weight: 800;
-      color: var(--gold);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      text-align: center;
+      font-size: 0.65rem; font-weight: 800; color: var(--gold);
+      text-transform: uppercase; letter-spacing: 0.04em; text-align: center;
     }
     .pro-dance {
-      width: 100px;
-      height: 130px;
-      position: relative;
+      width: 90px; height: 120px; position: relative;
       animation: pro-bounce 0.5s ease-in-out infinite alternate;
     }
     .pro-dance .pd-head {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      overflow: hidden;
-      border: 2.5px solid var(--gold);
-      background: #0d1a2a;
-      position: absolute;
-      left: 50%;
-      top: 0;
-      transform: translateX(-50%);
-      z-index: 3;
+      width: 36px; height: 36px; border-radius: 50%; overflow: hidden;
+      border: 2.5px solid var(--gold); background: #0d1a2a; position: absolute;
+      left: 50%; top: 0; transform: translateX(-50%); z-index: 3;
       box-shadow: 0 0 12px rgba(255,213,79,0.4);
     }
-    .pro-dance .pd-head img {
-      width: 100%; height: 100%; object-fit: cover; display: block;
-    }
+    .pro-dance .pd-head img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .pro-dance .pd-head .identity-fallback {
-      display: flex; align-items: center; justify-content: center;
-      width: 100%; height: 100%; font-size: 1.2rem;
+      display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 1.1rem;
     }
     .pro-dance .pd-hat {
-      position: absolute;
-      left: 50%;
-      top: -8px;
-      transform: translateX(-50%);
-      z-index: 4;
-      font-size: 1.1rem;
-      animation: hat-wobble 0.5s ease-in-out infinite alternate;
+      position: absolute; left: 50%; top: -8px; transform: translateX(-50%); z-index: 4;
+      font-size: 1rem; animation: hat-wobble 0.5s ease-in-out infinite alternate;
       filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4));
     }
     .pro-dance .pd-torso {
-      position: absolute;
-      left: 50%;
-      top: 42px;
-      width: 18px;
-      height: 34px;
-      margin-left: -9px;
-      background: linear-gradient(180deg, #00e676, #1b5e20);
-      border-radius: 6px 6px 4px 4px;
-      z-index: 1;
+      position: absolute; left: 50%; top: 38px; width: 16px; height: 32px; margin-left: -8px;
+      background: linear-gradient(180deg, #00e676, #1b5e20); border-radius: 6px 6px 4px 4px; z-index: 1;
     }
     .pro-dance .pd-arm {
-      position: absolute;
-      top: 46px;
-      width: 26px;
-      height: 7px;
-      background: #e2e8f0;
-      border-radius: 4px;
-      z-index: 2;
+      position: absolute; top: 42px; width: 24px; height: 6px; background: #e2e8f0; border-radius: 4px; z-index: 2;
     }
     .pro-dance .pd-arm.left {
-      right: 50%;
-      margin-right: 6px;
-      transform-origin: right center;
+      right: 50%; margin-right: 5px; transform-origin: right center;
       animation: pro-arm-l 0.45s ease-in-out infinite alternate;
     }
     .pro-dance .pd-arm.right {
-      left: 50%;
-      margin-left: 6px;
-      transform-origin: left center;
+      left: 50%; margin-left: 5px; transform-origin: left center;
       animation: pro-arm-r 0.45s ease-in-out infinite alternate;
     }
     .pro-dance .pd-leg {
-      position: absolute;
-      top: 74px;
-      width: 8px;
-      height: 32px;
-      background: #94a3b8;
-      border-radius: 4px;
-      transform-origin: top center;
-      z-index: 1;
+      position: absolute; top: 68px; width: 7px; height: 28px; background: #94a3b8;
+      border-radius: 4px; transform-origin: top center; z-index: 1;
     }
-    .pro-dance .pd-leg.left {
-      left: calc(50% - 12px);
-      animation: pro-leg-l 0.45s ease-in-out infinite alternate;
-    }
-    .pro-dance .pd-leg.right {
-      left: calc(50% + 4px);
-      animation: pro-leg-r 0.45s ease-in-out infinite alternate;
-    }
+    .pro-dance .pd-leg.left { left: calc(50% - 11px); animation: pro-leg-l 0.45s ease-in-out infinite alternate; }
+    .pro-dance .pd-leg.right { left: calc(50% + 4px); animation: pro-leg-r 0.45s ease-in-out infinite alternate; }
     .pro-dance .pd-shoe {
-      position: absolute;
-      bottom: -3px;
-      left: -3px;
-      width: 14px;
-      height: 6px;
-      background: #0a1628;
-      border: 1px solid #e2e8f0;
-      border-radius: 3px 6px 3px 3px;
+      position: absolute; bottom: -3px; left: -3px; width: 13px; height: 5px;
+      background: #0a1628; border: 1px solid #e2e8f0; border-radius: 3px 6px 3px 3px;
     }
     @keyframes pro-bounce {
       from { transform: translateY(0) rotate(-2deg); }
@@ -1066,28 +952,30 @@
       to { transform: rotate(18deg); }
     }
     .fifa-dom-card {
-      min-width: 0;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 0.45rem 0.55rem 0.35rem;
-      display: flex;
-      flex-direction: column;
+      min-width: 0; background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 0.4rem 0.5rem 0.3rem; display: flex; flex-direction: column;
     }
     .fifa-dom-card .dom-title {
-      font-size: 0.65rem;
-      font-weight: 800;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-bottom: 0.25rem;
+      font-size: 0.62rem; font-weight: 800; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.2rem;
     }
-    .fifa-dom-card .dom-canvas-wrap {
-      flex: 1;
-      min-height: 120px;
-      position: relative;
-    }
+    .fifa-dom-card .dom-canvas-wrap { flex: 1; min-height: 110px; position: relative; }
     .fifa-dom-card canvas { width: 100% !important; height: 100% !important; }
+    .fifa-filter-card {
+      min-width: 0; background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 0.55rem 0.65rem; display: flex; flex-direction: column; gap: 0.4rem;
+    }
+    .fifa-filter-card .dom-title {
+      font-size: 0.62rem; font-weight: 800; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .fifa-filter-card select {
+      width: 100%; font-size: 0.82rem; font-weight: 700; padding: 0.4rem 0.5rem;
+    }
+    .fifa-filter-card .filter-hint {
+      font-size: 0.7rem; color: var(--muted); font-weight: 600; line-height: 1.3;
+    }
+    .fifa-filter-card .filter-hint strong { color: var(--accent); }
 
     /* Trivia millonario */
     .trivia-layout {
@@ -6294,9 +6182,8 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
 
     // ~30 partidos · siempre incluyen COL, ESP, FRA, ING, ITA, BRA, ARG, ALE
     // Plantilla: id, date, local, visitante, comp
-    // hora_col = hora en Colombia (COT, UTC-5). Típicas UEFA NL 14:45/20:45 CEST → 7:45am/1:45pm COT
+    // hora_col = Colombia (COT). Estimadas a partir de horarios UEFA / amistosos típicos.
     const FIFA_MATCHES = [
-      // Nations League
       { id: 'f01', date: '2026-09-24', hora_col: '13:45', local: 'Países Bajos', visitante: 'Alemania', comp: 'Nations League' },
       { id: 'f02', date: '2026-09-24', hora_col: '13:45', local: 'Portugal', visitante: 'Gales', comp: 'Nations League' },
       { id: 'f03', date: '2026-09-24', hora_col: '13:45', local: 'Noruega', visitante: 'Dinamarca', comp: 'Nations League' },
@@ -6317,7 +6204,6 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       { id: 'f18', date: '2026-10-03', hora_col: '13:45', local: 'España', visitante: 'República Checa', comp: 'Nations League' },
       { id: 'f19', date: '2026-10-03', hora_col: '13:45', local: 'Croacia', visitante: 'Inglaterra', comp: 'Nations League' },
       { id: 'f20', date: '2026-10-06', hora_col: '13:45', local: 'Croacia', visitante: 'España', comp: 'Nations League' },
-      // Amistosos
       { id: 'f21', date: '2026-09-30', hora_col: '19:00', local: 'Argentina', visitante: 'Bolivia', comp: 'Amistoso' },
       { id: 'f22', date: '2026-10-03', hora_col: '19:00', local: 'Argentina', visitante: 'Burkina Faso', comp: 'Amistoso' },
       { id: 'f23', date: '2026-10-06', hora_col: '16:00', local: 'Argentina', visitante: 'Benín', comp: 'Amistoso' },
@@ -6329,23 +6215,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       { id: 'f29', date: '2026-10-06', hora_col: '19:00', local: 'Colombia', visitante: 'Perú', comp: 'Amistoso' },
       { id: 'f30', date: '2026-09-29', hora_col: '07:00', local: 'Japón', visitante: 'Corea del Sur', comp: 'Amistoso' }
     ];
-
-    const MES_CORTOS = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-    function formatFifaWhen(m) {
-      // "26-sep 1:45pm" en horario Colombia
-      const parts = (m.date || '').split('-');
-      if (parts.length < 3) return m.date || '';
-      const day = String(parseInt(parts[2], 10));
-      const mes = MES_CORTOS[parseInt(parts[1], 10) - 1] || parts[1];
-      let time = '';
-      if (m.hora_col) {
-        const [hh, mm] = m.hora_col.split(':').map(Number);
-        const h12 = ((hh + 11) % 12) + 1;
-        const ampm = hh < 12 ? 'am' : 'pm';
-        time = ' ' + h12 + ':' + String(mm).padStart(2, '0') + ampm;
-      }
-      return day + '-' + mes + time;
-    }
+    let fifaTeamFilter = '';
 
     function ensureFifaData() {
       if (!data.fifa || typeof data.fifa !== 'object') {
@@ -6376,6 +6246,28 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       marrugo: 'rgba(77,208,225,0.85)',
       mauricio: 'rgba(244,143,177,0.85)'
     };
+    const MES_CORTOS = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+
+    function formatFifaWhen(m) {
+      const parts = (m.date || '').split('-');
+      if (parts.length < 3) return m.date || '';
+      const day = String(parseInt(parts[2], 10));
+      const mes = MES_CORTOS[parseInt(parts[1], 10) - 1] || parts[1];
+      let time = '';
+      if (m.hora_col) {
+        const [hh, mm] = m.hora_col.split(':').map(Number);
+        const h12 = ((hh + 11) % 12) + 1;
+        const ampm = hh < 12 ? 'am' : 'pm';
+        time = ' ' + h12 + ':' + String(mm).padStart(2, '0') + ampm;
+      }
+      return day + '-' + mes + time;
+    }
+
+    function fifaTeamList() {
+      const set = new Set();
+      FIFA_MATCHES.forEach(m => { set.add(m.local); set.add(m.visitante); });
+      return Array.from(set).sort((a, b) => a.localeCompare(b, 'es'));
+    }
 
     function fifaScoreDetail(pred, real) {
       if (!pred || real == null || real.h == null || real.a == null || pred.h === '' || pred.a === '' || pred.h == null || pred.a == null) return null;
@@ -6475,6 +6367,19 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       renderFifaMatches();
     }
 
+    function onFifaTeamFilterChange(sel) {
+      fifaTeamFilter = sel.value || '';
+      renderFifaMatches({ preserveScroll: true });
+      const hint = document.getElementById('fifaFilterHint');
+      if (hint) {
+        if (!fifaTeamFilter) hint.innerHTML = 'Mostrando <strong>todos</strong> los partidos';
+        else {
+          const n = FIFA_MATCHES.filter(m => m.local === fifaTeamFilter || m.visitante === fifaTeamFilter).length;
+          hint.innerHTML = '<strong>' + n + '</strong> partido' + (n === 1 ? '' : 's') + ' de ' + fifaTeamFilter;
+        }
+      }
+    }
+
     function renderFifaRanking() {
       const el = document.getElementById('fifaRankingView');
       if (!el) return;
@@ -6491,6 +6396,16 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
         ? '<div class="pd-head">' + avatarHtml(leader.id) + '</div>'
         : '<div class="pd-head"><span class="identity-fallback">👤</span></div>';
       const danceName = leader ? (PLAYER_NAMES[leader.id] || leader.id) : '—';
+      const teams = fifaTeamList();
+      const opts = teams.map(t =>
+        '<option value="' + t.replace(/"/g, '&quot;') + '"' + (fifaTeamFilter === t ? ' selected' : '') + '>' + t + '</option>'
+      ).join('');
+      let hintHtml;
+      if (!fifaTeamFilter) hintHtml = 'Mostrando <strong>todos</strong> los partidos';
+      else {
+        const n = FIFA_MATCHES.filter(m => m.local === fifaTeamFilter || m.visitante === fifaTeamFilter).length;
+        hintHtml = '<strong>' + n + '</strong> partido' + (n === 1 ? '' : 's') + ' de ' + fifaTeamFilter;
+      }
       el.hidden = false;
       el.innerHTML =
         '<div class="fifa-rank-layout">' +
@@ -6503,11 +6418,9 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
           '<div class="fifa-leader-dance">' +
             '<div class="dance-label">👑 ' + danceName + '</div>' +
             '<div class="pro-dance">' +
-              '<div class="pd-hat">👑</div>' +
-              headHtml +
+              '<div class="pd-hat">👑</div>' + headHtml +
               '<div class="pd-torso"></div>' +
-              '<div class="pd-arm left"></div>' +
-              '<div class="pd-arm right"></div>' +
+              '<div class="pd-arm left"></div><div class="pd-arm right"></div>' +
               '<div class="pd-leg left"><div class="pd-shoe"></div></div>' +
               '<div class="pd-leg right"><div class="pd-shoe"></div></div>' +
             '</div>' +
@@ -6516,9 +6429,16 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
             '<div class="dom-title">Dominio · % pts posibles</div>' +
             '<div class="dom-canvas-wrap"><canvas id="fifaDomCanvas"></canvas></div>' +
           '</div>' +
+          '<div class="fifa-filter-card">' +
+            '<div class="dom-title">Filtrar por equipo</div>' +
+            '<select id="fifaTeamSelect" onchange="onFifaTeamFilterChange(this)">' +
+              '<option value="">Todos los equipos</option>' + opts +
+            '</select>' +
+            '<div class="filter-hint" id="fifaFilterHint">' + hintHtml + '</div>' +
+          '</div>' +
         '</div>';
       const canvas = document.getElementById('fifaDomCanvas');
-      if (canvas) fifaDomChart = buildDomChart(canvas, rows, { thick: 18 });
+      if (canvas) fifaDomChart = buildDomChart(canvas, rows, { thick: 16 });
     }
 
     function renderFifaMatches(opts) {
@@ -6534,8 +6454,14 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
           : null);
       ensureFifaData();
       const user = currentUser();
-      const sorted = FIFA_MATCHES.slice().sort((a, b) => a.date.localeCompare(b.date) || (a.hora_col || '').localeCompare(b.hora_col || '') || a.id.localeCompare(b.id));
+      let sorted = FIFA_MATCHES.slice();
+      if (fifaTeamFilter) sorted = sorted.filter(m => m.local === fifaTeamFilter || m.visitante === fifaTeamFilter);
+      sorted.sort((a, b) => a.date.localeCompare(b.date) || (a.hora_col || '').localeCompare(b.hora_col || '') || a.id.localeCompare(b.id));
 
+      if (!sorted.length) {
+        el.innerHTML = '<div class="empty-state" style="padding:1.5rem 1rem;">No hay partidos' + (fifaTeamFilter ? ' de <strong>' + fifaTeamFilter + '</strong>' : '') + '.</div>';
+        return;
+      }
       el.innerHTML = sorted.map(m => {
         const real = data.fifa.results[m.id] || {};
         const preds = data.fifa.predictions[m.id] || {};
