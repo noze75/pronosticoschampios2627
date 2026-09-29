@@ -415,6 +415,125 @@
     }
 
 
+
+    /* ===== Ahorcado Champions ===== */
+    .hang-wrap { max-width: 520px; margin: 0 auto; }
+    .hang-top {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.75rem;
+    }
+    .hang-lives {
+      font-weight: 800; font-size: 0.9rem; color: var(--muted);
+    }
+    .hang-lives strong { color: var(--accent); font-size: 1.15rem; }
+    .hang-club-hint {
+      width: 64px; height: 64px; background: #fff; border-radius: 12px;
+      border: 1px solid var(--border); display: flex; align-items: center;
+      justify-content: center; overflow: hidden; flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    }
+    .hang-club-hint img {
+      width: 100%; height: 100%; object-fit: contain; padding: 0.25rem;
+      box-sizing: border-box;
+    }
+    .hang-gallows {
+      position: relative; width: 180px; height: 220px; margin: 0.4rem auto 0.75rem;
+    }
+    .hang-gallows .pole-v {
+      position: absolute; left: 28px; top: 10px; width: 8px; height: 180px;
+      background: #8d6e63; border-radius: 4px;
+    }
+    .hang-gallows .pole-h {
+      position: absolute; left: 28px; top: 10px; width: 90px; height: 8px;
+      background: #8d6e63; border-radius: 4px;
+    }
+    .hang-gallows .rope {
+      position: absolute; left: 110px; top: 18px; width: 3px; height: 28px;
+      background: #a1887f;
+    }
+    .hang-gallows .base {
+      position: absolute; left: 12px; bottom: 18px; width: 90px; height: 8px;
+      background: #6d4c41; border-radius: 4px;
+    }
+    .hang-body-part { position: absolute; transition: opacity 0.2s; }
+    .hang-head {
+      left: 94px; top: 42px; width: 36px; height: 36px; border-radius: 50%;
+      border: 3px solid var(--text); background: var(--card);
+      overflow: hidden; display: flex; align-items: center; justify-content: center;
+    }
+    .hang-head img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .hang-head .fallback-face { font-size: 1.2rem; line-height: 1; }
+    .hang-torso {
+      left: 109px; top: 80px; width: 6px; height: 48px; background: var(--text);
+      border-radius: 3px;
+    }
+    .hang-arm-l {
+      left: 86px; top: 88px; width: 28px; height: 5px; background: var(--text);
+      border-radius: 3px; transform: rotate(-28deg); transform-origin: right center;
+    }
+    .hang-arm-r {
+      left: 109px; top: 88px; width: 28px; height: 5px; background: var(--text);
+      border-radius: 3px; transform: rotate(28deg); transform-origin: left center;
+    }
+    .hang-leg-l {
+      left: 92px; top: 124px; width: 28px; height: 5px; background: var(--text);
+      border-radius: 3px; transform: rotate(-55deg); transform-origin: right center;
+    }
+    .hang-leg-r {
+      left: 105px; top: 124px; width: 28px; height: 5px; background: var(--text);
+      border-radius: 3px; transform: rotate(55deg); transform-origin: left center;
+    }
+    .hang-foot-l {
+      left: 78px; top: 148px; width: 14px; height: 5px; background: var(--text);
+      border-radius: 3px;
+    }
+    .hang-foot-r {
+      left: 120px; top: 148px; width: 14px; height: 5px; background: var(--text);
+      border-radius: 3px;
+    }
+    .hang-head.dead {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 2px rgba(239,83,80,0.25);
+    }
+    .hang-word {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 0.35rem 0.55rem;
+      margin: 0.65rem 0 0.9rem; min-height: 2.4rem;
+    }
+    .hang-letter-slot {
+      min-width: 1.35rem; text-align: center; font-weight: 900; font-size: 1.35rem;
+      letter-spacing: 0.02em; border-bottom: 3px solid var(--border); padding: 0.1rem 0.15rem;
+      color: var(--text);
+    }
+    .hang-letter-slot.space {
+      border-bottom-color: transparent; min-width: 0.7rem;
+    }
+    .hang-letter-slot.revealed { color: var(--accent); border-bottom-color: rgba(0,230,118,0.45); }
+    .hang-kb {
+      display: grid; grid-template-columns: repeat(9, 1fr); gap: 0.3rem;
+      max-width: 420px; margin: 0 auto 0.75rem;
+    }
+    .hang-kb button {
+      background: var(--card); border: 1px solid var(--border); color: var(--text);
+      font-weight: 800; font-size: 0.92rem; padding: 0.45rem 0; border-radius: 8px;
+      cursor: pointer; transition: background 0.12s, border-color 0.12s;
+    }
+    .hang-kb button:hover:not(:disabled) {
+      background: var(--card-hover); border-color: rgba(0,230,118,0.4);
+    }
+    .hang-kb button:disabled { opacity: 0.35; cursor: default; }
+    .hang-kb button.ok { background: rgba(0,230,118,0.18); border-color: rgba(0,230,118,0.45); color: var(--accent); }
+    .hang-kb button.bad { background: rgba(239,83,80,0.15); border-color: rgba(239,83,80,0.4); color: var(--danger); }
+    .hang-msg {
+      text-align: center; font-weight: 800; margin: 0.5rem 0 0.75rem; font-size: 1.05rem;
+    }
+    .hang-msg.win { color: var(--accent); }
+    .hang-msg.lose { color: var(--danger); }
+    .hang-actions { display: flex; justify-content: center; gap: 0.55rem; flex-wrap: wrap; }
+    .hang-wrong-list {
+      text-align: center; font-size: 0.8rem; color: var(--muted); font-weight: 600;
+      margin-bottom: 0.5rem; min-height: 1.2rem;
+    }
+
     .trivia-logo-wrap {
       display: flex;
       justify-content: center;
@@ -2980,6 +3099,11 @@
             <div class="juego-card-title">¡Quiubo, pues, apúrele con el escudo!</div>
             <div class="juego-card-desc">Escudo a trozos · 4 opciones · puntos que bajan cada segundo</div>
           </button>
+          <button type="button" class="juego-card" onclick="openJuego('hangman')">
+            <div class="juego-card-icon">🪢</div>
+            <div class="juego-card-title">Ahorcado Champions</div>
+            <div class="juego-card-desc">60 jugadores · 8 vidas · pista = escudo del club</div>
+          </button>
         </div>
       </div>
       <div id="juegoTrivia" class="juego-view" hidden>
@@ -2997,6 +3121,15 @@
           9 piezas (3×3) · cada 5 s · 1000 pts → 0. ¡Acierta antes!
         </div>
         <div id="logoRaceApp"></div>
+      </div>
+      <div id="juegoHangman" class="juego-view" hidden>
+        <button type="button" class="juego-back" onclick="closeJuego()">← Volver a juegos</button>
+        <div class="rules" style="margin:0.75rem 0 0.85rem;">
+          <strong>Ahorcado Champions</strong> —
+          Jugadores de clubes de esta fase de liga · <strong>8 vidas</strong> ·
+          la única pista es el <strong>escudo del club</strong>.
+        </div>
+        <div id="hangmanApp"></div>
       </div>
     </div>
 
@@ -5922,6 +6055,8 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       document.getElementById('juegosHub').hidden = true;
       document.getElementById('juegoTrivia').hidden = which !== 'trivia';
       document.getElementById('juegoLogo').hidden = which !== 'logo';
+      const hangEl = document.getElementById('juegoHangman');
+      if (hangEl) hangEl.hidden = which !== 'hangman';
       if (which === 'trivia') {
         triviaState = null;
         renderTrivia();
@@ -5931,15 +6066,22 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
         logoRaceState = null;
         renderLogoRace();
       }
+      if (which === 'hangman') {
+        hangmanState = null;
+        renderHangman();
+      }
     }
 
     function closeJuego() {
       stopLogoRaceTimer();
       logoRaceState = null;
       triviaState = null;
+      hangmanState = null;
       document.getElementById('juegosHub').hidden = false;
       document.getElementById('juegoTrivia').hidden = true;
       document.getElementById('juegoLogo').hidden = true;
+      const hangEl = document.getElementById('juegoHangman');
+      if (hangEl) hangEl.hidden = true;
     }
 
     // ========== APÚRELE CON EL LOGO ==========
@@ -6579,6 +6721,253 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
           renderFifaPanel();
         });
       });
+    }
+
+
+
+    // ========== AHORCADO CHAMPIONS ==========
+    const HANGMAN_MAX_LIVES = 8;
+    // name = display (spaces ok). club must match LOGO_MAP key exactly.
+    const HANGMAN_BANK = [
+      { name: 'KYLIAN MBAPPE', club: 'Real Madrid' },
+      { name: 'VINICIUS JUNIOR', club: 'Real Madrid' },
+      { name: 'JUDE BELLINGHAM', club: 'Real Madrid' },
+      { name: 'RODRYGO GOES', club: 'Real Madrid' },
+      { name: 'ENDRICK FELIPE', club: 'Real Madrid' },
+      { name: 'THIBAUT COURTOIS', club: 'Real Madrid' },
+      { name: 'FEDERICO VALVERDE', club: 'Real Madrid' },
+      { name: 'AURELIEN TCHOUAMENI', club: 'Real Madrid' },
+      { name: 'MARC CUCURELLA', club: 'Real Madrid' },
+      { name: 'ARDA GULER', club: 'Real Madrid' },
+      { name: 'LAMINE YAMAL', club: 'Barcelona' },
+      { name: 'PEDRI GONZALEZ', club: 'Barcelona' },
+      { name: 'RAPHINHA DIAS', club: 'Barcelona' },
+      { name: 'FRENKIE DE JONG', club: 'Barcelona' },
+      { name: 'PAU CUBARSI', club: 'Barcelona' },
+      { name: 'FERMIN LOPEZ', club: 'Barcelona' },
+      { name: 'DANI OLMO', club: 'Barcelona' },
+      { name: 'ANDREAS CHRISTENSEN', club: 'Barcelona' },
+      { name: 'ERLING HAALAND', club: 'Manchester City' },
+      { name: 'GIANLUIGI DONNARUMMA', club: 'Manchester City' },
+      { name: 'PHIL FODEN', club: 'Manchester City' },
+      { name: 'RAYAN CHERKI', club: 'Manchester City' },
+      { name: 'RUBEN DIAS', club: 'Manchester City' },
+      { name: 'JOSKO GVARDIOL', club: 'Manchester City' },
+      { name: 'FLORIAN WIRTZ', club: 'Liverpool' },
+      { name: 'VIRGIL VAN DIJK', club: 'Liverpool' },
+      { name: 'ALISSON BECKER', club: 'Liverpool' },
+      { name: 'CODY GAKPO', club: 'Liverpool' },
+      { name: 'DOMINIK SZOBOSZLAI', club: 'Liverpool' },
+      { name: 'ALEXIS MAC ALLISTER', club: 'Liverpool' },
+      { name: 'JEREMIE FRIMPONG', club: 'Liverpool' },
+      { name: 'BUKAYO SAKA', club: 'Arsenal' },
+      { name: 'DECLAN RICE', club: 'Arsenal' },
+      { name: 'MARTIN ODEGAARD', club: 'Arsenal' },
+      { name: 'VIKTOR GYOKERES', club: 'Arsenal' },
+      { name: 'WILLIAM SALIBA', club: 'Arsenal' },
+      { name: 'GABRIEL MAGALHAES', club: 'Arsenal' },
+      { name: 'HARRY KANE', club: 'Bayern München' },
+      { name: 'LUIS DIAZ', club: 'Bayern München' },
+      { name: 'JAMAL MUSIALA', club: 'Bayern München' },
+      { name: 'MANUEL NEUER', club: 'Bayern München' },
+      { name: 'MICHAEL OLISE', club: 'Bayern München' },
+      { name: 'SERGE GNABRY', club: 'Bayern München' },
+      { name: 'OUSMANE DEMBELE', club: 'Paris Saint-Germain' },
+      { name: 'VITINHA FERREIRA', club: 'Paris Saint-Germain' },
+      { name: 'NUNO MENDES', club: 'Paris Saint-Germain' },
+      { name: 'ACHRAF HAKIMI', club: 'Paris Saint-Germain' },
+      { name: 'JOAO NEVES', club: 'Paris Saint-Germain' },
+      { name: 'ANTOINE GRIEZMANN', club: 'Atlético de Madrid' },
+      { name: 'JULIAN ALVAREZ', club: 'Atlético de Madrid' },
+      { name: 'JAN OBLAK', club: 'Atlético de Madrid' },
+      { name: 'ALEXANDER SORLOTH', club: 'Atlético de Madrid' },
+      { name: 'LAUTARO MARTINEZ', club: 'Inter' },
+      { name: 'NICOLO BARELLA', club: 'Inter' },
+      { name: 'ALESSANDRO BASTONI', club: 'Inter' },
+      { name: 'LUIS SUAREZ', club: 'Sporting CP' },
+      { name: 'SERHOU GUIRASSY', club: 'Borussia Dortmund' },
+      { name: 'VICTOR OSIMHEN', club: 'Galatasaray' },
+      { name: 'JOHN MCGINN', club: 'Aston Villa' },
+      { name: 'DIOGO COSTA', club: 'Porto' }
+    ];
+
+    let hangmanState = null;
+
+    function hangNormalize(ch) {
+      return ch.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+    }
+
+    function hangNormalizeWord(s) {
+      return s.split('').map(c => c === ' ' ? ' ' : hangNormalize(c)).join('');
+    }
+
+    function pickHangmanPlayer() {
+      const i = Math.floor(Math.random() * HANGMAN_BANK.length);
+      return HANGMAN_BANK[i];
+    }
+
+    function startHangman() {
+      const user = currentUser();
+      if (!user) {
+        const okGuest = confirm(
+          'No has elegido quién eres en Soy.\n\n' +
+          'Si pierdes, la cabeza del ahorcado será genérica.\n\n' +
+          '¿Jugar igual como invitado?'
+        );
+        if (!okGuest) {
+          toast('Elige quién eres en Soy y vuelve a pulsar Jugar');
+          return;
+        }
+      } else {
+        const name = PLAYER_NAMES[user] || user;
+        const ok = confirm(
+          '¿Confirmas que juegas como ' + name + '?\n\n' +
+          'Si pierdes, tu foto será la cabeza del ahorcado.'
+        );
+        if (!ok) {
+          toast('Cambia Soy arriba si no eres ' + name);
+          return;
+        }
+      }
+
+      const entry = pickHangmanPlayer();
+      const answer = hangNormalizeWord(entry.name);
+      hangmanState = {
+        displayName: entry.name,
+        answer: answer,
+        club: entry.club,
+        guessed: {},
+        wrong: [],
+        lives: HANGMAN_MAX_LIVES,
+        status: 'playing', // playing | win | lose
+        player: user || null
+      };
+      renderHangman();
+    }
+
+    function hangmanGuess(letter) {
+      if (!hangmanState || hangmanState.status !== 'playing') return;
+      const L = hangNormalize(letter);
+      if (!/^[A-Z]$/.test(L)) return;
+      if (hangmanState.guessed[L]) return;
+      hangmanState.guessed[L] = true;
+      if (hangmanState.answer.indexOf(L) === -1) {
+        hangmanState.wrong.push(L);
+        hangmanState.lives -= 1;
+        if (hangmanState.lives <= 0) {
+          hangmanState.lives = 0;
+          hangmanState.status = 'lose';
+        }
+      } else {
+        // check win
+        const letters = hangmanState.answer.replace(/ /g, '');
+        const all = [...new Set(letters.split(''))].every(ch => hangmanState.guessed[ch]);
+        if (all) hangmanState.status = 'win';
+      }
+      renderHangman();
+    }
+
+    function hangmanBodyPartsHtml() {
+      const wrongN = hangmanState ? hangmanState.wrong.length : 0;
+      const show = (n) => wrongN >= n;
+      const lost = hangmanState && hangmanState.status === 'lose';
+      let headInner = '<span class="fallback-face">' + (lost ? '😵' : '😮') + '</span>';
+      if (lost && hangmanState.player) {
+        headInner = avatarHtml(hangmanState.player);
+      }
+      // 8 steps: head, torso, L arm, R arm, L leg, R leg, eyes X, dead posture (tilt)
+      return (
+        (show(1) || lost ? '<div class="hang-body-part hang-head' + (lost ? ' dead' : '') + '">' + headInner + '</div>' : '') +
+        (show(2) ? '<div class="hang-body-part hang-torso"></div>' : '') +
+        (show(3) ? '<div class="hang-body-part hang-arm-l"></div>' : '') +
+        (show(4) ? '<div class="hang-body-part hang-arm-r"></div>' : '') +
+        (show(5) ? '<div class="hang-body-part hang-leg-l"></div>' : '') +
+        (show(6) ? '<div class="hang-body-part hang-leg-r"></div>' : '') +
+        (show(7) ? '<div class="hang-body-part hang-foot-l"></div>' : '') +
+        (show(8) || lost ? '<div class="hang-body-part hang-foot-r"></div>' : '')
+      );
+    }
+
+    function renderHangman() {
+      const el = document.getElementById('hangmanApp');
+      if (!el) return;
+
+      if (!hangmanState) {
+        el.innerHTML =
+          '<div class="trivia-home hang-wrap">' +
+            '<h2>🪢 Ahorcado Champions</h2>' +
+            '<p>Adivina el <strong>nombre del jugador</strong> de un club de esta Champions.<br>' +
+            'Tienes <strong>8 vidas</strong>. La única pista es el <strong>escudo del club</strong>.<br>' +
+            'Si pierdes con tu identidad en <strong>Soy</strong>, tu foto será la cabeza del ahorcado.</p>' +
+            '<button class="primary" onclick="startHangman()">▶ Jugar ahora</button>' +
+          '</div>';
+        return;
+      }
+
+      const s = hangmanState;
+      const logoSrc = (typeof LOGO_MAP !== 'undefined' && LOGO_MAP[s.club]) ? LOGO_MAP[s.club] : '';
+      const clubHint = logoSrc
+        ? '<div class="hang-club-hint" title="Pista: escudo del club"><img src="' + logoSrc + '" alt="Escudo" onerror="this.style.display=\'none\'"/></div>'
+        : '<div class="hang-club-hint">❓</div>';
+
+      // word slots
+      let slots = '';
+      for (let i = 0; i < s.answer.length; i++) {
+        const ch = s.answer[i];
+        if (ch === ' ') {
+          slots += '<span class="hang-letter-slot space"></span>';
+        } else if (s.guessed[ch] || s.status === 'lose') {
+          slots += '<span class="hang-letter-slot revealed">' + ch + '</span>';
+        } else {
+          slots += '<span class="hang-letter-slot">&nbsp;</span>';
+        }
+      }
+
+      // keyboard
+      const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+      let kb = '<div class="hang-kb">';
+      letters.forEach(L => {
+        const used = !!s.guessed[L];
+        let cls = '';
+        if (used) cls = s.answer.indexOf(L) >= 0 ? 'ok' : 'bad';
+        const dis = used || s.status !== 'playing' ? ' disabled' : '';
+        kb += '<button type="button" class="' + cls + '"' + dis +
+          " onclick=\"hangmanGuess('" + L + "')\">" + L + '</button>';
+      });
+      kb += '</div>';
+
+      let msg = '';
+      if (s.status === 'win') {
+        msg = '<div class="hang-msg win">¡Bien ahí! Era <strong>' + s.displayName + '</strong></div>';
+      } else if (s.status === 'lose') {
+        msg = '<div class="hang-msg lose">Menos mal no es por plata<br><span style="color:var(--muted);font-size:0.92rem;font-weight:700">Era <strong style="color:var(--text)">' + s.displayName + '</strong></span></div>';
+      }
+
+      const wrongTxt = s.wrong.length
+        ? 'Fallos: ' + s.wrong.join(' · ')
+        : '';
+
+      el.innerHTML =
+        '<div class="hang-wrap">' +
+          '<div class="hang-top">' +
+            '<div class="hang-lives">Vidas: <strong>' + s.lives + '</strong> / ' + HANGMAN_MAX_LIVES + '</div>' +
+            clubHint +
+          '</div>' +
+          '<div class="hang-gallows">' +
+            '<div class="pole-v"></div><div class="pole-h"></div><div class="rope"></div><div class="base"></div>' +
+            hangmanBodyPartsHtml() +
+          '</div>' +
+          '<div class="hang-word">' + slots + '</div>' +
+          '<div class="hang-wrong-list">' + wrongTxt + '</div>' +
+          msg +
+          (s.status === 'playing' ? kb : '') +
+          '<div class="hang-actions">' +
+            (s.status !== 'playing'
+              ? '<button class="primary" onclick="startHangman()">▶ Otra partida</button>' +
+                '<button class="juego-back" onclick="closeJuego()">← Volver</button>'
+              : '') +
+          '</div>' +
+        '</div>';
     }
 
 
