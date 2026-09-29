@@ -437,77 +437,83 @@
       box-sizing: border-box;
     }
     .hang-gallows {
-      position: relative; width: 200px; height: 240px; margin: 0.4rem auto 0.75rem;
+      position: relative; width: 200px; height: 250px; margin: 0.35rem auto 0.65rem;
     }
     .hang-gallows .pole-v {
-      position: absolute; left: 36px; top: 12px; width: 8px; height: 195px;
+      position: absolute; left: 32px; top: 10px; width: 9px; height: 205px;
       background: #8d6e63; border-radius: 4px;
     }
     .hang-gallows .pole-h {
-      position: absolute; left: 36px; top: 12px; width: 100px; height: 8px;
+      position: absolute; left: 32px; top: 10px; width: 108px; height: 9px;
       background: #8d6e63; border-radius: 4px;
     }
     .hang-gallows .rope {
-      position: absolute; left: 128px; top: 20px; width: 3px; height: 26px;
+      position: absolute; left: 132px; top: 18px; width: 3px; height: 22px;
       background: #a1887f;
     }
     .hang-gallows .base {
-      position: absolute; left: 18px; bottom: 16px; width: 100px; height: 8px;
+      position: absolute; left: 14px; bottom: 14px; width: 110px; height: 9px;
       background: #6d4c41; border-radius: 4px;
     }
-    .hang-body-part { position: absolute; transition: opacity 0.2s; }
-    /* Head centered under rope */
-    .hang-head {
-      left: 110px; top: 42px; width: 40px; height: 40px; border-radius: 50%;
-      border: 3px solid var(--text); background: var(--card);
-      overflow: hidden; display: flex; align-items: center; justify-content: center;
-      z-index: 2;
+    /* Figure under the rope — same language as .pro-dance */
+    .hang-figure {
+      position: absolute; left: 98px; top: 36px;
+      width: 90px; height: 130px;
     }
-    .hang-head img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .hang-head .fallback-face { font-size: 1.25rem; line-height: 1; }
-    .hang-head.dead {
+    .hang-figure .pd-head {
+      width: 40px; height: 40px; border-radius: 50%; overflow: hidden;
+      border: 2.5px solid var(--text); background: #0d1a2a;
+      position: absolute; left: 50%; top: 0; transform: translateX(-50%); z-index: 3;
+    }
+    .hang-figure .pd-head img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .hang-figure .pd-head .identity-fallback,
+    .hang-figure .pd-head .fallback-face {
+      display: flex; align-items: center; justify-content: center;
+      width: 100%; height: 100%; font-size: 1.2rem;
+    }
+    .hang-figure.dead .pd-head {
       border-color: var(--danger);
-      box-shadow: 0 0 0 2px rgba(239,83,80,0.25);
+      box-shadow: 0 0 0 2px rgba(239,83,80,0.28);
     }
-    /* Torso hangs from chin */
-    .hang-torso {
-      left: 127px; top: 82px; width: 6px; height: 52px;
-      background: var(--text); border-radius: 3px;
+    .hang-figure .pd-torso {
+      position: absolute; left: 50%; top: 42px; width: 18px; height: 34px; margin-left: -9px;
+      background: linear-gradient(180deg, #00e676, #1b5e20);
+      border-radius: 7px 7px 5px 5px; z-index: 1;
     }
-    /* Arms: slight downward angle from shoulders (more natural hang) */
-    .hang-arm-l {
-      left: 100px; top: 90px; width: 30px; height: 5px;
-      background: var(--text); border-radius: 3px;
-      transform: rotate(32deg); transform-origin: right center;
+    .hang-figure .pd-arm {
+      position: absolute; top: 48px; width: 26px; height: 7px;
+      background: #e2e8f0; border-radius: 4px; z-index: 2;
     }
-    .hang-arm-r {
-      left: 130px; top: 90px; width: 30px; height: 5px;
-      background: var(--text); border-radius: 3px;
-      transform: rotate(-32deg); transform-origin: left center;
+    .hang-figure .pd-arm.left {
+      right: 50%; margin-right: 6px;
+      transform: rotate(28deg); transform-origin: right center;
     }
-    /* Legs: mild outward V, not extreme X */
-    .hang-leg-l {
-      left: 106px; top: 130px; width: 28px; height: 5px;
-      background: var(--text); border-radius: 3px;
-      transform: rotate(38deg); transform-origin: right center;
+    .hang-figure .pd-arm.right {
+      left: 50%; margin-left: 6px;
+      transform: rotate(-28deg); transform-origin: left center;
     }
-    .hang-leg-r {
-      left: 126px; top: 130px; width: 28px; height: 5px;
-      background: var(--text); border-radius: 3px;
-      transform: rotate(-38deg); transform-origin: left center;
+    .hang-figure .pd-leg {
+      position: absolute; top: 74px; width: 8px; height: 30px;
+      background: #94a3b8; border-radius: 4px; transform-origin: top center; z-index: 1;
     }
-    /* Small feet at end of legs */
-    .hang-foot-l {
-      left: 96px; top: 154px; width: 12px; height: 5px;
-      background: var(--text); border-radius: 3px;
-      transform: rotate(38deg);
+    .hang-figure .pd-leg.left {
+      left: calc(50% - 12px); transform: rotate(16deg);
     }
-    .hang-foot-r {
-      left: 148px; top: 154px; width: 12px; height: 5px;
-      background: var(--text); border-radius: 3px;
-      transform: rotate(-38deg);
+    .hang-figure .pd-leg.right {
+      left: calc(50% + 4px); transform: rotate(-16deg);
     }
+    .hang-figure .pd-shoe {
+      position: absolute; bottom: -3px; left: -3px; width: 14px; height: 6px;
+      background: #0a1628; border: 1px solid #e2e8f0;
+      border-radius: 3px 6px 3px 3px;
+    }
+    .hang-figure.dead .pd-arm.left { transform: rotate(48deg); }
+    .hang-figure.dead .pd-arm.right { transform: rotate(-48deg); }
+    .hang-figure.dead .pd-leg.left { transform: rotate(22deg); }
+    .hang-figure.dead .pd-leg.right { transform: rotate(-22deg); }
+
     .hang-word {
+
       display: flex; flex-wrap: wrap; justify-content: center; gap: 0.35rem 0.55rem;
       margin: 0.65rem 0 0.9rem; min-height: 2.4rem;
     }
@@ -6882,21 +6888,25 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
     function hangmanBodyPartsHtml() {
       const wrongN = hangmanState ? hangmanState.wrong.length : 0;
       const show = (n) => wrongN >= n;
-      const lost = hangmanState && hangmanState.status === 'lose';
+      const lost = !!(hangmanState && hangmanState.status === 'lose');
       let headInner = '<span class="fallback-face">' + (lost ? '😵' : '😮') + '</span>';
       if (lost && hangmanState.player) {
         headInner = avatarHtml(hangmanState.player);
+      } else if (show(1) && hangmanState && hangmanState.player) {
+        // optional: show face only on lose; while playing keep emoji
+        headInner = '<span class="fallback-face">😮</span>';
       }
-      // 8 steps: head, torso, L arm, R arm, L leg, R leg, eyes X, dead posture (tilt)
+      // 8 steps matching pro-dance pieces: head, torso, L arm, R arm, L leg, R leg, L shoe, R shoe
+      const cls = 'hang-figure' + (lost ? ' dead' : '');
       return (
-        (show(1) || lost ? '<div class="hang-body-part hang-head' + (lost ? ' dead' : '') + '">' + headInner + '</div>' : '') +
-        (show(2) ? '<div class="hang-body-part hang-torso"></div>' : '') +
-        (show(3) ? '<div class="hang-body-part hang-arm-l"></div>' : '') +
-        (show(4) ? '<div class="hang-body-part hang-arm-r"></div>' : '') +
-        (show(5) ? '<div class="hang-body-part hang-leg-l"></div>' : '') +
-        (show(6) ? '<div class="hang-body-part hang-leg-r"></div>' : '') +
-        (show(7) ? '<div class="hang-body-part hang-foot-l"></div>' : '') +
-        (show(8) || lost ? '<div class="hang-body-part hang-foot-r"></div>' : '')
+        '<div class="' + cls + '">' +
+          (show(1) || lost ? '<div class="pd-head">' + headInner + '</div>' : '') +
+          (show(2) ? '<div class="pd-torso"></div>' : '') +
+          (show(3) ? '<div class="pd-arm left"></div>' : '') +
+          (show(4) ? '<div class="pd-arm right"></div>' : '') +
+          (show(5) ? '<div class="pd-leg left"' + (show(7) ? '><div class="pd-shoe"></div></div>' : '></div>') : '') +
+          (show(6) ? '<div class="pd-leg right"' + (show(8) || lost ? '><div class="pd-shoe"></div></div>' : '></div>') : '') +
+        '</div>'
       );
     }
 
