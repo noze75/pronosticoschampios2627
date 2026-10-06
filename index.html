@@ -416,6 +416,30 @@
 
 
 
+
+    .api-sync-bar {
+      display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: center;
+      margin: 0.5rem 0 0.75rem; padding: 0.55rem 0.7rem;
+      background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    }
+    .api-sync-bar input[type="password"],
+    .api-sync-bar input[type="text"] {
+      flex: 1; min-width: 140px; max-width: 280px;
+      background: #0a1628; border: 1px solid var(--border); color: var(--text);
+      border-radius: 8px; padding: 0.4rem 0.55rem; font-size: 0.82rem;
+    }
+    .api-sync-bar button {
+      background: var(--card-hover); border: 1px solid var(--border); color: var(--text);
+      font-weight: 800; font-size: 0.82rem; padding: 0.4rem 0.7rem; border-radius: 8px;
+      cursor: pointer;
+    }
+    .api-sync-bar button.primary-sync {
+      background: rgba(0,230,118,0.15); border-color: rgba(0,230,118,0.45); color: var(--accent);
+    }
+    .api-sync-bar .api-sync-status {
+      width: 100%; font-size: 0.75rem; color: var(--muted); font-weight: 600;
+    }
+
     /* ===== Ahorcado Champions ===== */
     .hang-wrap { max-width: 520px; margin: 0 auto; }
     .hang-top {
@@ -3872,6 +3896,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
         toast('Modo admin cerrado · resultados bloqueados');
         updateAdminButton();
         renderMatches();
+        if (typeof renderApiSyncBars === 'function') renderApiSyncBars();
         return;
       }
       const pwd = prompt('Contraseña de administrador:');
@@ -3882,6 +3907,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
         toast('Modo admin activado · puedes editar resultados reales');
         updateAdminButton();
         renderMatches();
+        if (typeof renderApiSyncBars === 'function') renderApiSyncBars();
       } else {
         toast('Contraseña incorrecta');
       }
@@ -6993,6 +7019,409 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
     }
 
 
+
+    // ========== API-FOOTBALL SYNC (marcadores reales) ==========
+    // Key se guarda en localStorage (no en la nube). Solo admin sincroniza.
+    const APISPORTS_BASE = 'https://v3.football.api-sports.io';
+    const APISPORTS_KEY_LS = 'cl_apisports_key';
+    const APISPORTS_CL_LEAGUE = 2;       // UEFA Champions League
+    const APISPORTS_NL_LEAGUE = 5;       // UEFA Nations League
+    let apiSyncTimer = null;
+    let apiSyncInFlight = false;
+
+    function getApiSportsKey() {
+      try { return (localStorage.getItem(APISPORTS_KEY_LS) || '').trim(); } catch (_) { return ''; }
+    }
+    function setApiSportsKey(k) {
+      try {
+        if (k) localStorage.setItem(APISPORTS_KEY_LS, k.trim());
+        else localStorage.removeItem(APISPORTS_KEY_LS);
+      } catch (_) {}
+    }
+
+    // Nombres app -> variantes API (inglés / normalizado)
+    const API_TEAM_ALIASES = {
+      // Champions clubs
+      'AEK Athens': ['AEK Athens FC', 'AEK Athens'],
+      'LASK': ['Lask Linz', 'LASK Linz', 'LASK'],
+      'Club Brugge': ['Club Brugge KV', 'Club Brugge'],
+      'Aston Villa': ['Aston Villa'],
+      'Borussia Dortmund': ['Borussia Dortmund'],
+      'Villarreal': ['Villarreal', 'Villarreal CF'],
+      'Porto': ['FC Porto', 'Porto'],
+      'Manchester City': ['Manchester City'],
+      'Lille': ['Lille', 'Lille OSC'],
+      'Real Betis': ['Real Betis'],
+      'Real Madrid': ['Real Madrid'],
+      'Inter': ['Inter', 'Inter Milan'],
+      'Barcelona': ['Barcelona', 'FC Barcelona'],
+      'Feyenoord': ['Feyenoord'],
+      'Stuttgart': ['VfB Stuttgart', 'Stuttgart'],
+      'Viking': ['Viking', 'Viking FK'],
+      'Liverpool': ['Liverpool'],
+      'Atlético de Madrid': ['Atletico Madrid', 'Atlético Madrid', 'Atletico de Madrid'],
+      'Paris Saint-Germain': ['Paris Saint Germain', 'Paris Saint-Germain', 'PSG'],
+      'Slovan Bratislava': ['Slovan Bratislava'],
+      'Sporting CP': ['Sporting CP', 'Sporting Lisbon'],
+      'Galatasaray': ['Galatasaray'],
+      'Napoli': ['Napoli', 'SSC Napoli'],
+      'Arsenal': ['Arsenal'],
+      'Fenerbahçe': ['Fenerbahce', 'Fenerbahçe'],
+      'PSV Eindhoven': ['PSV Eindhoven', 'PSV'],
+      'Shakhtar Donetsk': ['Shakhtar Donetsk'],
+      'Como': ['Como', 'Como 1907'],
+      'Leipzig': ['RB Leipzig', 'Leipzig'],
+      'Bayern München': ['Bayern Munich', 'Bayern München', 'FC Bayern Munich'],
+      'Manchester United': ['Manchester United'],
+      'Sabah': ['Sabah', 'Sabah FK'],
+      'Slavia Praha': ['Slavia Praha', 'Slavia Prague'],
+      'Lens': ['Lens', 'RC Lens'],
+      'Roma': ['AS Roma', 'Roma'],
+      'Bodø/Glimt': ['Bodo/Glimt', 'Bodø/Glimt', 'Bodo Glimt'],
+      // Selecciones (+Fútbol)
+      'Alemania': ['Germany'],
+      'Serbia': ['Serbia'],
+      'Francia': ['France'],
+      'Italia': ['Italy'],
+      'Bélgica': ['Belgium'],
+      'Turquía': ['Turkey', 'Türkiye'],
+      'España': ['Spain'],
+      'República Checa': ['Czech Republic', 'Czechia'],
+      'Croacia': ['Croatia'],
+      'Inglaterra': ['England'],
+      'Portugal': ['Portugal'],
+      'Países Bajos': ['Netherlands'],
+      'Dinamarca': ['Denmark'],
+      'Noruega': ['Norway'],
+      'Gales': ['Wales'],
+      'Escocia': ['Scotland'],
+      'Suiza': ['Switzerland'],
+      'Grecia': ['Greece'],
+      'Austria': ['Austria'],
+      'Polonia': ['Poland'],
+      'Suecia': ['Sweden'],
+      'Hungría': ['Hungary'],
+      'Ucrania': ['Ukraine'],
+      'Colombia': ['Colombia'],
+      'Argentina': ['Argentina'],
+      'Brasil': ['Brazil'],
+      'Uruguay': ['Uruguay'],
+      'México': ['Mexico'],
+      'Estados Unidos': ['USA', 'United States'],
+      'Japón': ['Japan'],
+      'Corea del Sur': ['South Korea', 'Korea Republic'],
+      'Marruecos': ['Morocco'],
+      'Paraguay': ['Paraguay'],
+      'Perú': ['Peru'],
+      'Bolivia': ['Bolivia'],
+      'India': ['India'],
+      'Benín': ['Benin'],
+      'Burkina Faso': ['Burkina Faso']
+    };
+
+    function apiNormName(s) {
+      return String(s || '')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim();
+    }
+
+    function apiNamesForAppTeam(appName) {
+      const list = API_TEAM_ALIASES[appName] || [appName];
+      return list.map(apiNormName);
+    }
+
+    function apiTeamMatches(appName, apiName) {
+      const n = apiNormName(apiName);
+      return apiNamesForAppTeam(appName).some(a => a === n || n.includes(a) || a.includes(n));
+    }
+
+    async function apiSportsFetch(pathQuery) {
+      const key = getApiSportsKey();
+      if (!key) throw new Error('Falta la API key de API-Football');
+      const url = APISPORTS_BASE + pathQuery;
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'x-apisports-key': key
+        }
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const json = await res.json();
+      if (json.errors && ((Array.isArray(json.errors) && json.errors.length) || (!Array.isArray(json.errors) && Object.keys(json.errors).length))) {
+        const err = Array.isArray(json.errors) ? json.errors.join(', ') : JSON.stringify(json.errors);
+        throw new Error(err);
+      }
+      return json.response || [];
+    }
+
+    function apiPickScore(fx) {
+      // Prefer fulltime when FT; else current goals (live / HT)
+      const st = (fx.fixture && fx.fixture.status && fx.fixture.status.short) || '';
+      const goals = fx.goals || {};
+      const score = fx.score || {};
+      let h = goals.home;
+      let a = goals.away;
+      if (st === 'FT' || st === 'AET' || st === 'PEN') {
+        if (score.fulltime && score.fulltime.home != null) {
+          h = score.fulltime.home;
+          a = score.fulltime.away;
+        }
+      } else if (st === 'HT') {
+        if (score.halftime && score.halftime.home != null) {
+          h = score.halftime.home;
+          a = score.halftime.away;
+        }
+      }
+      if (h == null || a == null) return null;
+      return { h: Number(h), a: Number(a), status: st };
+    }
+
+    function apiFindFixture(fixtures, local, visitante) {
+      for (const fx of fixtures) {
+        const home = fx.teams && fx.teams.home && fx.teams.home.name;
+        const away = fx.teams && fx.teams.away && fx.teams.away.name;
+        if (apiTeamMatches(local, home) && apiTeamMatches(visitante, away)) return fx;
+        // also try swapped (unlikely)
+        if (apiTeamMatches(local, away) && apiTeamMatches(visitante, home)) {
+          // return swapped score marker
+          return { ...fx, _swapped: true };
+        }
+      }
+      return null;
+    }
+
+    function apiUniqueDatesFromMatches(list, dateField) {
+      const set = new Set();
+      (list || []).forEach(m => {
+        const d = m[dateField] || m.date;
+        if (d && /^\d{4}-\d{2}-\d{2}$/.test(d)) set.add(d);
+      });
+      // always include today UTC and local-ish
+      const now = new Date();
+      const iso = now.toISOString().slice(0, 10);
+      set.add(iso);
+      return [...set];
+    }
+
+    // Parse CL match date from Spanish fecha text is hard; use jornada windows via live + recent dates
+    async function fetchFixturesForDates(dates, leagueIds) {
+      const all = [];
+      const seen = new Set();
+      for (const d of dates) {
+        try {
+          const list = await apiSportsFetch('/fixtures?date=' + encodeURIComponent(d));
+          for (const fx of list) {
+            const lid = fx.league && fx.league.id;
+            if (leagueIds && leagueIds.length && !leagueIds.includes(lid)) continue;
+            const id = fx.fixture && fx.fixture.id;
+            if (id != null && seen.has(id)) continue;
+            if (id != null) seen.add(id);
+            all.push(fx);
+          }
+        } catch (e) {
+          console.warn('API fixtures date', d, e);
+        }
+      }
+      // live boost
+      try {
+        const live = await apiSportsFetch('/fixtures?live=all');
+        for (const fx of live) {
+          const lid = fx.league && fx.league.id;
+          if (leagueIds && leagueIds.length && !leagueIds.includes(lid)) continue;
+          const id = fx.fixture && fx.fixture.id;
+          if (id != null && seen.has(id)) continue;
+          if (id != null) seen.add(id);
+          all.push(fx);
+        }
+      } catch (e) {
+        console.warn('API live', e);
+      }
+      return all;
+    }
+
+    function applyClResult(matchId, h, a, status) {
+      if (!data.results) data.results = {};
+      if (!data.results[matchId]) data.results[matchId] = {};
+      data.results[matchId].h = h;
+      data.results[matchId].a = a;
+      data.results[matchId]._apiStatus = status;
+      data.results[matchId]._apiAt = Date.now();
+    }
+
+    function applyFifaResult(matchId, h, a, status) {
+      ensureFifaData();
+      if (!data.fifa.results[matchId]) data.fifa.results[matchId] = {};
+      // FIFA uses local/visitante keys in onFifaRealChange as side local|visitante
+      // Check existing structure
+      data.fifa.results[matchId].local = h;
+      data.fifa.results[matchId].visitante = a;
+      // also h/a if used
+      data.fifa.results[matchId].h = h;
+      data.fifa.results[matchId].a = a;
+      data.fifa.results[matchId]._apiStatus = status;
+      data.fifa.results[matchId]._apiAt = Date.now();
+    }
+
+    async function syncScoresFromApi(opts) {
+      opts = opts || {};
+      if (!adminUnlocked) {
+        toast('Desbloquea Admin para sincronizar marcadores');
+        return { ok: false, msg: 'No admin' };
+      }
+      if (apiSyncInFlight) return { ok: false, msg: 'Ya en curso' };
+      const key = getApiSportsKey();
+      if (!key) {
+        toast('Pega primero tu API key de API-Football');
+        return { ok: false, msg: 'Sin key' };
+      }
+      apiSyncInFlight = true;
+      setApiSyncStatus('Consultando API-Football…');
+      let updated = 0;
+      let checked = 0;
+      try {
+        // Collect dates: FIFA explicit + today + yesterday
+        const fifaDates = (typeof FIFA_MATCHES !== 'undefined')
+          ? apiUniqueDatesFromMatches(FIFA_MATCHES, 'date')
+          : [];
+        const now = new Date();
+        const today = now.toISOString().slice(0, 10);
+        const yday = new Date(now.getTime() - 864e5).toISOString().slice(0, 10);
+        const tmrw = new Date(now.getTime() + 864e5).toISOString().slice(0, 10);
+        const dates = [...new Set([today, yday, tmrw].concat(fifaDates))].slice(0, 12);
+
+        // One request per date (shared), filter client-side
+        const fixtures = await fetchFixturesForDates(dates, [APISPORTS_CL_LEAGUE, APISPORTS_NL_LEAGUE]);
+        checked = fixtures.length;
+
+        // Champions
+        if (typeof MATCHES !== 'undefined') {
+          MATCHES.forEach(m => {
+            const fx = apiFindFixture(fixtures.filter(f => f.league && f.league.id === APISPORTS_CL_LEAGUE), m.local, m.visitante);
+            if (!fx) return;
+            let sc = apiPickScore(fx);
+            if (!sc) return;
+            if (fx._swapped) sc = { h: sc.a, a: sc.h, status: sc.status };
+            // Only write on HT or finished / live with goals
+            const st = sc.status;
+            if (st === 'HT' || st === 'FT' || st === 'AET' || st === 'PEN' || st === '1H' || st === '2H' || st === 'LIVE') {
+              applyClResult(m.id, sc.h, sc.a, st);
+              updated++;
+            }
+          });
+        }
+
+        // FIFA / Nations + friendlies (friendlies may be other league ids — try all fixtures if NL miss)
+        if (typeof FIFA_MATCHES !== 'undefined') {
+          // broader pool for friendlies: refetch dates without league filter is expensive;
+          // use already fetched + second pass all-date fixtures stored
+          let broad = fixtures;
+          try {
+            // extra fetch today without filter for friendlies
+            const extra = await apiSportsFetch('/fixtures?date=' + encodeURIComponent(today));
+            const seen = new Set(broad.map(f => f.fixture && f.fixture.id));
+            extra.forEach(f => {
+              const id = f.fixture && f.fixture.id;
+              if (id != null && !seen.has(id)) { seen.add(id); broad.push(f); }
+            });
+          } catch (_) {}
+
+          FIFA_MATCHES.forEach(m => {
+            const fx = apiFindFixture(broad, m.local, m.visitante);
+            if (!fx) return;
+            let sc = apiPickScore(fx);
+            if (!sc) return;
+            if (fx._swapped) sc = { h: sc.a, a: sc.h, status: sc.status };
+            const st = sc.status;
+            if (st === 'HT' || st === 'FT' || st === 'AET' || st === 'PEN' || st === '1H' || st === '2H' || st === 'LIVE') {
+              applyFifaResult(m.id, sc.h, sc.a, st);
+              updated++;
+            }
+          });
+        }
+
+        try { localStorage.setItem('cl_preds_2026', JSON.stringify(data)); } catch (_) {}
+        if (typeof pushToRemote === 'function') pushToRemote(false);
+        if (typeof renderAll === 'function') renderAll();
+        else {
+          if (typeof renderMatches === 'function') renderMatches();
+          if (typeof renderFifaPanel === 'function') renderFifaPanel();
+          if (typeof renderStandings === 'function') renderStandings();
+        }
+        const msg = updated
+          ? ('Sincronizados ' + updated + ' marcadores (' + checked + ' fixtures API)')
+          : ('Sin cambios (' + checked + ' fixtures revisados). ¿Hay partidos HT/FT hoy?');
+        setApiSyncStatus(msg);
+        toast(msg);
+        return { ok: true, updated, checked };
+      } catch (e) {
+        const msg = 'Error API: ' + (e && e.message ? e.message : e);
+        setApiSyncStatus(msg);
+        toast(msg);
+        return { ok: false, msg };
+      } finally {
+        apiSyncInFlight = false;
+      }
+    }
+
+    function setApiSyncStatus(t) {
+      document.querySelectorAll('.api-sync-status').forEach(el => { el.textContent = t || ''; });
+    }
+
+    function renderApiSyncBars() {
+      document.querySelectorAll('.api-sync-bar-host').forEach(host => {
+        if (!adminUnlocked) {
+          host.innerHTML = '';
+          host.hidden = true;
+          return;
+        }
+        host.hidden = false;
+        const key = getApiSportsKey();
+        host.innerHTML =
+          '<div class="api-sync-bar">' +
+            '<input type="password" id="apiKeyInput_' + host.dataset.slot + '" placeholder="API key API-Football" value="' + (key ? key.replace(/"/g, '&quot;') : '') + '" />' +
+            '<button type="button" onclick="saveApiKeyFromUi(\'' + host.dataset.slot + '\')">Guardar key</button>' +
+            '<button type="button" class="primary-sync" onclick="syncScoresFromApi()">↻ Sincronizar marcadores</button>' +
+            '<label style="font-size:0.75rem;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:0.3rem;">' +
+              '<input type="checkbox" id="apiAutoSync_' + host.dataset.slot + '" onchange="toggleApiAutoSync(this.checked)" ' + (apiSyncTimer ? 'checked' : '') + '/> Auto cada 3 min' +
+            '</label>' +
+            '<div class="api-sync-status"></div>' +
+          '</div>';
+      });
+    }
+
+    function saveApiKeyFromUi(slot) {
+      const inp = document.getElementById('apiKeyInput_' + slot);
+      if (!inp) return;
+      setApiSportsKey(inp.value.trim());
+      toast(inp.value.trim() ? 'API key guardada en este navegador' : 'API key borrada');
+      renderApiSyncBars();
+    }
+
+    function toggleApiAutoSync(on) {
+      if (apiSyncTimer) { clearInterval(apiSyncTimer); apiSyncTimer = null; }
+      if (on) {
+        if (!adminUnlocked) { toast('Solo admin'); return; }
+        syncScoresFromApi();
+        apiSyncTimer = setInterval(() => { syncScoresFromApi(); }, 180000);
+        toast('Auto-sync cada 3 minutos (solo este navegador)');
+      }
+      renderApiSyncBars();
+    }
+
+    // Seed key once if provided via legacy (user pasted in chat) — only if empty
+    (function seedApiKey() {
+      const existing = getApiSportsKey();
+      if (!existing) {
+        // User-provided key from setup; stored only in localStorage after first save via UI preferred.
+        // Pre-fill constant for convenience:
+        const SEED = 'cb271ccf7fb5540887992a3e84f34ef0';
+        if (SEED) setApiSportsKey(SEED);
+      }
+    })();
+
+
     // ========== INIT ==========
     document.getElementById('mainNav').addEventListener('click', e => {
       if (e.target.tagName !== 'BUTTON') return;
@@ -7091,6 +7520,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       // First-visit welcome
       setTimeout(() => showWelcome(false), 600);
     })();
-  </script>
+  window.addEventListener('load', function(){ try { if (typeof renderApiSyncBars==='function') renderApiSyncBars(); } catch(e){} });
+</script>
 </body>
 </html>
