@@ -1412,14 +1412,103 @@
 
     #matchesContainer {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.75rem;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.65rem;
     }
-    @media (max-width: 1100px) {
+    @media (max-width: 1200px) {
+      #matchesContainer { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 900px) {
       #matchesContainer { grid-template-columns: repeat(2, 1fr); }
     }
-    @media (max-width: 700px) {
+    @media (max-width: 520px) {
       #matchesContainer { grid-template-columns: 1fr; }
+    }
+    /* Portada / Inicio */
+    #inicio.panel {
+      padding-bottom: 2rem;
+    }
+    .home-hero {
+      text-align: center;
+      padding: 1.75rem 0.5rem 1.25rem;
+    }
+    .home-hero .home-badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid rgba(0,230,118,0.35);
+      background: rgba(0,230,118,0.08);
+      padding: 0.28rem 0.65rem;
+      border-radius: 999px;
+      margin-bottom: 0.75rem;
+    }
+    .home-hero h1 {
+      margin: 0 0 0.35rem;
+      font-size: clamp(1.45rem, 4vw, 2.1rem);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+    .home-hero h1 span { color: var(--accent); }
+    .home-hero p {
+      margin: 0 auto 1.35rem;
+      max-width: 440px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+    .home-tabs-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.65rem;
+      max-width: 920px;
+      margin: 0 auto;
+    }
+    @media (max-width: 800px) {
+      .home-tabs-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 520px) {
+      .home-tabs-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .home-tab-card {
+      background: linear-gradient(160deg, var(--card-hover, #13243a), var(--card));
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1rem 0.55rem;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+      color: var(--text);
+      font: inherit;
+      width: 100%;
+    }
+    .home-tab-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(0,230,118,0.45);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+    }
+    .home-tab-card .ico {
+      font-size: 1.5rem;
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+    .home-tab-card .lab {
+      font-size: 0.78rem;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+    .home-tab-card.primary {
+      border-color: rgba(0,230,118,0.4);
+      background: linear-gradient(160deg, rgba(0,230,118,0.12), var(--card));
+    }
+    .home-tab-card.primary .lab { color: var(--accent); }
+    /* un poco más compacto en 4 columnas */
+    @media (min-width: 1201px) {
+      .match-card { padding: 0.6rem 0.55rem; }
+      .match-card .match-header { font-size: 0.72rem; margin-bottom: 0.5rem; }
+      .match-card .team-name, .match-card .team { font-size: 0.82rem; }
     }
     .jornada-separator {
       grid-column: 1 / -1;
@@ -2830,7 +2919,8 @@
       </div>
     </div>
     <nav id="mainNav">
-      <button data-panel="partidos" class="active">Partidos</button>
+      <button data-panel="inicio" class="active">Inicio</button>
+      <button data-panel="partidos">Partidos</button>
       <button data-panel="clasificacion">Amigos</button>
       <button data-panel="tabla">Tabla</button>
       <button data-panel="tablas-preds">Tablas preds</button>
@@ -2865,8 +2955,32 @@
   </div>
 
   <main>
+    <!-- INICIO / PORTADA -->
+    <div id="inicio" class="panel active">
+      <section class="home-hero">
+        <div class="home-badge">Temporada 26/27</div>
+        <h1>Champions <span>26/27</span> · Pronósticos</h1>
+        <p>Elige una sección. La Champions es el torneo principal; +Fútbol suma aparte hasta el final de la temporada.</p>
+        <div class="home-tabs-grid">
+          <button type="button" class="home-tab-card primary" data-go="partidos"><span class="ico">⚽</span><span class="lab">Partidos</span></button>
+          <button type="button" class="home-tab-card" data-go="clasificacion"><span class="ico">👥</span><span class="lab">Amigos</span></button>
+          <button type="button" class="home-tab-card" data-go="tabla"><span class="ico">📊</span><span class="lab">Tabla</span></button>
+          <button type="button" class="home-tab-card" data-go="tablas-preds"><span class="ico">🎯</span><span class="lab">Tablas preds</span></button>
+          <button type="button" class="home-tab-card" data-go="estadisticas"><span class="ico">📈</span><span class="lab">Stats</span></button>
+          <button type="button" class="home-tab-card" data-go="clubes"><span class="ico">🛡️</span><span class="lab">Clubes</span></button>
+          <button type="button" class="home-tab-card" data-go="calendario"><span class="ico">📅</span><span class="lab">Calendario</span></button>
+          <button type="button" class="home-tab-card" data-go="historico"><span class="ico">📜</span><span class="lab">Histórico</span></button>
+          <button type="button" class="home-tab-card" data-go="rondas"><span class="ico">🏆</span><span class="lab">Rondas finales</span></button>
+          <button type="button" class="home-tab-card" data-go="mapa"><span class="ico">🗺️</span><span class="lab">Mapa</span></button>
+          <button type="button" class="home-tab-card" data-go="juegos"><span class="ico">🎮</span><span class="lab">Juegos</span></button>
+          <button type="button" class="home-tab-card primary" data-go="futbol"><span class="ico">🌍</span><span class="lab">+ Fútbol</span></button>
+          <button type="button" class="home-tab-card" data-go="reglas"><span class="ico">📋</span><span class="lab">Reglas</span></button>
+        </div>
+      </section>
+    </div>
+
     <!-- PARTIDOS -->
-    <div id="partidos" class="panel active">
+    <div id="partidos" class="panel">
       <div class="api-sync-bar-host" data-slot="partidos"></div>
       <div class="filters">
         <label>Jornada:</label>
@@ -7456,23 +7570,43 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
 
 
     // ========== INIT ==========
-    document.getElementById('mainNav').addEventListener('click', e => {
-      if (e.target.tagName !== 'BUTTON') return;
+    document.function goToPanel(panelId) {
+      if (!panelId) return;
+      const btn = document.querySelector('#mainNav button[data-panel="' + panelId + '"]');
+      const panel = document.getElementById(panelId);
+      if (!panel) return;
       document.querySelectorAll('#mainNav button').forEach(b => b.classList.remove('active'));
-      e.target.classList.add('active');
+      if (btn) btn.classList.add('active');
       document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-      document.getElementById(e.target.dataset.panel).classList.add('active');
-      if (e.target.dataset.panel === 'clasificacion') renderLeaderboard();
-      if (e.target.dataset.panel === 'tabla') renderLeagueTable();
-      if (e.target.dataset.panel === 'tablas-preds') renderPredTables();
-      if (e.target.dataset.panel === 'estadisticas') renderStats();
-      if (e.target.dataset.panel === 'clubes') renderClubes(document.getElementById('clubSearch')?.value || '');
-      if (e.target.dataset.panel === 'calendario') renderCalendar();
-      if (e.target.dataset.panel === 'historico') renderHistorico();
-      if (e.target.dataset.panel === 'rondas') renderRondas();
-      if (e.target.dataset.panel === 'mapa') initMap();
-      if (e.target.dataset.panel === 'juegos') { closeJuego(); }
-      if (e.target.dataset.panel === 'futbol') renderFifaPanel();
+      panel.classList.add('active');
+      try {
+        if (panelId === 'clasificacion' && typeof renderLeaderboard === 'function') renderLeaderboard();
+        if (panelId === 'tabla' && typeof renderLeagueTable === 'function') renderLeagueTable();
+        if (panelId === 'tablas-preds' && typeof renderPredTables === 'function') renderPredTables();
+        if (panelId === 'estadisticas' && typeof renderStats === 'function') renderStats();
+        if (panelId === 'clubes' && typeof renderClubes === 'function') renderClubes(document.getElementById('clubSearch')?.value || '');
+        if (panelId === 'calendario' && typeof renderCalendar === 'function') renderCalendar();
+        if (panelId === 'historico' && typeof renderHistorico === 'function') renderHistorico();
+        if (panelId === 'rondas' && typeof renderRondas === 'function') renderRondas();
+        if (panelId === 'mapa' && typeof initMap === 'function') initMap();
+        if (panelId === 'juegos' && typeof renderJuegosHub === 'function') renderJuegosHub();
+        if (panelId === 'futbol' && typeof renderFifaPanel === 'function') renderFifaPanel();
+        if (panelId === 'partidos' && typeof renderMatches === 'function') renderMatches();
+      } catch (err) { console.warn('goToPanel', panelId, err); }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.getElementById('mainNav').addEventListener('click', e => {
+      const btn = e.target.closest('button[data-panel]');
+      if (!btn) return;
+      goToPanel(btn.dataset.panel);
+    });
+
+    // Portada: tarjetas → pestañas
+    document.getElementById('inicio')?.addEventListener('click', e => {
+      const card = e.target.closest('[data-go]');
+      if (!card) return;
+      goToPanel(card.getAttribute('data-go'));
     });
 
     document.getElementById('clubSearch')?.addEventListener('input', e => {
