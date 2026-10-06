@@ -7386,7 +7386,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
             '<button type="button" onclick="saveApiKeyFromUi(\'' + host.dataset.slot + '\')">Guardar key</button>' +
             '<button type="button" class="primary-sync" onclick="syncScoresFromApi()">↻ Sincronizar marcadores</button>' +
             '<label style="font-size:0.75rem;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:0.3rem;">' +
-              '<input type="checkbox" id="apiAutoSync_' + host.dataset.slot + '" onchange="toggleApiAutoSync(this.checked)" ' + (apiSyncTimer ? 'checked' : '') + '/> Auto cada 3 min' +
+              '<input type="checkbox" id="apiAutoSync_' + host.dataset.slot + '" onchange="toggleApiAutoSync(this.checked)" ' + (apiSyncTimer ? 'checked' : '') + '/> Auto cada 20 min' +
             '</label>' +
             '<div class="api-sync-status"></div>' +
           '</div>';
@@ -7406,8 +7406,8 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       if (on) {
         if (!adminUnlocked) { toast('Solo admin'); return; }
         syncScoresFromApi();
-        apiSyncTimer = setInterval(() => { syncScoresFromApi(); }, 180000);
-        toast('Auto-sync cada 3 minutos (solo este navegador)');
+        apiSyncTimer = setInterval(() => { syncScoresFromApi(); }, 1200000);
+        toast('Auto-sync cada 20 minutos (solo este navegador)');
       }
       renderApiSyncBars();
     }
