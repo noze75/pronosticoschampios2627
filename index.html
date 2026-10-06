@@ -3183,8 +3183,8 @@
       <div class="rules" style="margin-bottom:0.75rem;">
         <strong id="fifaWindowTitle">+ Fútbol · Fecha FIFA</strong>
         <span id="fifaWindowDates" style="color:var(--muted)"></span>
-        — Pronósticos de selecciones. Ranking aparte de la Champions.
-        Solo el <strong>admin</strong> carga resultados reales. Elige <strong>Soy</strong> para introducir tus pronósticos.
+        — Ranking <strong>único y acumulativo</strong> (aparte de la Champions). Se suman todas las fechas FIFA hasta que termine la Champions.
+        Solo el <strong>admin</strong> carga resultados reales (o la API). Elige <strong>Soy</strong> para tus pronósticos.
       </div>
       <div id="fifaRankingView"></div>
       <div id="fifaPartidosView"></div>
@@ -6331,12 +6331,15 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
 
 
     // ========== + FÚTBOL · FECHA FIFA (plantilla reutilizable) ==========
-    // Cambia FIFA_WINDOW + FIFA_MATCHES en cada ventana internacional.
+    // +Fútbol: UNA sola tabla acumulativa paralela a la Champions.
+    // Se van añadiendo partidos a FIFA_MATCHES (fechas FIFA, amistosos, etc.).
+    // Los puntos se suman; no se reinicia al cambiar de ventana.
+    // Termina cuando termina la Champions 26/27.
     const FIFA_WINDOW = {
-      id: '2026-sep-oct',
-      name: 'Fecha FIFA · Sep–Oct 2026',
+      id: 'cl-2026-27',
+      name: 'Temporada Champions 26/27',
       from: '2026-09-21',
-      to: '2026-10-06'
+      to: '2027-06-01'
     };
 
     // name -> ISO 3166-1 alpha-2 for flagcdn
@@ -6411,11 +6414,13 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       }
       if (!data.fifa.predictions) data.fifa.predictions = {};
       if (!data.fifa.results) data.fifa.results = {};
-      // Nueva ventana → no mezclar resultados viejos
-      if (data.fifa.windowId && data.fifa.windowId !== FIFA_WINDOW.id) {
-        data.fifa = { predictions: {}, results: {}, windowId: FIFA_WINDOW.id };
+      // Tabla única acumulativa: nunca borrar al añadir partidos / ventanas.
+      // Solo migrar el id de temporada si venía de una versión antigua.
+      if (!data.fifa.windowId) data.fifa.windowId = FIFA_WINDOW.id;
+      else if (data.fifa.windowId !== FIFA_WINDOW.id) {
+        // Mantener predictions/results; solo actualizar etiqueta de temporada
+        data.fifa.windowId = FIFA_WINDOW.id;
       }
-      data.fifa.windowId = FIFA_WINDOW.id;
     }
 
     function fifaFlagHtml(team) {
@@ -7268,18 +7273,20 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
 
     async function syncScoresFromApi(opts) {
       opts = opts || {};
-      if (!adminUnlocked) {
+      const isAuto = !!opts.auto;
+      // Manual solo admin; auto puede correr sin admin
+      if (!isAuto && !adminUnlocked) {
         toast('Desbloquea Admin para sincronizar marcadores');
         return { ok: false, msg: 'No admin' };
       }
       if (apiSyncInFlight) return { ok: false, msg: 'Ya en curso' };
       const key = getApiSportsKey();
       if (!key) {
-        toast('Pega primero tu API key de API-Football');
+        if (!isAuto) toast('Pega primero tu API key de API-Football');
         return { ok: false, msg: 'Sin key' };
       }
       apiSyncInFlight = true;
-      setApiSyncStatus('Consultando API-Football…');
+      if (!isAuto) setApiSyncStatus('Consultando API-Football…');
       let updated = 0;
       let checked = 0;
       try {
@@ -7355,12 +7362,14 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
           ? ('Sincronizados ' + updated + ' marcadores (' + checked + ' fixtures API)')
           : ('Sin cambios (' + checked + ' fixtures revisados). ¿Hay partidos HT/FT hoy?');
         setApiSyncStatus(msg);
-        toast(msg);
+        if (!isAuto) toast(msg);
+        else if (updated) console.log('[api-sync]', msg);
         return { ok: true, updated, checked };
       } catch (e) {
         const msg = 'Error API: ' + (e && e.message ? e.message : e);
         setApiSyncStatus(msg);
-        toast(msg);
+        if (!isAuto) toast(msg);
+        else console.warn('[api-sync]', msg);
         return { ok: false, msg };
       } finally {
         apiSyncInFlight = false;
@@ -7371,7 +7380,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       document.querySelectorAll('.api-sync-status').forEach(el => { el.textContent = t || ''; });
     }
 
-    function renderApiSyncBars() {
+        function renderApiSyncBars() {
       document.querySelectorAll('.api-sync-bar-host').forEach(host => {
         if (!adminUnlocked) {
           host.innerHTML = '';
@@ -7384,14 +7393,13 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
           '<div class="api-sync-bar">' +
             '<input type="password" id="apiKeyInput_' + host.dataset.slot + '" placeholder="API key API-Football" value="' + (key ? key.replace(/"/g, '&quot;') : '') + '" />' +
             '<button type="button" onclick="saveApiKeyFromUi(\'' + host.dataset.slot + '\')">Guardar key</button>' +
-            '<button type="button" class="primary-sync" onclick="syncScoresFromApi()">↻ Sincronizar marcadores</button>' +
-            '<label style="font-size:0.75rem;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:0.3rem;">' +
-              '<input type="checkbox" id="apiAutoSync_' + host.dataset.slot + '" onchange="toggleApiAutoSync(this.checked)" ' + (apiSyncTimer ? 'checked' : '') + '/> Auto cada 20 min' +
-            '</label>' +
+            '<button type="button" class="primary-sync" onclick="syncScoresFromApi()">↻ Sincronizar ahora</button>' +
+            '<span style="font-size:0.75rem;font-weight:700;color:var(--muted);">Auto cada 20 min (siempre activo)</span>' +
             '<div class="api-sync-status"></div>' +
           '</div>';
       });
     }
+
 
     function saveApiKeyFromUi(slot) {
       const inp = document.getElementById('apiKeyInput_' + slot);
@@ -7402,14 +7410,19 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
     }
 
     function toggleApiAutoSync(on) {
-      if (apiSyncTimer) { clearInterval(apiSyncTimer); apiSyncTimer = null; }
+      // El auto de fondo siempre está activo; el checkbox solo fuerza un ciclo extra al activarlo
       if (on) {
-        if (!adminUnlocked) { toast('Solo admin'); return; }
-        syncScoresFromApi();
-        apiSyncTimer = setInterval(() => { syncScoresFromApi(); }, 1200000);
-        toast('Auto-sync cada 20 minutos (solo este navegador)');
+        syncScoresFromApi({ auto: true });
+        toast('Sincronización automática cada 20 min (sin necesidad de Admin)');
       }
       renderApiSyncBars();
+    }
+
+    function startBackgroundApiSync() {
+      if (apiSyncTimer) return;
+      // Primera pasada al cargar (silenciosa), luego cada 20 min
+      setTimeout(function() { syncScoresFromApi({ auto: true }); }, 4000);
+      apiSyncTimer = setInterval(function() { syncScoresFromApi({ auto: true }); }, 1200000);
     }
 
     // Seed key once if provided via legacy (user pasted in chat) — only if empty
@@ -7522,7 +7535,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       // First-visit welcome
       setTimeout(() => showWelcome(false), 600);
     })();
-  window.addEventListener('load', function(){ try { if (typeof renderApiSyncBars==='function') renderApiSyncBars(); } catch(e){} });
+  window.addEventListener('load', function(){ try { if (typeof renderApiSyncBars==='function') renderApiSyncBars(); if (typeof startBackgroundApiSync==='function') startBackgroundApiSync(); } catch(e){} });
 </script>
 </body>
 </html>
