@@ -6354,7 +6354,8 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       'Chile': 'cl', 'Perú': 'pe', 'Bolivia': 'bo', 'Paraguay': 'py',
       'Australia': 'au', 'India': 'in', 'Burkina Faso': 'bf', 'Benín': 'bj',
       'Hungría': 'hu', 'Ucrania': 'ua', 'Polonia': 'pl', 'Suecia': 'se',
-      'Austria': 'at', 'Rumanía': 'ro', 'Georgia': 'ge'
+      'Austria': 'at', 'Rumanía': 'ro', 'Georgia': 'ge',
+      'Singapur': 'sg'
     };
 
     const FIFA_FLAG_EMOJI = {
@@ -6368,7 +6369,8 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       'Chile': '🇨🇱', 'Perú': '🇵🇪', 'Bolivia': '🇧🇴', 'Paraguay': '🇵🇾',
       'Australia': '🇦🇺', 'India': '🇮🇳', 'Burkina Faso': '🇧🇫', 'Benín': '🇧🇯',
       'Hungría': '🇭🇺', 'Ucrania': '🇺🇦', 'Polonia': '🇵🇱', 'Suecia': '🇸🇪',
-      'Austria': '🇦🇹', 'Rumanía': '🇷🇴', 'Georgia': '🇬🇪'
+      'Austria': '🇦🇹', 'Rumanía': '🇷🇴', 'Georgia': '🇬🇪',
+      'Singapur': '🇸🇬'
     };
 
     // ~30 partidos · siempre incluyen COL, ESP, FRA, ING, ITA, BRA, ARG, ALE
@@ -6404,7 +6406,19 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       { id: 'f27', date: '2026-09-26', hora_col: '21:00', local: 'México', visitante: 'Colombia', comp: 'Amistoso' },
       { id: 'f28', date: '2026-10-02', hora_col: '19:00', local: 'Colombia', visitante: 'Paraguay', comp: 'Amistoso' },
       { id: 'f29', date: '2026-10-06', hora_col: '19:00', local: 'Colombia', visitante: 'Perú', comp: 'Amistoso' },
-      { id: 'f30', date: '2026-09-29', hora_col: '07:00', local: 'Japón', visitante: 'Corea del Sur', comp: 'Amistoso' }
+      { id: 'f30', date: '2026-09-29', hora_col: '07:00', local: 'Japón', visitante: 'Corea del Sur', comp: 'Amistoso' },
+      // —— Noviembre 2026 (confirmados) · faltan 5 por anunciar (Argentina×2, Oceanía, Concacaf, África)
+      { id: 'f31', date: '2026-11-12', hora_col: '14:45', local: 'República Checa', visitante: 'España', comp: 'Nations League' },
+      { id: 'f32', date: '2026-11-12', hora_col: '14:45', local: 'Inglaterra', visitante: 'Croacia', comp: 'Nations League' },
+      { id: 'f33', date: '2026-11-12', hora_col: '14:45', local: 'Italia', visitante: 'Francia', comp: 'Nations League' },
+      { id: 'f34', date: '2026-11-13', hora_col: '14:45', local: 'Serbia', visitante: 'Alemania', comp: 'Nations League' },
+      { id: 'f35', date: '2026-11-13', hora_col: '19:00', local: 'Colombia', visitante: 'Chile', comp: 'Amistoso' },
+      { id: 'f36', date: '2026-11-14', hora_col: '05:15', local: 'Japón', visitante: 'Brasil', comp: 'Amistoso' },
+      { id: 'f37', date: '2026-11-15', hora_col: '14:45', local: 'España', visitante: 'Inglaterra', comp: 'Nations League' },
+      { id: 'f38', date: '2026-11-15', hora_col: '14:45', local: 'Francia', visitante: 'Turquía', comp: 'Nations League' },
+      { id: 'f39', date: '2026-11-16', hora_col: '14:45', local: 'Alemania', visitante: 'Países Bajos', comp: 'Nations League' },
+      { id: 'f40', date: '2026-11-17', hora_col: '05:00', local: 'Singapur', visitante: 'Brasil', comp: 'Amistoso' },
+      { id: 'f41', date: '2026-11-17', hora_col: '19:00', local: 'Chile', visitante: 'Colombia', comp: 'Amistoso' },
     ];
     let fifaTeamFilter = '';
 
@@ -7123,7 +7137,11 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       'Bolivia': ['Bolivia'],
       'India': ['India'],
       'Benín': ['Benin'],
-      'Burkina Faso': ['Burkina Faso']
+      'Burkina Faso': ['Burkina Faso'],
+
+      'Chile': ['Chile'],
+      'Singapur': ['Singapore'],
+      'Japón': ['Japan'],
     };
 
     function apiNormName(s) {
