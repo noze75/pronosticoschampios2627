@@ -3060,19 +3060,19 @@
         <h1>Champions <span>26/27</span> · Pronósticos</h1>
         <p>Elige una sección. La Champions es el torneo principal; +Fútbol suma aparte hasta el final de la temporada.</p>
         <div class="home-tabs-grid">
-          <button type="button" class="home-tab-card primary" data-go="partidos"><span class="ico">⚽</span><span class="lab">Partidos</span></button>
-          <button type="button" class="home-tab-card" data-go="clasificacion"><span class="ico">👥</span><span class="lab">Amigos</span></button>
-          <button type="button" class="home-tab-card" data-go="tabla"><span class="ico">📊</span><span class="lab">Tabla</span></button>
-          <button type="button" class="home-tab-card" data-go="tablas-preds"><span class="ico">🎯</span><span class="lab">Tablas preds</span></button>
-          <button type="button" class="home-tab-card" data-go="estadisticas"><span class="ico">📈</span><span class="lab">Stats</span></button>
-          <button type="button" class="home-tab-card" data-go="clubes"><span class="ico">🛡️</span><span class="lab">Clubes</span></button>
-          <button type="button" class="home-tab-card" data-go="calendario"><span class="ico">📅</span><span class="lab">Calendario</span></button>
-          <button type="button" class="home-tab-card" data-go="historico"><span class="ico">📜</span><span class="lab">Histórico</span></button>
-          <button type="button" class="home-tab-card" data-go="rondas"><span class="ico">🏆</span><span class="lab">Rondas finales</span></button>
-          <button type="button" class="home-tab-card" data-go="mapa"><span class="ico">🗺️</span><span class="lab">Mapa</span></button>
-          <button type="button" class="home-tab-card" data-go="juegos"><span class="ico">🎮</span><span class="lab">Juegos</span></button>
-          <button type="button" class="home-tab-card primary" data-go="futbol"><span class="ico">🌍</span><span class="lab">+ Fútbol</span></button>
-          <button type="button" class="home-tab-card" data-go="reglas"><span class="ico">📋</span><span class="lab">Reglas</span></button>
+          <button type="button" class="home-tab-card primary" data-go="partidos" onclick="goToPanel('partidos')" onclick="goToPanel('partidos')"><span class="ico">⚽</span><span class="lab">Partidos</span></button>
+          <button type="button" class="home-tab-card" data-go="clasificacion" onclick="goToPanel('clasificacion')"><span class="ico">👥</span><span class="lab">Amigos</span></button>
+          <button type="button" class="home-tab-card" data-go="tabla" onclick="goToPanel('tabla')"><span class="ico">📊</span><span class="lab">Tabla</span></button>
+          <button type="button" class="home-tab-card" data-go="tablas-preds" onclick="goToPanel('tablas-preds')"><span class="ico">🎯</span><span class="lab">Tablas preds</span></button>
+          <button type="button" class="home-tab-card" data-go="estadisticas" onclick="goToPanel('estadisticas')"><span class="ico">📈</span><span class="lab">Stats</span></button>
+          <button type="button" class="home-tab-card" data-go="clubes" onclick="goToPanel('clubes')"><span class="ico">🛡️</span><span class="lab">Clubes</span></button>
+          <button type="button" class="home-tab-card" data-go="calendario" onclick="goToPanel('calendario')"><span class="ico">📅</span><span class="lab">Calendario</span></button>
+          <button type="button" class="home-tab-card" data-go="historico" onclick="goToPanel('historico')"><span class="ico">📜</span><span class="lab">Histórico</span></button>
+          <button type="button" class="home-tab-card" data-go="rondas" onclick="goToPanel('rondas')"><span class="ico">🏆</span><span class="lab">Rondas finales</span></button>
+          <button type="button" class="home-tab-card" data-go="mapa" onclick="goToPanel('mapa')"><span class="ico">🗺️</span><span class="lab">Mapa</span></button>
+          <button type="button" class="home-tab-card" data-go="juegos" onclick="goToPanel('juegos')"><span class="ico">🎮</span><span class="lab">Juegos</span></button>
+          <button type="button" class="home-tab-card primary" data-go="futbol" onclick="goToPanel('futbol')"><span class="ico">🌍</span><span class="lab">+ Fútbol</span></button>
+          <button type="button" class="home-tab-card" data-go="reglas" onclick="goToPanel('reglas')"><span class="ico">📋</span><span class="lab">Reglas</span></button>
         </div>
       </section>
     </div>
@@ -7668,8 +7668,9 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
 
 
     // ========== INIT ==========
-    document./* boot home-mode */
-    if (document.getElementById('inicio')?.classList.contains('active')) document.body.classList.add('home-mode');
+    if (document.getElementById('inicio')?.classList.contains('active')) {
+      document.body.classList.add('home-mode');
+    }
 
     function goToPanel(panelId) {
       if (!panelId) return;
