@@ -1503,16 +1503,61 @@
       padding-top: 0.45rem;
     }
     .match-card .pred-box {
-      padding: 0.35rem 0.4rem;
+      padding: 0.4rem 0.45rem 0.45rem;
+      background: #0d1a2e;
+      border: 1px solid #2a4a75;
+      border-radius: 8px;
     }
     .match-card .pred-box .name {
-      font-size: 0.68rem;
+      font-size: 0.72rem;
+      font-weight: 800;
+      margin-bottom: 0.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    .match-card .pred-box input[type="number"] {
-      width: 2.15rem;
-      font-size: 0.95rem;
+    .match-card .pred-box .score-inputs.pred-scores {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.25rem;
+      margin-top: 0.1rem;
+    }
+    .match-card .pred-box .score-inputs.pred-scores .score-colon {
+      color: #94a3b8;
       font-weight: 900;
-      padding: 0.22rem 0.15rem;
+      font-size: 1rem;
+    }
+    .match-card .pred-box .score-inputs.pred-scores input[type="number"] {
+      width: 40px;
+      height: 36px;
+      text-align: center;
+      font-size: 1.15rem;
+      font-weight: 900;
+      line-height: 1;
+      padding: 0.15rem;
+      border-radius: 8px;
+      border: 2px solid #3d5a80;
+      background: #152033;
+      color: #f8fafc;
+      -moz-appearance: textfield;
+    }
+    .match-card .pred-box .score-inputs.pred-scores input[type="number"]::-webkit-outer-spin-button,
+    .match-card .pred-box .score-inputs.pred-scores input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .match-card .pred-box .score-inputs.pred-scores input[type="number"]:not(:placeholder-shown) {
+      color: #f8fafc;
+      border-color: #4a6fa5;
+    }
+    .match-card .pred-box.can-edit .score-inputs.pred-scores input[type="number"] {
+      border-color: rgba(0,230,118,0.55);
+      background: #0a1628;
+    }
+    .match-card .pred-box .score-inputs.pred-scores input[type="number"]:disabled {
+      opacity: 1;
+      color: #f8fafc;
     }
     @media (min-width: 1201px) {
       .match-card { padding: 0.65rem 0.6rem; }
@@ -1849,17 +1894,7 @@
       border-color: var(--border);
       background: rgba(255,255,255,0.04);
     }
-    /* Predicciones más grandes */
-    .match-card .pred-box .score-inputs input[type="number"] {
-      width: 2.15rem;
-      font-size: 0.95rem;
-      font-weight: 900;
-      padding: 0.22rem 0.15rem;
-    }
-    .match-card .pred-box .score-inputs span {
-      font-size: 0.9rem;
-      font-weight: 800;
-    }
+
     .real-result {
       display: flex;
       align-items: center;
@@ -4574,12 +4609,12 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
           return `
             <div class="pred-box ${p} ${boxCls}">
               <div class="name">${PLAYER_NAMES[p]} ${badge}</div>
-              <div class="score-inputs">
-                <input type="number" min="0" max="20" data-match="${m.id}" data-player="${p}" data-side="h"
+              <div class="score-inputs pred-scores">
+                <input type="number" min="0" max="20" inputmode="numeric" data-match="${m.id}" data-player="${p}" data-side="h"
                   value="${pred.h != null ? pred.h : ''}" ${canEdit ? '' : 'disabled'}
                   placeholder="-" />
-                <span style="color:var(--muted)">-</span>
-                <input type="number" min="0" max="20" data-match="${m.id}" data-player="${p}" data-side="a"
+                <span class="score-colon">:</span>
+                <input type="number" min="0" max="20" inputmode="numeric" data-match="${m.id}" data-player="${p}" data-side="a"
                   value="${pred.a != null ? pred.a : ''}" ${canEdit ? '' : 'disabled'}
                   placeholder="-" />
               </div>
