@@ -3335,6 +3335,29 @@
         Forma con resultados reales de esta fase de liga (más reciente a la izquierda). G = ganado · E = empate · P = perdido.
       </p>
       <div id="teamFormGrid" class="team-form-grid"></div>
+
+      <h3 class="section-title" style="margin-top:1.5rem;">Puntos posibles por país</h3>
+      <p style="font-size:0.85rem;color:var(--muted);margin:-0.4rem 0 0.75rem;">
+        Partidos con resultado real en los que interviene al menos un club de ese país.
+        Máximo = 2 pts × partidos. % = puntos logrados ÷ máximos.
+      </p>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>País</th>
+              <th>PJ</th>
+              <th>Máx</th>
+              <th>Báez</th>
+              <th>Juan</th>
+              <th>Marrugo</th>
+              <th>Mauricio</th>
+              <th>% grupo</th>
+            </tr>
+          </thead>
+          <tbody id="countryStatsBody"></tbody>
+        </table>
+      </div>
     </div>
 
     <!-- CLUBES -->
@@ -5678,9 +5701,72 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
 
       // Teams table
       renderTeamForm();
+      renderCountryStats();
 
       // Charts
       renderCharts(pStats, ranking);
+    }
+
+
+    function teamCountry(name) {
+      const info = (typeof TEAM_INFO !== 'undefined' && TEAM_INFO[name]) || null;
+      return (info && info.country) ? info.country : 'Otros';
+    }
+
+    function renderCountryStats() {
+      const tbody = document.getElementById('countryStatsBody');
+      if (!tbody) return;
+
+      // país -> lista de match ids (con resultado)
+      const byCountry = {};
+      MATCHES.forEach(m => {
+        const real = data.results[m.id];
+        if (!real || real.h == null || real.a == null) return;
+        const countries = new Set([teamCountry(m.local), teamCountry(m.visitante)]);
+        countries.forEach(c => {
+          if (!byCountry[c]) byCountry[c] = [];
+          byCountry[c].push(m.id);
+        });
+      });
+
+      const rows = Object.keys(byCountry).map(country => {
+        const ids = byCountry[country];
+        const pj = ids.length;
+        const max = pj * 2; // por jugador
+        const pts = {};
+        PLAYERS.forEach(p => { pts[p] = 0; });
+        ids.forEach(id => {
+          const real = data.results[id] || {};
+          const preds = data.predictions[id] || {};
+          PLAYERS.forEach(p => {
+            const pred = preds[p] || {};
+            if (pred.h == null || pred.a == null) return;
+            pts[p] += calcPoints(pred.h, pred.a, real.h, real.a).pts;
+          });
+        });
+        const sum = PLAYERS.reduce((a, p) => a + pts[p], 0);
+        const maxGroup = max * PLAYERS.length;
+        const pctGroup = maxGroup > 0 ? (sum / maxGroup * 100) : 0;
+        return { country, pj, max, pts, sum, pctGroup };
+      }).sort((a, b) => b.pj - a.pj || a.country.localeCompare(b.country));
+
+      const cell = (p, max) => {
+        const v = p;
+        const pct = max > 0 ? (v / max * 100) : 0;
+        const col = pct >= 50 ? 'var(--accent)' : (pct >= 25 ? 'var(--gold, #ffd54f)' : 'var(--muted)');
+        return `<td style="font-weight:800;color:${col}">${v}<span style="font-weight:600;font-size:0.72rem;color:var(--muted);margin-left:0.25rem">${max ? pct.toFixed(0) + '%' : ''}</span></td>`;
+      };
+
+      tbody.innerHTML = rows.length
+        ? rows.map(r => `
+          <tr>
+            <td><strong>${r.country}</strong></td>
+            <td>${r.pj}</td>
+            <td>${r.max}</td>
+            ${PLAYERS.map(p => cell(r.pts[p], r.max)).join('')}
+            <td style="font-weight:900;color:${r.pctGroup >= 50 ? 'var(--accent)' : (r.pctGroup >= 25 ? 'var(--gold, #ffd54f)' : 'var(--muted)')}">${r.pctGroup.toFixed(1)}%</td>
+          </tr>`).join('')
+        : '<tr><td colspan="8" style="text-align:center;color:var(--muted);">Aún no hay resultados cargados</td></tr>';
     }
 
     function getTeamLast5(teamName) {
