@@ -1509,9 +1509,10 @@
       font-size: 0.68rem;
     }
     .match-card .pred-box input[type="number"] {
-      width: 2rem;
-      font-size: 0.78rem;
-      padding: 0.15rem 0.2rem;
+      width: 2.15rem;
+      font-size: 0.95rem;
+      font-weight: 900;
+      padding: 0.22rem 0.15rem;
     }
     @media (min-width: 1201px) {
       .match-card { padding: 0.65rem 0.6rem; }
@@ -1774,13 +1775,105 @@
       padding: 0.12rem 0.4rem;
       border-radius: 5px;
       color: var(--muted);
-      font-weight: 700;
+      font-weight: 800;
     }
-    .pred-box .pts-badge.has-pts { color: var(--accent); background: rgba(0,230,118,0.12); }
+    /* 2 pts = verde */
     .pred-box .pts-badge.exact {
       background: rgba(0,230,118,0.2);
       color: #69f0ae;
-      border: 1px solid rgba(0,230,118,0.35);
+      border: 1px solid rgba(0,230,118,0.4);
+    }
+    /* 1 pt = amarillo */
+    .pred-box .pts-badge.has-pts {
+      color: #ffd54f;
+      background: rgba(255,213,79,0.14);
+      border: 1px solid rgba(255,213,79,0.35);
+    }
+    /* 0 pts = rojo */
+    .pred-box .pts-badge.zero-pts {
+      color: #ff8a80;
+      background: rgba(255,82,82,0.14);
+      border: 1px solid rgba(255,82,82,0.35);
+    }
+
+    /* Equipos izq + marcador real der */
+    .match-main-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.35rem;
+    }
+    .match-main-row .teams {
+      display: flex;
+      flex-direction: column;
+      gap: 0.28rem;
+      min-width: 0;
+      flex: 1;
+      margin-bottom: 0;
+    }
+    .match-main-row .teams .local,
+    .match-main-row .teams .visitante {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      justify-content: flex-start;
+      text-align: left;
+    }
+    .match-main-row .teams .vs { display: none; }
+    .match-main-row .teams .team-name {
+      font-size: 0.78rem;
+      font-weight: 800;
+      line-height: 1.15;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .match-main-row .teams .team-logo {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+      flex-shrink: 0;
+      border-radius: 5px;
+      background: rgba(255,255,255,0.06);
+      padding: 2px;
+    }
+    .match-main-row .real-result {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.2rem;
+      margin-top: 0;
+      padding: 0.4rem 0.45rem;
+      min-width: 72px;
+      flex-shrink: 0;
+    }
+    .match-main-row .real-result label {
+      font-size: 0.62rem;
+      font-weight: 800;
+      margin: 0;
+      color: var(--accent);
+    }
+    .match-main-row .real-result .score-inputs { gap: 0.2rem; }
+    .match-main-row .real-result .score-inputs input {
+      width: 28px;
+      font-size: 0.95rem;
+      font-weight: 900;
+      padding: 0.2rem 0.1rem;
+    }
+    .match-main-row .score-sep { color: #86efac; font-weight: 800; }
+
+    /* Predicciones más grandes */
+    .match-card .pred-box .score-inputs input[type="number"] {
+      width: 2.15rem;
+      font-size: 0.95rem;
+      font-weight: 900;
+      padding: 0.22rem 0.15rem;
+    }
+    .match-card .pred-box .score-inputs span {
+      font-size: 0.9rem;
+      font-weight: 800;
     }
     .real-result {
       display: flex;
@@ -4503,7 +4596,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
           let badge = '';
           if (hasReal && pred.h != null && pred.a != null) {
             const r = calcPoints(pred.h, pred.a, real.h, real.a);
-            const cls = r.exact ? 'exact' : (r.pts > 0 ? 'has-pts' : '');
+            const cls = r.exact || r.pts === 2 ? 'exact' : (r.pts === 1 ? 'has-pts' : 'zero-pts');
             badge = `<span class="pts-badge ${cls}">${r.pts} pts</span>`;
           }
           const boxCls = canEdit ? 'can-edit' : 'locked-edit';
@@ -4528,22 +4621,23 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
               <span class="jornada">J${m.jornada}</span>
               <span>${m.fecha} · ${m.hora_col} COT</span>
             </div>
-            <div class="teams">
-              <div class="local">${teamLogo(m.local)}<span class="team-name">${m.local}</span></div>
-              <div class="vs">VS</div>
-              <div class="visitante">${teamLogo(m.visitante)}<span class="team-name">${m.visitante}</span></div>
-            </div>
-            ${m.notas ? `<div class="note">📌 ${m.notas}</div>` : ''}
-            <div class="real-result${!adminUnlocked ? ' locked' : ''}">
-              <label>Resultado real:${!adminUnlocked ? ' 🔒' : (hasReal ? ' (admin)' : '')}</label>
-              <div class="score-inputs">
-                <input type="number" min="0" max="20" data-match="${m.id}" data-side="real-h"
-                  value="${real.h != null ? real.h : ''}" placeholder="-" ${!adminUnlocked ? 'disabled' : ''} />
-                <span style="color:#86efac">-</span>
-                <input type="number" min="0" max="20" data-match="${m.id}" data-side="real-a"
-                  value="${real.a != null ? real.a : ''}" placeholder="-" ${!adminUnlocked ? 'disabled' : ''} />
+            <div class="match-main-row">
+              <div class="teams">
+                <div class="local">${teamLogo(m.local)}<span class="team-name">${m.local}</span></div>
+                <div class="visitante">${teamLogo(m.visitante)}<span class="team-name">${m.visitante}</span></div>
+              </div>
+              <div class="real-result${!adminUnlocked ? ' locked' : ''}">
+                <label>${!adminUnlocked ? '🔒' : 'Real'}</label>
+                <div class="score-inputs">
+                  <input type="number" min="0" max="20" data-match="${m.id}" data-side="real-h"
+                    value="${real.h != null ? real.h : ''}" placeholder="-" ${!adminUnlocked ? 'disabled' : ''} />
+                  <span class="score-sep">-</span>
+                  <input type="number" min="0" max="20" data-match="${m.id}" data-side="real-a"
+                    value="${real.a != null ? real.a : ''}" placeholder="-" ${!adminUnlocked ? 'disabled' : ''} />
+                </div>
               </div>
             </div>
+            ${m.notas ? `<div class="note">📌 ${m.notas}</div>` : ''}
             <div class="predictions-grid">${predBoxes}</div>
           </div>`;
       });
