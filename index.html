@@ -417,7 +417,8 @@
 
 
 
-    .api-sync-bar {
+    .api-sync-bar, .api-sync-bar-host { display: none !important; }
+    .api-sync-bar-DISABLED {
       display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: center;
       margin: 0.5rem 0 0.75rem; padding: 0.55rem 0.7rem;
       background: var(--card); border: 1px solid var(--border); border-radius: 10px;
@@ -3192,8 +3193,7 @@
 
     <!-- PARTIDOS -->
     <div id="partidos" class="panel">
-      <div class="api-sync-bar-host" data-slot="partidos"></div>
-      <div class="filters">
+            <div class="filters">
         <label>Jornada:</label>
         <select id="filterJornada">
           <option value="all">Todas</option>
@@ -3490,8 +3490,7 @@
 
     <!-- + FÚTBOL (Fecha FIFA) -->
     <div id="futbol" class="panel">
-      <div class="api-sync-bar-host" data-slot="futbol"></div>
-      <div class="rules" style="margin-bottom:0.75rem;">
+            <div class="rules" style="margin-bottom:0.75rem;">
         <strong id="fifaWindowTitle">+ Fútbol · Fecha FIFA</strong>
         <span id="fifaWindowDates" style="color:var(--muted)"></span>
         — Ranking <strong>único y acumulativo</strong> (aparte de la Champions). Se suman todas las fechas FIFA hasta que termine la Champions.
@@ -7463,7 +7462,12 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const json = await res.json();
       if (json.errors && ((Array.isArray(json.errors) && json.errors.length) || (!Array.isArray(json.errors) && Object.keys(json.errors).length))) {
-        const err = Array.isArray(json.errors) ? json.errors.join(', ') : JSON.stringify(json.errors);
+        let err;
+        if (Array.isArray(json.errors)) err = json.errors.join(', ');
+        else if (json.errors.access) err = 'Cuenta API suspendida o sin acceso: ' + json.errors.access;
+        else if (json.errors.token) err = 'API key inválida: ' + json.errors.token;
+        else if (json.errors.requests) err = 'Límite de peticiones: ' + json.errors.requests;
+        else err = JSON.stringify(json.errors);
         throw new Error(err);
       }
       return json.response || [];
@@ -7522,6 +7526,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
     async function fetchFixturesForDates(dates, leagueIds) {
       const all = [];
       const seen = new Set();
+      let lastErr = null;
       for (const d of dates) {
         try {
           const list = await apiSportsFetch('/fixtures?date=' + encodeURIComponent(d));
@@ -7534,6 +7539,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
             all.push(fx);
           }
         } catch (e) {
+          lastErr = e;
           console.warn('API fixtures date', d, e);
         }
       }
@@ -7549,8 +7555,11 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
           all.push(fx);
         }
       } catch (e) {
+        lastErr = e;
         console.warn('API live', e);
       }
+      // Si no hubo fixtures y sí hubo error de API, propagar (cuenta suspendida, key, etc.)
+      if (!all.length && lastErr) throw lastErr;
       return all;
     }
 
@@ -7579,8 +7588,10 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
 
     async function syncScoresFromApi(opts) {
       opts = opts || {};
+      // API desactivada — marcadores manuales con Admin
+      if (!opts.auto) toast('Sincronización API desactivada. Usa Admin para cargar marcadores a mano.');
+      return { ok: false, msg: 'API desactivada' };
       const isAuto = !!opts.auto;
-      // Manual solo admin; auto puede correr sin admin
       if (!isAuto && !adminUnlocked) {
         toast('Desbloquea Admin para sincronizar marcadores');
         return { ok: false, msg: 'No admin' };
@@ -7687,23 +7698,8 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
     }
 
         function renderApiSyncBars() {
-      document.querySelectorAll('.api-sync-bar-host').forEach(host => {
-        if (!adminUnlocked) {
-          host.innerHTML = '';
-          host.hidden = true;
-          return;
-        }
-        host.hidden = false;
-        const key = getApiSportsKey();
-        host.innerHTML =
-          '<div class="api-sync-bar">' +
-            '<input type="password" id="apiKeyInput_' + host.dataset.slot + '" placeholder="API key API-Football" value="' + (key ? key.replace(/"/g, '&quot;') : '') + '" />' +
-            '<button type="button" onclick="saveApiKeyFromUi(\'' + host.dataset.slot + '\')">Guardar key</button>' +
-            '<button type="button" class="primary-sync" onclick="syncScoresFromApi()">↻ Sincronizar ahora</button>' +
-            '<span style="font-size:0.75rem;font-weight:700;color:var(--muted);">Auto cada 20 min (siempre activo)</span>' +
-            '<div class="api-sync-status"></div>' +
-          '</div>';
-      });
+      /* API desactivada: marcadores manuales */
+      document.querySelectorAll('.api-sync-bar-host, .api-sync-bar').forEach(el => { el.innerHTML = ''; el.style.display = 'none'; });
     }
 
 
@@ -7725,22 +7721,12 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
     }
 
     function startBackgroundApiSync() {
-      if (apiSyncTimer) return;
-      // Primera pasada al cargar (silenciosa), luego cada 20 min
-      setTimeout(function() { syncScoresFromApi({ auto: true }); }, 4000);
-      apiSyncTimer = setInterval(function() { syncScoresFromApi({ auto: true }); }, 1200000);
+      /* API desactivada */
+      if (window._apiSyncTimer) { clearInterval(window._apiSyncTimer); window._apiSyncTimer = null; }
     }
 
     // Seed key once if provided via legacy (user pasted in chat) — only if empty
-    (function seedApiKey() {
-      const existing = getApiSportsKey();
-      if (!existing) {
-        // User-provided key from setup; stored only in localStorage after first save via UI preferred.
-        // Pre-fill constant for convenience:
-        const SEED = 'cb271ccf7fb5540887992a3e84f34ef0';
-        if (SEED) setApiSportsKey(SEED);
-      }
-    })();
+    /* seedApiKey eliminado — API desactivada */
 
 
     // ========== INIT ==========
