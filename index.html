@@ -3336,23 +3336,20 @@
       </p>
       <div id="teamFormGrid" class="team-form-grid"></div>
 
-      <h3 class="section-title" style="margin-top:1.5rem;">Puntos posibles por país</h3>
+      <h3 class="section-title" style="margin-top:1.5rem;">Puntos por país (resultados reales)</h3>
       <p style="font-size:0.85rem;color:var(--muted);margin:-0.4rem 0 0.75rem;">
-        Partidos con resultado real en los que interviene al menos un club de ese país.
-        Máximo = 2 pts × partidos. % = puntos logrados ÷ máximos.
+        Suma de los clubes de cada país en la fase de liga. Máx = 3 pts × partidos jugados por esos equipos. % = puntos obtenidos ÷ máximos.
       </p>
       <div style="overflow-x:auto;">
         <table>
           <thead>
             <tr>
               <th>País</th>
+              <th>Equipos</th>
               <th>PJ</th>
+              <th>Pts</th>
               <th>Máx</th>
-              <th>Báez</th>
-              <th>Juan</th>
-              <th>Marrugo</th>
-              <th>Mauricio</th>
-              <th>% grupo</th>
+              <th>%</th>
             </tr>
           </thead>
           <tbody id="countryStatsBody"></tbody>
@@ -5717,56 +5714,53 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       const tbody = document.getElementById('countryStatsBody');
       if (!tbody) return;
 
-      // país -> lista de match ids (con resultado)
-      const byCountry = {};
+      // Acumular PJ y pts de liga por equipo, luego agrupar por país
+      const teamStats = {};
       MATCHES.forEach(m => {
+        [m.local, m.visitante].forEach(t => {
+          if (!teamStats[t]) teamStats[t] = { pj: 0, pts: 0 };
+        });
         const real = data.results[m.id];
         if (!real || real.h == null || real.a == null) return;
-        const countries = new Set([teamCountry(m.local), teamCountry(m.visitante)]);
-        countries.forEach(c => {
-          if (!byCountry[c]) byCountry[c] = [];
-          byCountry[c].push(m.id);
-        });
+        const home = teamStats[m.local];
+        const away = teamStats[m.visitante];
+        home.pj++; away.pj++;
+        if (real.h > real.a) { home.pts += 3; }
+        else if (real.h < real.a) { away.pts += 3; }
+        else { home.pts += 1; away.pts += 1; }
+      });
+
+      const byCountry = {};
+      Object.keys(teamStats).forEach(name => {
+        const c = teamCountry(name);
+        if (!byCountry[c]) byCountry[c] = { teams: 0, pj: 0, pts: 0, names: [] };
+        byCountry[c].teams++;
+        byCountry[c].pj += teamStats[name].pj;
+        byCountry[c].pts += teamStats[name].pts;
+        byCountry[c].names.push(name);
       });
 
       const rows = Object.keys(byCountry).map(country => {
-        const ids = byCountry[country];
-        const pj = ids.length;
-        const max = pj * 2; // por jugador
-        const pts = {};
-        PLAYERS.forEach(p => { pts[p] = 0; });
-        ids.forEach(id => {
-          const real = data.results[id] || {};
-          const preds = data.predictions[id] || {};
-          PLAYERS.forEach(p => {
-            const pred = preds[p] || {};
-            if (pred.h == null || pred.a == null) return;
-            pts[p] += calcPoints(pred.h, pred.a, real.h, real.a).pts;
-          });
-        });
-        const sum = PLAYERS.reduce((a, p) => a + pts[p], 0);
-        const maxGroup = max * PLAYERS.length;
-        const pctGroup = maxGroup > 0 ? (sum / maxGroup * 100) : 0;
-        return { country, pj, max, pts, sum, pctGroup };
-      }).sort((a, b) => b.pj - a.pj || a.country.localeCompare(b.country));
-
-      const cell = (p, max) => {
-        const v = p;
-        const pct = max > 0 ? (v / max * 100) : 0;
-        const col = pct >= 50 ? 'var(--accent)' : (pct >= 25 ? 'var(--gold, #ffd54f)' : 'var(--muted)');
-        return `<td style="font-weight:800;color:${col}">${v}<span style="font-weight:600;font-size:0.72rem;color:var(--muted);margin-left:0.25rem">${max ? pct.toFixed(0) + '%' : ''}</span></td>`;
-      };
+        const r = byCountry[country];
+        const max = r.pj * 3;
+        const pct = max > 0 ? (r.pts / max * 100) : 0;
+        return { country, teams: r.teams, pj: r.pj, pts: r.pts, max, pct };
+      }).filter(r => r.pj > 0)
+        .sort((a, b) => b.pts - a.pts || b.pct - a.pct || a.country.localeCompare(b.country));
 
       tbody.innerHTML = rows.length
-        ? rows.map(r => `
-          <tr>
-            <td><strong>${r.country}</strong></td>
-            <td>${r.pj}</td>
-            <td>${r.max}</td>
-            ${PLAYERS.map(p => cell(r.pts[p], r.max)).join('')}
-            <td style="font-weight:900;color:${r.pctGroup >= 50 ? 'var(--accent)' : (r.pctGroup >= 25 ? 'var(--gold, #ffd54f)' : 'var(--muted)')}">${r.pctGroup.toFixed(1)}%</td>
-          </tr>`).join('')
-        : '<tr><td colspan="8" style="text-align:center;color:var(--muted);">Aún no hay resultados cargados</td></tr>';
+        ? rows.map(r => {
+            const col = r.pct >= 60 ? 'var(--accent)' : (r.pct >= 35 ? 'var(--gold, #ffd54f)' : 'var(--muted)');
+            return `<tr>
+              <td><strong>${r.country}</strong></td>
+              <td>${r.teams}</td>
+              <td>${r.pj}</td>
+              <td style="font-weight:900">${r.pts}</td>
+              <td>${r.max}</td>
+              <td style="font-weight:900;color:${col}">${r.pct.toFixed(1)}%</td>
+            </tr>`;
+          }).join('')
+        : '<tr><td colspan="6" style="text-align:center;color:var(--muted);">Aún no hay resultados cargados</td></tr>';
     }
 
     function getTeamLast5(teamName) {
