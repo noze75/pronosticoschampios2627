@@ -3,6 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#00e676" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="CL 26/27" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
   <title>Pronósticos Champions League 2026/27 – Fase de Liga</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -3075,9 +3082,56 @@
       .actions { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
       .actions button { flex-shrink: 0; }
     }
+  
+    /* Banner instalar app */
+    .pwa-install-banner {
+      position: sticky;
+      top: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.65rem 1rem;
+      background: linear-gradient(90deg, rgba(0,230,118,0.18), rgba(0,230,118,0.08));
+      border-bottom: 1px solid rgba(0,230,118,0.35);
+      color: var(--text);
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+    .pwa-install-banner[hidden] { display: none !important; }
+    .pwa-install-banner .pwa-msg { flex: 1; min-width: 0; }
+    .pwa-install-banner .pwa-msg strong { color: var(--accent); }
+    .pwa-install-banner .pwa-actions { display: flex; gap: 0.4rem; flex-shrink: 0; }
+    .pwa-install-banner button {
+      border: none;
+      border-radius: 8px;
+      padding: 0.4rem 0.7rem;
+      font-weight: 800;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .pwa-install-banner .pwa-btn-install {
+      background: var(--accent);
+      color: #04120a;
+    }
+    .pwa-install-banner .pwa-btn-close {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
   </style>
 </head>
 <body>
+  <div id="pwaInstallBanner" class="pwa-install-banner" hidden>
+    <div class="pwa-msg">📱 <strong>Instala en el celular</strong> — añádela a tu pantalla de inicio para usarla como app.</div>
+    <div class="pwa-actions">
+      <button type="button" class="pwa-btn-install" id="pwaInstallBtn">Instalar</button>
+      <button type="button" class="pwa-btn-close" id="pwaCloseBtn" aria-label="Cerrar">✕</button>
+    </div>
+  </div>
+
   <header>
     <div class="header-top">
       <h1><span class="ball">⚽</span> <span class="brand">Champions 26/27</span> · Pronósticos</h1>
@@ -7934,5 +7988,76 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
     })();
   window.addEventListener('load', function(){ try { if (document.getElementById('inicio')?.classList.contains('active')) document.body.classList.add('home-mode'); if (typeof renderApiSyncBars==='function') renderApiSyncBars(); if (typeof startBackgroundApiSync==='function') startBackgroundApiSync(); } catch(e){} });
 </script>
+
+<script>
+(function () {
+  // Registrar service worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('./sw.js').catch(function (err) {
+        console.warn('SW register failed', err);
+      });
+    });
+  }
+
+  var banner = document.getElementById('pwaInstallBanner');
+  var btnInstall = document.getElementById('pwaInstallBtn');
+  var btnClose = document.getElementById('pwaCloseBtn');
+  if (!banner) return;
+
+  function isStandalone() {
+    return window.matchMedia('(display-mode: standalone)').matches
+      || window.navigator.standalone === true;
+  }
+
+  // Si ya está instalada / modo app, no mostrar
+  if (isStandalone()) {
+    banner.hidden = true;
+    return;
+  }
+
+  // Si el usuario cerró el aviso en esta sesión/dispositivo
+  try {
+    if (localStorage.getItem('pwa_banner_dismissed') === '1') {
+      banner.hidden = true;
+      return;
+    }
+  } catch (e) {}
+
+  banner.hidden = false;
+
+  var deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    banner.hidden = false;
+  });
+
+  if (btnInstall) {
+    btnInstall.addEventListener('click', async function () {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        try { await deferredPrompt.userChoice; } catch (e) {}
+        deferredPrompt = null;
+      } else {
+        // iOS / navegadores sin beforeinstallprompt
+        var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+        var msg = isIOS
+          ? 'En iPhone: botón Compartir → “Añadir a pantalla de inicio”.'
+          : 'En el menú del navegador elige “Instalar app” o “Añadir a pantalla de inicio”.';
+        alert(msg);
+      }
+    });
+  }
+
+  if (btnClose) {
+    btnClose.addEventListener('click', function () {
+      banner.hidden = true;
+      try { localStorage.setItem('pwa_banner_dismissed', '1'); } catch (e) {}
+    });
+  }
+})();
+</script>
+
 </body>
 </html>
