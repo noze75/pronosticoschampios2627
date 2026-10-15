@@ -3489,6 +3489,21 @@
     .lib-bvs { text-align: center; font-size: 0.7rem; font-weight: 800; color: var(--muted); }
     .lib-final-card { border-color: rgba(0,230,118,0.35); }
     .lib-rank-card.lib-rank-full { margin: 0 auto 0.5rem; }
+    .lib-soy-hint {
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin: 0.5rem 0 0.25rem;
+      padding: 0.45rem 0.65rem;
+      border-radius: 8px;
+      background: rgba(255,213,79,0.08);
+      border: 1px solid rgba(255,213,79,0.25);
+    }
+    .lib-soy-hint.ok {
+      background: rgba(0,230,118,0.08);
+      border-color: rgba(0,230,118,0.28);
+      color: var(--text);
+    }
 
   </style>
 </head>
@@ -4733,6 +4748,11 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       closeIdentityMenu();
       renderPersonalBar();
       renderMatches();
+      // Refrescar pestañas Fútbol para habilitar casillas del jugador elegido
+      try {
+        if (typeof renderFifaPanel === 'function') renderFifaPanel();
+        if (typeof renderLibertadoresPanel === 'function') renderLibertadoresPanel();
+      } catch (e) {}
     }
 
     function getTableHitsForPlayer(playerId) {
@@ -8440,6 +8460,9 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       if (!root) return;
       const me = (typeof currentUser === 'function') ? currentUser() : '';
       const admin = !!adminUnlocked;
+      const soyHint = !me
+        ? '<p class="lib-soy-hint">Elige <strong>Soy</strong> (arriba) con tu nombre para poder ingresar marcadores en los partidos pendientes.</p>'
+        : '<p class="lib-soy-hint ok">Pronosticando como <strong style="color:var(--' + me + ')">' + (PLAYER_NAMES[me] || me) + '</strong></p>';
 
       function matchCards(comp) {
         return CONMEBOL_MATCHES.filter(m => m.comp === comp).map(raw => {
@@ -8561,6 +8584,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
 
       root.innerHTML =
         rankTable(null, 'Mini ranking · Libertadores + Suramericana') +
+        soyHint +
         '<div class="lib-dual" style="margin-top:0.85rem">' +
           '<div class="lib-col">' +
             '<h3 class="lib-col-title">🏆 Libertadores</h3>' +
