@@ -3384,6 +3384,31 @@
     .lib-rank-card th { color: var(--muted); font-size: 0.68rem; text-transform: uppercase; }
     .lib-rank-card td.pts { font-weight: 900; color: var(--accent); text-align: right; }
 
+  
+    .lib-dual {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem;
+      align-items: start;
+    }
+    @media (max-width: 800px) {
+      .lib-dual { grid-template-columns: 1fr; }
+    }
+    .lib-col-title {
+      margin: 0 0 0.15rem;
+      font-size: 1rem;
+      font-weight: 900;
+      color: var(--accent);
+    }
+    .lib-col-sub {
+      margin: 0 0 0.55rem;
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .lib-col .lib-match-card { margin-bottom: 0.45rem; }
+    .lib-col .lib-pred-box input { width: 32px; height: 28px; font-size: 0.9rem; }
+
   </style>
 </head>
 <body>
@@ -3486,7 +3511,7 @@
       <section class="home-hero">
         <div class="home-badge">Temporada 26/27</div>
         <h1>Champions <span>26/27</span> · Pronósticos</h1>
-        <p>Elige una sección. La Champions es el torneo principal; +Fútbol suma aparte hasta el final de la temporada.</p>
+        
         <div class="home-tabs-grid">
           <button type="button" class="home-tab-card primary" data-go="futbol" onclick="goToPanel('futbol')"><span class="ico">⚽</span><span class="lab">Fútbol</span></button>
           <button type="button" class="home-tab-card" data-go="clasificacion" onclick="goToPanel('clasificacion')"><span class="ico">👥</span><span class="lab">Amigos</span></button>
@@ -3844,72 +3869,14 @@
       <div id="futbol-sub-libertadores" class="futbol-subpanel">
         <div class="lib-wrap">
           <p class="lib-note">
-            <strong style="color:var(--text)">Copa Libertadores 2026 · Semifinales</strong><br>
-            Pronostica los partidos (misma puntuación: 2 exacto · 1 resultado). La ida Fluminense–Palmeiras ya está <strong>1-2</strong>.
-            Final: <strong>28 nov</strong> · Centenario, Montevideo.
+            <strong style="color:var(--text)">Libertadores y Suramericana 2026 · Semifinales</strong><br>
+            Izquierda <strong>Libertadores</strong> · derecha <strong>Suramericana</strong>.
+            Misma puntuación (2 exacto · 1 resultado). Partidos ya jugados: resultado fijo y <strong>2 pts para todos</strong>.
           </p>
-          <div id="libInteractive" style="margin-bottom:1rem;"></div>
-          <div class="lib-bracket">
-            <div class="lib-semi">
-              <div class="lib-tie">
-                <h4>Semifinal 1</h4>
-                <div class="lib-leg">
-                  <div class="meta">Ida · Mié 14 oct · Maracaná · 19:30 COL</div>
-                  <div class="lib-team"><img class="lib-logo" src="logos/Fluminense.png" alt="" onerror="this.style.display='none'" /><span>Fluminense</span><span class="score">1</span></div>
-                  <div class="lib-team"><img class="lib-logo" src="logos/Palmeiras.png" alt="" onerror="this.style.display='none'" /><span>Palmeiras</span><span class="score">2</span></div>
-                </div>
-                <div class="lib-leg">
-                  <div class="meta">Vuelta · Mié 21 oct · Allianz Parque · 19:30 COL</div>
-                  <div class="lib-team"><img class="lib-logo" src="logos/Palmeiras.png" alt="" onerror="this.style.display='none'" /><span>Palmeiras</span><span class="score empty">—</span></div>
-                  <div class="lib-team"><img class="lib-logo" src="logos/Fluminense.png" alt="" onerror="this.style.display='none'" /><span>Fluminense</span><span class="score empty">—</span></div>
-                </div>
-                <div class="lib-agg">Global: <span>Palmeiras 2-1</span> (ida)</div>
-              </div>
-              <div class="lib-tie">
-                <h4>Semifinal 2</h4>
-                <div class="lib-leg">
-                  <div class="meta">Ida · Jue 15 oct · La Plata · 19:30 COL</div>
-                  <div class="lib-team"><img class="lib-logo" src="logos/Estudiantes.png" alt="" onerror="this.style.display='none'" /><span>Estudiantes</span><span class="score empty">—</span></div>
-                  <div class="lib-team"><img class="lib-logo" src="logos/Flamengo.png" alt="" onerror="this.style.display='none'" /><span>Flamengo</span><span class="score empty">—</span></div>
-                </div>
-                <div class="lib-leg">
-                  <div class="meta">Vuelta · Jue 22 oct · Maracaná · 19:30 COL</div>
-                  <div class="lib-team"><img class="lib-logo" src="logos/Flamengo.png" alt="" onerror="this.style.display='none'" /><span>Flamengo</span><span class="score empty">—</span></div>
-                  <div class="lib-team"><img class="lib-logo" src="logos/Estudiantes.png" alt="" onerror="this.style.display='none'" /><span>Estudiantes</span><span class="score empty">—</span></div>
-                </div>
-                <div class="lib-agg">Global: <span>por definir</span></div>
-              </div>
-            </div>
-            <div class="lib-final-col">
-              <div class="lib-connector">→</div>
-              <div class="lib-final-box">
-                <h4>Final</h4>
-                <div class="date">Sáb 28 nov 2026 · Centenario, Montevideo</div>
-                <div class="slot">Ganador SF1</div>
-                <div style="font-size:0.75rem;color:var(--muted);font-weight:800;">vs</div>
-                <div class="slot">Ganador SF2</div>
-              </div>
-              <div class="lib-connector">←</div>
-            </div>
-            <div class="lib-semi" style="opacity:0.95;">
-              <div class="lib-tie" style="border-color:rgba(0,230,118,0.25);">
-                <h4>Camino a la final</h4>
-                <div class="lib-leg">
-                  <div class="meta">SF1 · Brasil</div>
-                  <div class="lib-team"><img class="lib-logo" src="logos/Fluminense.png" alt="" onerror="this.style.display='none'" /><span>Fluminense</span><span class="score" style="color:var(--muted);font-size:0.75rem;">ida 1</span></div>
-                  <div class="lib-team"><img class="lib-logo" src="logos/Palmeiras.png" alt="" onerror="this.style.display='none'" /><span>Palmeiras</span><span class="score" style="font-size:0.75rem;">ida 2</span></div>
-                </div>
-                <div class="lib-leg">
-                  <div class="meta">SF2 · ARG vs BRA</div>
-                  <div class="lib-team"><img class="lib-logo" src="logos/Estudiantes.png" alt="" onerror="this.style.display='none'" /><span>Estudiantes</span><span class="score empty">—</span></div>
-                  <div class="lib-team"><img class="lib-logo" src="logos/Flamengo.png" alt="" onerror="this.style.display='none'" /><span>Flamengo</span><span class="score empty">—</span></div>
-                </div>
-                <div class="lib-agg">Campeón 2026: <span>por definir</span></div>
-              </div>
-            </div>
-          </div>
+          <div id="libInteractive"></div>
         </div>
-      </div></div>
+      </div>
+    </div>
 
     <!-- REGLAS -->
     <div id="reglas" class="panel">
@@ -4053,7 +4020,11 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       "Estudiantes": "logos/Estudiantes.png",
       "Palmeiras": "logos/Palmeiras.png",
       "Fluminense": "logos/Fluminense.png",
-      "Flamengo": "logos/Flamengo.png"
+      "Flamengo": "logos/Flamengo.png",
+      "Boca": "logos/Boca.png",
+      "Vasco": "logos/Vasco.png",
+      "Atlético Mineiro": "logos/Atlético Mineiro.png",
+      "City Torque": "logos/City Torque.png"
 
     };
 
@@ -8251,33 +8222,44 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
 
     
     
-    const LIBERTADORES_MATCHES = [
-      { id: 'lib_sf1_ida', ronda: 'SF1 Ida', local: 'Fluminense', visitante: 'Palmeiras', fecha: 'Mié 14 oct', hora_col: '19:30', lockedResult: { h: 1, a: 2 } },
-      { id: 'lib_sf1_vuelta', ronda: 'SF1 Vuelta', local: 'Palmeiras', visitante: 'Fluminense', fecha: 'Mié 21 oct', hora_col: '19:30' },
-      { id: 'lib_sf2_ida', ronda: 'SF2 Ida', local: 'Estudiantes', visitante: 'Flamengo', fecha: 'Jue 15 oct', hora_col: '19:30' },
-      { id: 'lib_sf2_vuelta', ronda: 'SF2 Vuelta', local: 'Flamengo', visitante: 'Estudiantes', fecha: 'Jue 22 oct', hora_col: '19:30' }
+    
+    const CONMEBOL_MATCHES = [
+      { id: 'lib_sf1_ida', comp: 'lib', ronda: 'SF1 Ida', local: 'Fluminense', visitante: 'Palmeiras', fecha: 'Mié 14 oct', hora_col: '19:30', result: { h: 1, a: 2 } },
+      { id: 'lib_sf1_vuelta', comp: 'lib', ronda: 'SF1 Vuelta', local: 'Palmeiras', visitante: 'Fluminense', fecha: 'Mié 21 oct', hora_col: '19:30' },
+      { id: 'lib_sf2_ida', comp: 'lib', ronda: 'SF2 Ida', local: 'Estudiantes', visitante: 'Flamengo', fecha: 'Jue 15 oct', hora_col: '19:30' },
+      { id: 'lib_sf2_vuelta', comp: 'lib', ronda: 'SF2 Vuelta', local: 'Flamengo', visitante: 'Estudiantes', fecha: 'Jue 22 oct', hora_col: '19:30' },
+      { id: 'sud_sf1_ida', comp: 'sud', ronda: 'SF1 Ida', local: 'Boca', visitante: 'Vasco', fecha: 'Mar 13 oct', hora_col: '19:30', result: { h: 0, a: 1 } },
+      { id: 'sud_sf1_vuelta', comp: 'sud', ronda: 'SF1 Vuelta', local: 'Vasco', visitante: 'Boca', fecha: 'Mar 20 oct', hora_col: '19:30' },
+      { id: 'sud_sf2_ida', comp: 'sud', ronda: 'SF2 Ida', local: 'Atlético Mineiro', visitante: 'City Torque', fecha: 'Mié 14 oct', hora_col: '17:00', result: { h: 3, a: 0 } },
+      { id: 'sud_sf2_vuelta', comp: 'sud', ronda: 'SF2 Vuelta', local: 'City Torque', visitante: 'Atlético Mineiro', fecha: 'Mié 21 oct', hora_col: '17:00' }
     ];
 
     function ensureLibertadoresData() {
       if (!data.libertadores) data.libertadores = { predictions: {}, results: {} };
       if (!data.libertadores.predictions) data.libertadores.predictions = {};
       if (!data.libertadores.results) data.libertadores.results = {};
-      // Resultado fijo ida SF1
-      if (data.libertadores.results.lib_sf1_ida == null) {
-        data.libertadores.results.lib_sf1_ida = { h: 1, a: 2 };
-      }
+      CONMEBOL_MATCHES.forEach(m => {
+        if (m.result) {
+          data.libertadores.results[m.id] = { h: m.result.h, a: m.result.a };
+          if (!data.libertadores.predictions[m.id]) data.libertadores.predictions[m.id] = {};
+          PLAYERS.forEach(p => {
+            data.libertadores.predictions[m.id][p] = { h: m.result.h, a: m.result.a };
+          });
+        }
+      });
     }
 
-    
     function libLogo(name) {
+      if (typeof LOGO_MAP !== 'undefined' && LOGO_MAP[name]) return LOGO_MAP[name];
       return 'logos/' + name + '.png';
     }
 
-    function getLibRanking() {
+    function getLibRanking(comp) {
       ensureLibertadoresData();
+      const list = CONMEBOL_MATCHES.filter(m => !comp || m.comp === comp);
       const rows = PLAYERS.map(p => {
-        let pts = 0, played = 0, exact = 0;
-        LIBERTADORES_MATCHES.forEach(m => {
+        let pts = 0, exact = 0, played = 0;
+        list.forEach(m => {
           const real = data.libertadores.results[m.id];
           if (!real || real.h == null || real.a == null) return;
           const pred = (data.libertadores.predictions[m.id] || {})[p];
@@ -8287,7 +8269,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
           played++;
           if (d.exact) exact++;
         });
-        return { id: p, name: PLAYER_NAMES[p] || p, pts, played, exact };
+        return { id: p, name: PLAYER_NAMES[p] || p, pts, exact, played };
       });
       rows.sort((a, b) => b.pts - a.pts || b.exact - a.exact || a.name.localeCompare(b.name));
       return rows;
@@ -8300,62 +8282,82 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       const me = (typeof currentUser === 'function') ? currentUser() : '';
       const admin = !!adminUnlocked;
 
-      const matchHtml = LIBERTADORES_MATCHES.map(m => {
-        const real = data.libertadores.results[m.id] || m.lockedResult || null;
-        const hasReal = real && real.h != null && real.a != null;
-        const preds = data.libertadores.predictions[m.id] || {};
-        const boxes = PLAYERS.map(p => {
-          const pred = preds[p] || {};
-          const canEdit = (admin || (me && me === p)) && !hasReal;
-          let ptsHtml = '';
-          if (hasReal && pred.h != null && pred.a != null) {
-            const d = calcPoints(pred.h, pred.a, real.h, real.a);
-            ptsHtml = '<span class="pts-mini' + (d.pts > 0 ? ' ok' : '') + '">' + d.pts + ' pts</span>';
-          }
-          return '<div class="lib-pred-box ' + p + (canEdit ? ' can-edit' : '') + '">' +
-            '<div class="name"><span>' + (PLAYER_NAMES[p] || p) + '</span>' + ptsHtml + '</div>' +
-            '<div class="score-line">' +
-            '<input type="number" min="0" max="20" inputmode="numeric" data-lib-pred="' + m.id + '" data-lib-player="' + p + '" data-side="h" value="' + (pred.h != null ? pred.h : '') + '" ' + (canEdit ? '' : 'disabled') + ' placeholder="-" />' +
-            '<span style="color:#94a3b8;font-weight:900">:</span>' +
-            '<input type="number" min="0" max="20" inputmode="numeric" data-lib-pred="' + m.id + '" data-lib-player="' + p + '" data-side="a" value="' + (pred.a != null ? pred.a : '') + '" ' + (canEdit ? '' : 'disabled') + ' placeholder="-" />' +
-            '</div></div>';
+      function matchCards(comp) {
+        return CONMEBOL_MATCHES.filter(m => m.comp === comp).map(m => {
+          const real = data.libertadores.results[m.id] || null;
+          const hasReal = real && real.h != null && real.a != null;
+          const preds = data.libertadores.predictions[m.id] || {};
+          const boxes = PLAYERS.map(p => {
+            const pred = preds[p] || {};
+            const canEdit = (admin || (me && me === p)) && !hasReal;
+            let ptsHtml = '';
+            if (hasReal && pred.h != null && pred.a != null) {
+              const d = calcPoints(pred.h, pred.a, real.h, real.a);
+              ptsHtml = '<span class="pts-mini' + (d.pts > 0 ? ' ok' : '') + '">' + d.pts + ' pts</span>';
+            }
+            return '<div class="lib-pred-box ' + p + (canEdit ? ' can-edit' : '') + '">' +
+              '<div class="name"><span>' + (PLAYER_NAMES[p] || p) + '</span>' + ptsHtml + '</div>' +
+              '<div class="score-line">' +
+              '<input type="number" min="0" max="20" inputmode="numeric" data-lib-pred="' + m.id + '" data-lib-player="' + p + '" data-side="h" value="' + (pred.h != null ? pred.h : '') + '" ' + (canEdit ? '' : 'disabled') + ' placeholder="-" />' +
+              '<span style="color:#94a3b8;font-weight:900">:</span>' +
+              '<input type="number" min="0" max="20" inputmode="numeric" data-lib-pred="' + m.id + '" data-lib-player="' + p + '" data-side="a" value="' + (pred.a != null ? pred.a : '') + '" ' + (canEdit ? '' : 'disabled') + ' placeholder="-" />' +
+              '</div></div>';
+          }).join('');
+          return '<div class="lib-match-card">' +
+            '<div class="lib-match-head"><strong>' + m.ronda + '</strong><span class="meta">' + m.fecha + ' · ' + m.hora_col + ' COL</span></div>' +
+            '<div class="lib-match-teams">' +
+            '<img src="' + libLogo(m.local) + '" alt="" onerror="this.style.display=\'none\'" />' +
+            '<span>' + m.local + '</span><span style="color:var(--muted);font-size:0.75rem">vs</span>' +
+            '<img src="' + libLogo(m.visitante) + '" alt="" onerror="this.style.display=\'none\'" />' +
+            '<span>' + m.visitante + '</span>' +
+            (hasReal
+              ? '<span class="lib-real-badge">' + real.h + ' : ' + real.a + '</span>'
+              : '<span class="lib-real-badge pending">Pendiente</span>') +
+            '</div>' +
+            '<div class="lib-preds-grid">' + boxes + '</div></div>';
         }).join('');
-        return '<div class="lib-match-card">' +
-          '<div class="lib-match-head"><strong>' + m.ronda + '</strong><span class="meta">' + m.fecha + ' · ' + m.hora_col + ' COL</span></div>' +
-          '<div class="lib-match-teams">' +
-          '<img src="' + libLogo(m.local) + '" alt="" onerror="this.style.display=\'none\'" />' +
-          '<span>' + m.local + '</span><span style="color:var(--muted)">vs</span>' +
-          '<img src="' + libLogo(m.visitante) + '" alt="" onerror="this.style.display=\'none\'" />' +
-          '<span>' + m.visitante + '</span>' +
-          (hasReal
-            ? '<span class="lib-real-badge">' + real.h + ' : ' + real.a + '</span>'
-            : '<span class="lib-real-badge pending">Sin resultado</span>') +
-          '</div>' +
-          '<div class="lib-preds-grid">' + boxes + '</div></div>';
-      }).join('');
-
-      const rank = getLibRanking();
-      const rankHtml = '<div class="lib-rank-card"><h3>Mini ranking Libertadores</h3><table><thead><tr><th>#</th><th>Jugador</th><th>Pts</th><th>Exactos</th></tr></thead><tbody>' +
-        rank.map((r, i) => '<tr><td>' + (i + 1) + '</td><td style="font-weight:800;color:var(--' + r.id + ')">' + r.name + '</td><td class="pts">' + r.pts + '</td><td>' + r.exact + '</td></tr>').join('') +
-        '</tbody></table>' +
-        '<p style="margin:0.55rem 0 0;font-size:0.72rem;color:var(--muted);">Misma puntuación que Champions: 2 exacto · 1 resultado.</p></div>';
-
-      // Admin: cargar resultado en partidos abiertos
-      let adminHtml = '';
-      if (admin) {
-        adminHtml = '<div class="lib-match-card" style="border-color:rgba(255,213,79,0.35);"><strong style="font-size:0.8rem;color:var(--gold)">Admin · cargar resultado</strong>' +
-          LIBERTADORES_MATCHES.filter(m => !(data.libertadores.results[m.id] && data.libertadores.results[m.id].h != null)).map(m =>
-            '<div style="display:flex;flex-wrap:wrap;gap:0.35rem;align-items:center;margin-top:0.4rem;font-size:0.75rem;">' +
-            '<span style="min-width:110px;font-weight:800">' + m.ronda + '</span>' +
-            '<input type="number" min="0" max="20" data-lib-res="' + m.id + '" data-side="h" placeholder="' + m.local.slice(0,3) + '" style="width:48px;text-align:center" />' +
-            '<span>:</span>' +
-            '<input type="number" min="0" max="20" data-lib-res="' + m.id + '" data-side="a" placeholder="' + m.visitante.slice(0,3) + '" style="width:48px;text-align:center" />' +
-            '<button type="button" data-lib-res-save="' + m.id + '" style="padding:0.25rem 0.5rem;border-radius:6px;border:none;background:var(--accent);color:#04120a;font-weight:800;cursor:pointer">Guardar</button>' +
-            '</div>'
-          ).join('') + '</div>';
       }
 
-      root.innerHTML = '<div class="lib-layout"><div class="lib-matches">' + matchHtml + adminHtml + '</div>' + rankHtml + '</div>';
+      function rankTable(comp, title) {
+        const rank = getLibRanking(comp);
+        return '<div class="lib-rank-card" style="position:static;margin-top:0.5rem"><h3>' + title + '</h3><table><thead><tr><th>#</th><th>Jugador</th><th>Pts</th><th>Ex.</th></tr></thead><tbody>' +
+          rank.map((r, i) => '<tr><td>' + (i + 1) + '</td><td style="font-weight:800;color:var(--' + r.id + ')">' + r.name + '</td><td class="pts">' + r.pts + '</td><td>' + r.exact + '</td></tr>').join('') +
+          '</tbody></table></div>';
+      }
+
+      let adminHtml = '';
+      if (admin) {
+        const open = CONMEBOL_MATCHES.filter(m => !(data.libertadores.results[m.id] && data.libertadores.results[m.id].h != null));
+        if (open.length) {
+          adminHtml = '<div class="lib-match-card" style="grid-column:1/-1;border-color:rgba(255,213,79,0.35)"><strong style="font-size:0.8rem;color:var(--gold)">Admin · cargar resultado</strong>' +
+            open.map(m =>
+              '<div style="display:flex;flex-wrap:wrap;gap:0.35rem;align-items:center;margin-top:0.35rem;font-size:0.72rem;">' +
+              '<span style="min-width:130px;font-weight:800">' + (m.comp === 'lib' ? 'LIB' : 'SUD') + ' ' + m.ronda + '</span>' +
+              '<input type="number" min="0" max="20" data-lib-res="' + m.id + '" data-side="h" placeholder="L" style="width:44px;text-align:center" />' +
+              '<span>:</span>' +
+              '<input type="number" min="0" max="20" data-lib-res="' + m.id + '" data-side="a" placeholder="V" style="width:44px;text-align:center" />' +
+              '<button type="button" data-lib-res-save="' + m.id + '" style="padding:0.2rem 0.45rem;border-radius:6px;border:none;background:var(--accent);color:#04120a;font-weight:800;cursor:pointer">OK</button>' +
+              '</div>'
+            ).join('') + '</div>';
+        }
+      }
+
+      root.innerHTML =
+        '<div class="lib-dual">' +
+          '<div class="lib-col">' +
+            '<h3 class="lib-col-title">🏆 Libertadores</h3>' +
+            '<p class="lib-col-sub">Final · 28 nov · Centenario (Montevideo)</p>' +
+            matchCards('lib') +
+            rankTable('lib', 'Mini ranking Libertadores') +
+          '</div>' +
+          '<div class="lib-col">' +
+            '<h3 class="lib-col-title">🌎 Suramericana</h3>' +
+            '<p class="lib-col-sub">Final · 21 nov · Barranquilla</p>' +
+            matchCards('sud') +
+            rankTable('sud', 'Mini ranking Suramericana') +
+          '</div>' +
+          adminHtml +
+        '</div>';
 
       root.querySelectorAll('[data-lib-pred]').forEach(inp => {
         inp.addEventListener('change', onLibPredChange);
@@ -8372,7 +8374,6 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
           ensureLibertadoresData();
           data.libertadores.results[id] = { h, a };
           if (typeof saveData === 'function') saveData();
-          else if (typeof persist === 'function') persist();
           renderLibertadoresPanel();
           toast('Resultado guardado');
         });
@@ -8391,16 +8392,9 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       const val = el.value === '' ? null : parseInt(el.value, 10);
       data.libertadores.predictions[id][user][side] = (val == null || isNaN(val)) ? null : val;
       if (typeof saveData === 'function') saveData();
-      else if (typeof persist === 'function') persist();
-      // refrescar pts del ranking sin perder foco
-      const rank = getLibRanking();
-      const tbody = document.querySelector('#libInteractive .lib-rank-card tbody');
-      if (tbody) {
-        tbody.innerHTML = rank.map((r, i) => '<tr><td>' + (i + 1) + '</td><td style="font-weight:800;color:var(--' + r.id + ')">' + r.name + '</td><td class="pts">' + r.pts + '</td><td>' + r.exact + '</td></tr>').join('');
-      }
     }
 
-    function showFutbolSub(sub) {
+function showFutbolSub(sub) {
       sub = sub || 'champions';
       document.querySelectorAll('#futbolSubnav button').forEach(b => {
         b.classList.toggle('active', b.dataset.futbolSub === sub);
