@@ -3082,51 +3082,190 @@
       .actions { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
       .actions button { flex-shrink: 0; }
     }
+
   
-    /* Banner instalar app */
-    .pwa-install-banner {
-      position: sticky;
-      top: 0;
-      z-index: 9999;
+    /* Subpestañas Fútbol */
+    .futbol-subnav {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-      padding: 0.65rem 1rem;
-      background: linear-gradient(90deg, rgba(0,230,118,0.18), rgba(0,230,118,0.08));
-      border-bottom: 1px solid rgba(0,230,118,0.35);
-      color: var(--text);
-      font-size: 0.88rem;
-      font-weight: 700;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin: 0 0 1rem;
+      padding: 0.35rem;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
     }
-    .pwa-install-banner[hidden] { display: none !important; }
-    .pwa-install-banner .pwa-msg { flex: 1; min-width: 0; }
-    .pwa-install-banner .pwa-msg strong { color: var(--accent); }
-    .pwa-install-banner .pwa-actions { display: flex; gap: 0.4rem; flex-shrink: 0; }
-    .pwa-install-banner button {
-      border: none;
-      border-radius: 8px;
-      padding: 0.4rem 0.7rem;
-      font-weight: 800;
-      font-size: 0.8rem;
-      cursor: pointer;
-    }
-    .pwa-install-banner .pwa-btn-install {
-      background: var(--accent);
-      color: #04120a;
-    }
-    .pwa-install-banner .pwa-btn-close {
+    .futbol-subnav button {
+      flex: 1;
+      min-width: 120px;
+      border: 1px solid transparent;
       background: transparent;
       color: var(--muted);
+      font-weight: 800;
+      font-size: 0.82rem;
+      padding: 0.55rem 0.75rem;
+      border-radius: 9px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .futbol-subnav button:hover {
+      color: var(--text);
+      background: rgba(255,255,255,0.04);
+    }
+    .futbol-subnav button.active {
+      color: #04120a;
+      background: var(--accent);
+      border-color: rgba(0,230,118,0.5);
+    }
+    .futbol-subpanel { display: none; }
+    .futbol-subpanel.active { display: block; }
+    .futbol-placeholder {
+      text-align: center;
+      padding: 2.5rem 1rem;
+      color: var(--muted);
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+      background: rgba(0,0,0,0.15);
+    }
+    .futbol-placeholder strong { color: var(--text); display: block; margin-bottom: 0.35rem; font-size: 1.05rem; }
+
+  
+    /* Llave Copa Libertadores */
+    .lib-wrap { max-width: 980px; margin: 0 auto; }
+    .lib-note {
+      font-size: 0.85rem; color: var(--muted); margin: 0 0 1rem; line-height: 1.4;
+    }
+    .lib-bracket {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 0.75rem 1rem;
+      align-items: center;
+    }
+    @media (max-width: 720px) {
+      .lib-bracket { grid-template-columns: 1fr; }
+      .lib-final-col { order: -1; }
+    }
+    .lib-semi {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .lib-tie {
+      background: var(--card);
       border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 0.75rem 0.85rem;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }
+    .lib-tie h4 {
+      margin: 0 0 0.55rem;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .lib-leg {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.25rem 0.5rem;
+      align-items: center;
+      padding: 0.4rem 0;
+      border-top: 1px dashed var(--border);
+    }
+    .lib-leg:first-of-type { border-top: none; }
+    .lib-leg .meta {
+      grid-column: 1 / -1;
+      font-size: 0.68rem;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 0.15rem;
+    }
+    .lib-logo {
+      width: 26px;
+      height: 26px;
+      object-fit: contain;
+      flex-shrink: 0;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.06);
+    }
+    .lib-team {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-weight: 800;
+      font-size: 0.88rem;
+    }
+    .lib-team span:not(.score) { flex: 1; min-width: 0; }
+    .lib-team .score { margin-left: auto; }
+    .lib-team .score {
+      min-width: 1.4rem;
+      text-align: center;
+      font-weight: 900;
+      color: var(--gold);
+      font-size: 1rem;
+    }
+    .lib-team .score.empty { color: var(--muted); }
+    .lib-agg {
+      margin-top: 0.45rem;
+      padding-top: 0.4rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-align: center;
+      color: var(--text);
+    }
+    .lib-agg span { color: var(--accent); }
+    .lib-final-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      min-width: 160px;
+    }
+    .lib-final-box {
+      width: 100%;
+      background: linear-gradient(160deg, rgba(0,230,118,0.12), var(--card));
+      border: 1px solid rgba(0,230,118,0.4);
+      border-radius: 14px;
+      padding: 1rem 0.85rem;
+      text-align: center;
+    }
+    .lib-final-box h4 {
+      margin: 0 0 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 900;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .lib-final-box .date {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 0.65rem;
+    }
+    .lib-final-box .slot {
+      background: rgba(0,0,0,0.25);
+      border-radius: 8px;
+      padding: 0.45rem 0.5rem;
+      margin: 0.3rem 0;
+      font-weight: 800;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .lib-connector {
+      text-align: center;
+      color: var(--muted);
+      font-size: 1.4rem;
+      font-weight: 900;
+      opacity: 0.5;
     }
 
   </style>
 </head>
 <body>
-  <div id="pwaInstallBanner" class="pwa-install-banner" hidden>
-    <div class="pwa-msg">📱 <strong>Instala en el celular</strong> — añádela a tu pantalla de inicio para usarla como app.</div>
-    <div class="pwa-actions">
+<div class="pwa-actions">
       <button type="button" class="pwa-btn-install" id="pwaInstallBtn">Instalar</button>
       <button type="button" class="pwa-btn-close" id="pwaCloseBtn" aria-label="Cerrar">✕</button>
     </div>
@@ -3186,7 +3325,7 @@
     </div>
     <nav id="mainNav">
       <button data-panel="inicio" class="active">Inicio</button>
-      <button data-panel="partidos">Partidos</button>
+      <button data-panel="futbol">Fútbol</button>
       <button data-panel="clasificacion">Amigos</button>
       <button data-panel="tabla">Tabla</button>
       <button data-panel="tablas-preds">Tablas preds</button>
@@ -3197,7 +3336,6 @@
       <button data-panel="rondas">Rondas finales</button>
       <button data-panel="mapa">Mapa</button>
       <button data-panel="juegos">Juegos</button>
-      <button data-panel="futbol">+ Fútbol</button>
       <button data-panel="reglas">Reglas</button>
     </nav>
   </header>
@@ -3228,7 +3366,7 @@
         <h1>Champions <span>26/27</span> · Pronósticos</h1>
         <p>Elige una sección. La Champions es el torneo principal; +Fútbol suma aparte hasta el final de la temporada.</p>
         <div class="home-tabs-grid">
-          <button type="button" class="home-tab-card primary" data-go="partidos" onclick="goToPanel('partidos')" onclick="goToPanel('partidos')"><span class="ico">⚽</span><span class="lab">Partidos</span></button>
+          <button type="button" class="home-tab-card primary" data-go="futbol" onclick="goToPanel('futbol')"><span class="ico">⚽</span><span class="lab">Fútbol</span></button>
           <button type="button" class="home-tab-card" data-go="clasificacion" onclick="goToPanel('clasificacion')"><span class="ico">👥</span><span class="lab">Amigos</span></button>
           <button type="button" class="home-tab-card" data-go="tabla" onclick="goToPanel('tabla')"><span class="ico">📊</span><span class="lab">Tabla</span></button>
           <button type="button" class="home-tab-card" data-go="tablas-preds" onclick="goToPanel('tablas-preds')"><span class="ico">🎯</span><span class="lab">Tablas preds</span></button>
@@ -3239,36 +3377,12 @@
           <button type="button" class="home-tab-card" data-go="rondas" onclick="goToPanel('rondas')"><span class="ico">🏆</span><span class="lab">Rondas finales</span></button>
           <button type="button" class="home-tab-card" data-go="mapa" onclick="goToPanel('mapa')"><span class="ico">🗺️</span><span class="lab">Mapa</span></button>
           <button type="button" class="home-tab-card" data-go="juegos" onclick="goToPanel('juegos')"><span class="ico">🎮</span><span class="lab">Juegos</span></button>
-          <button type="button" class="home-tab-card primary" data-go="futbol" onclick="goToPanel('futbol')"><span class="ico">🌍</span><span class="lab">+ Fútbol</span></button>
           <button type="button" class="home-tab-card" data-go="reglas" onclick="goToPanel('reglas')"><span class="ico">📋</span><span class="lab">Reglas</span></button>
         </div>
       </section>
     </div>
 
     <!-- PARTIDOS -->
-    <div id="partidos" class="panel">
-            <div class="filters">
-        <label>Jornada:</label>
-        <select id="filterJornada">
-          <option value="all">Todas</option>
-          <option value="1">1 · 8-10 sep 2026</option>
-          <option value="2">2 · 13-14 oct 2026</option>
-          <option value="3">3 · 20-21 oct 2026</option>
-          <option value="4">4 · 3-4 nov 2026</option>
-          <option value="5">5 · 24-25 nov 2026</option>
-          <option value="6">6 · 8-9 dic 2026</option>
-          <option value="7">7 · 19-20 ene 2027</option>
-          <option value="8">8 · 27 ene 2027</option>
-        </select>
-        <label>Buscar equipo:</label>
-        <input type="text" id="filterTeam" placeholder="Ej: Real Madrid..." style="width:160px;" />
-        <label>
-          <input type="checkbox" id="onlyPending" /> Solo pendientes de resultado
-        </label>
-      </div>
-      <div id="matchesContainer"></div>
-    </div>
-
     <!-- CLASIFICACIÓN -->
     <div id="clasificacion" class="panel">
       <div id="rankingStage" class="ranking-stage"></div>
@@ -3563,8 +3677,39 @@
 
 
     <!-- + FÚTBOL (Fecha FIFA) -->
+        <!-- FÚTBOL (hub) -->
     <div id="futbol" class="panel">
-            <div class="rules" style="margin-bottom:0.75rem;">
+      <div class="futbol-subnav" id="futbolSubnav">
+        <button type="button" data-futbol-sub="champions" class="active">Champions</button>
+        <button type="button" data-futbol-sub="fifa">Fecha FIFA</button>
+        <button type="button" data-futbol-sub="libertadores">Copa Libertadores</button>
+      </div>
+
+      <div id="futbol-sub-champions" class="futbol-subpanel active">
+        <div class="filters">
+        <label>Jornada:</label>
+        <select id="filterJornada">
+          <option value="all">Todas</option>
+          <option value="1">1 · 8-10 sep 2026</option>
+          <option value="2">2 · 13-14 oct 2026</option>
+          <option value="3">3 · 20-21 oct 2026</option>
+          <option value="4">4 · 3-4 nov 2026</option>
+          <option value="5">5 · 24-25 nov 2026</option>
+          <option value="6">6 · 8-9 dic 2026</option>
+          <option value="7">7 · 19-20 ene 2027</option>
+          <option value="8">8 · 27 ene 2027</option>
+        </select>
+        <label>Buscar equipo:</label>
+        <input type="text" id="filterTeam" placeholder="Ej: Real Madrid..." style="width:160px;" />
+        <label>
+          <input type="checkbox" id="onlyPending" /> Solo pendientes de resultado
+        </label>
+      </div>
+      <div id="matchesContainer"></div>
+      </div>
+
+      <div id="futbol-sub-fifa" class="futbol-subpanel">
+        <div class="rules" style="margin-bottom:0.75rem;">
         <strong id="fifaWindowTitle">+ Fútbol · Fecha FIFA</strong>
         <span id="fifaWindowDates" style="color:var(--muted)"></span>
         — Ranking <strong>único y acumulativo</strong> (aparte de la Champions). Se suman todas las fechas FIFA hasta que termine la Champions.
@@ -3572,7 +3717,76 @@
       </div>
       <div id="fifaRankingView"></div>
       <div id="fifaPartidosView"></div>
-    </div>
+      </div>
+
+      <div id="futbol-sub-libertadores" class="futbol-subpanel">
+        <div class="lib-wrap">
+          <p class="lib-note">
+            <strong style="color:var(--text)">Copa Libertadores 2026 · Semifinales</strong><br>
+            Ida / vuelta. Final a partido único el <strong>28 nov 2026</strong> en el Estadio Centenario (Montevideo).
+            Resultado fijo de la ida Fluminense–Palmeiras: <strong>1-2</strong>.
+          </p>
+          <div class="lib-bracket">
+            <div class="lib-semi">
+              <div class="lib-tie">
+                <h4>Semifinal 1</h4>
+                <div class="lib-leg">
+                  <div class="meta">Ida · Mié 14 oct · Maracaná · 19:30 COL</div>
+                  <div class="lib-team"><img class="lib-logo" src="logos/Fluminense.png" alt="" onerror="this.style.display='none'" /><span>Fluminense</span><span class="score">1</span></div>
+                  <div class="lib-team"><img class="lib-logo" src="logos/Palmeiras.png" alt="" onerror="this.style.display='none'" /><span>Palmeiras</span><span class="score">2</span></div>
+                </div>
+                <div class="lib-leg">
+                  <div class="meta">Vuelta · Mié 21 oct · Allianz Parque · 19:30 COL</div>
+                  <div class="lib-team"><img class="lib-logo" src="logos/Palmeiras.png" alt="" onerror="this.style.display='none'" /><span>Palmeiras</span><span class="score empty">—</span></div>
+                  <div class="lib-team"><img class="lib-logo" src="logos/Fluminense.png" alt="" onerror="this.style.display='none'" /><span>Fluminense</span><span class="score empty">—</span></div>
+                </div>
+                <div class="lib-agg">Global: <span>Palmeiras 2-1</span> (ida)</div>
+              </div>
+              <div class="lib-tie">
+                <h4>Semifinal 2</h4>
+                <div class="lib-leg">
+                  <div class="meta">Ida · Jue 15 oct · La Plata · 19:30 COL</div>
+                  <div class="lib-team"><img class="lib-logo" src="logos/Estudiantes.png" alt="" onerror="this.style.display='none'" /><span>Estudiantes</span><span class="score empty">—</span></div>
+                  <div class="lib-team"><img class="lib-logo" src="logos/Flamengo.png" alt="" onerror="this.style.display='none'" /><span>Flamengo</span><span class="score empty">—</span></div>
+                </div>
+                <div class="lib-leg">
+                  <div class="meta">Vuelta · Jue 22 oct · Maracaná · 19:30 COL</div>
+                  <div class="lib-team"><img class="lib-logo" src="logos/Flamengo.png" alt="" onerror="this.style.display='none'" /><span>Flamengo</span><span class="score empty">—</span></div>
+                  <div class="lib-team"><img class="lib-logo" src="logos/Estudiantes.png" alt="" onerror="this.style.display='none'" /><span>Estudiantes</span><span class="score empty">—</span></div>
+                </div>
+                <div class="lib-agg">Global: <span>por definir</span></div>
+              </div>
+            </div>
+            <div class="lib-final-col">
+              <div class="lib-connector">→</div>
+              <div class="lib-final-box">
+                <h4>Final</h4>
+                <div class="date">Sáb 28 nov 2026 · Centenario, Montevideo</div>
+                <div class="slot">Ganador SF1</div>
+                <div style="font-size:0.75rem;color:var(--muted);font-weight:800;">vs</div>
+                <div class="slot">Ganador SF2</div>
+              </div>
+              <div class="lib-connector">←</div>
+            </div>
+            <div class="lib-semi" style="opacity:0.95;">
+              <div class="lib-tie" style="border-color:rgba(0,230,118,0.25);">
+                <h4>Camino a la final</h4>
+                <div class="lib-leg">
+                  <div class="meta">SF1 · Brasil</div>
+                  <div class="lib-team"><img class="lib-logo" src="logos/Fluminense.png" alt="" onerror="this.style.display='none'" /><span>Fluminense</span><span class="score" style="color:var(--muted);font-size:0.75rem;">ida 1</span></div>
+                  <div class="lib-team"><img class="lib-logo" src="logos/Palmeiras.png" alt="" onerror="this.style.display='none'" /><span>Palmeiras</span><span class="score" style="font-size:0.75rem;">ida 2</span></div>
+                </div>
+                <div class="lib-leg">
+                  <div class="meta">SF2 · ARG vs BRA</div>
+                  <div class="lib-team"><img class="lib-logo" src="logos/Estudiantes.png" alt="" onerror="this.style.display='none'" /><span>Estudiantes</span><span class="score empty">—</span></div>
+                  <div class="lib-team"><img class="lib-logo" src="logos/Flamengo.png" alt="" onerror="this.style.display='none'" /><span>Flamengo</span><span class="score empty">—</span></div>
+                </div>
+                <div class="lib-agg">Campeón 2026: <span>por definir</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div></div>
 
     <!-- REGLAS -->
     <div id="reglas" class="panel">
@@ -3712,7 +3926,12 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       "Slavia Praha": "logos/Slavia Praha.png",
       "Lens": "logos/Lens.png",
       "Roma": "logos/Roma.png",
-      "Bodø/Glimt": "logos/Bodo Glimt.png"
+      "Bodø/Glimt": "logos/Bodo Glimt.png",
+      "Estudiantes": "logos/Estudiantes.png",
+      "Palmeiras": "logos/Palmeiras.png",
+      "Fluminense": "logos/Fluminense.png",
+      "Flamengo": "logos/Flamengo.png"
+
     };
 
     // Approximate stadium / city coordinates [lat, lng]
@@ -7870,6 +8089,8 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
 
     function goToPanel(panelId) {
       if (!panelId) return;
+      // Compatibilidad: antigua pestaña Partidos → Fútbol
+      if (panelId === 'partidos') panelId = 'futbol';
       const btn = document.querySelector('#mainNav button[data-panel="' + panelId + '"]');
       const panel = document.getElementById(panelId);
       if (!panel) return;
@@ -7889,11 +8110,39 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
         if (panelId === 'rondas' && typeof renderRondas === 'function') renderRondas();
         if (panelId === 'mapa' && typeof initMap === 'function') initMap();
         if (panelId === 'juegos' && typeof renderJuegosHub === 'function') renderJuegosHub();
-        if (panelId === 'futbol' && typeof renderFifaPanel === 'function') renderFifaPanel();
-        if (panelId === 'partidos' && typeof renderMatches === 'function') renderMatches();
+        if (panelId === 'futbol') {
+          const sub = document.querySelector('#futbolSubnav button.active')?.dataset?.futbolSub || 'champions';
+          if (typeof showFutbolSub === 'function') showFutbolSub(sub);
+          else {
+            if (typeof renderMatches === 'function') renderMatches();
+            if (typeof renderFifaPanel === 'function') renderFifaPanel();
+          }
+        }
+
       } catch (err) { console.warn('goToPanel', panelId, err); }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
+    
+    function showFutbolSub(sub) {
+      sub = sub || 'champions';
+      document.querySelectorAll('#futbolSubnav button').forEach(b => {
+        b.classList.toggle('active', b.dataset.futbolSub === sub);
+      });
+      document.querySelectorAll('.futbol-subpanel').forEach(p => p.classList.remove('active'));
+      const panel = document.getElementById('futbol-sub-' + sub);
+      if (panel) panel.classList.add('active');
+      try {
+        if (sub === 'champions' && typeof renderMatches === 'function') renderMatches();
+        if (sub === 'fifa' && typeof renderFifaPanel === 'function') renderFifaPanel();
+      } catch (e) { console.warn('showFutbolSub', e); }
+    }
+
+    document.getElementById('futbolSubnav')?.addEventListener('click', e => {
+      const btn = e.target.closest('button[data-futbol-sub]');
+      if (!btn) return;
+      showFutbolSub(btn.dataset.futbolSub);
+    });
 
     document.getElementById('mainNav').addEventListener('click', e => {
       const btn = e.target.closest('button[data-panel]');
@@ -7988,76 +8237,5 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
     })();
   window.addEventListener('load', function(){ try { if (document.getElementById('inicio')?.classList.contains('active')) document.body.classList.add('home-mode'); if (typeof renderApiSyncBars==='function') renderApiSyncBars(); if (typeof startBackgroundApiSync==='function') startBackgroundApiSync(); } catch(e){} });
 </script>
-
-<script>
-(function () {
-  // Registrar service worker
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function () {
-      navigator.serviceWorker.register('./sw.js').catch(function (err) {
-        console.warn('SW register failed', err);
-      });
-    });
-  }
-
-  var banner = document.getElementById('pwaInstallBanner');
-  var btnInstall = document.getElementById('pwaInstallBtn');
-  var btnClose = document.getElementById('pwaCloseBtn');
-  if (!banner) return;
-
-  function isStandalone() {
-    return window.matchMedia('(display-mode: standalone)').matches
-      || window.navigator.standalone === true;
-  }
-
-  // Si ya está instalada / modo app, no mostrar
-  if (isStandalone()) {
-    banner.hidden = true;
-    return;
-  }
-
-  // Si el usuario cerró el aviso en esta sesión/dispositivo
-  try {
-    if (localStorage.getItem('pwa_banner_dismissed') === '1') {
-      banner.hidden = true;
-      return;
-    }
-  } catch (e) {}
-
-  banner.hidden = false;
-
-  var deferredPrompt = null;
-  window.addEventListener('beforeinstallprompt', function (e) {
-    e.preventDefault();
-    deferredPrompt = e;
-    banner.hidden = false;
-  });
-
-  if (btnInstall) {
-    btnInstall.addEventListener('click', async function () {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        try { await deferredPrompt.userChoice; } catch (e) {}
-        deferredPrompt = null;
-      } else {
-        // iOS / navegadores sin beforeinstallprompt
-        var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-        var msg = isIOS
-          ? 'En iPhone: botón Compartir → “Añadir a pantalla de inicio”.'
-          : 'En el menú del navegador elige “Instalar app” o “Añadir a pantalla de inicio”.';
-        alert(msg);
-      }
-    });
-  }
-
-  if (btnClose) {
-    btnClose.addEventListener('click', function () {
-      banner.hidden = true;
-      try { localStorage.setItem('pwa_banner_dismissed', '1'); } catch (e) {}
-    });
-  }
-})();
-</script>
-
 </body>
 </html>
