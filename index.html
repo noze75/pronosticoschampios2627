@@ -3418,9 +3418,38 @@
     }
     .lib-col .lib-match-card { margin-bottom: 0.45rem; }
     .lib-col .lib-pred-box input { width: 26px; height: 24px; font-size: 0.8rem; }
-    .lib-dual + .lib-rank-card {
-      margin-top: 0.75rem;
-      max-width: 420px;
+    .lib-rank-card.lib-rank-full {
+      margin: 1rem auto 0;
+      max-width: 920px;
+      width: 100%;
+    }
+    .lib-rank-card.lib-rank-full h3 {
+      text-align: center;
+    }
+    .lib-rank-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    .lib-rank-table th,
+    .lib-rank-table td {
+      padding: 0.45rem 0.5rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .lib-rank-table th:nth-child(2),
+    .lib-rank-table td:nth-child(2) {
+      text-align: left;
+    }
+    .lib-rank-table th {
+      color: var(--muted);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .lib-rank-table td.pts {
+      font-weight: 900;
+      color: var(--accent);
     }
 
   </style>
@@ -4031,14 +4060,14 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       "Lens": "logos/Lens.png",
       "Roma": "logos/Roma.png",
       "Bodø/Glimt": "logos/Bodo Glimt.png",
-      "Estudiantes": "logos/Estudiantes.png",
-      "Palmeiras": "logos/Palmeiras.png",
-      "Fluminense": "logos/Fluminense.png",
-      "Flamengo": "logos/Flamengo.png",
-      "Boca": "logos/Boca.png",
-      "Vasco": "logos/Vasco.png",
-      "Atlético Mineiro": "logos/Atlético Mineiro.png",
-      "City Torque": "logos/City Torque.png"
+      "Estudiantes": "logos/estudiantes.png",
+      "Palmeiras": "logos/palmeiras.png",
+      "Fluminense": "logos/fluminense.png",
+      "Flamengo": "logos/flamengo.png",
+      "Boca": "logos/boca.png",
+      "Vasco": "logos/vasco.png",
+      "Atlético Mineiro": "logos/atletico-mineiro.png",
+      "City Torque": "logos/city-torque.png"
 
     };
 
@@ -8276,14 +8305,20 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
 
     function libLogo(name) {
       if (typeof LOGO_MAP !== 'undefined' && LOGO_MAP[name]) return LOGO_MAP[name];
-      return 'logos/' + name + '.png';
+      // GitHub Pages es case-sensitive: preferir minúsculas
+      const slug = String(name || '')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9.-]/g, '');
+      return 'logos/' + slug + '.png';
     }
 
     function getLibRanking(comp) {
       ensureLibertadoresData();
       const list = CONMEBOL_MATCHES.filter(m => !comp || m.comp === comp);
       const rows = PLAYERS.map(p => {
-        let pts = 0, exact = 0, played = 0;
+        let pts = 0, exact = 0, resultOnly = 0, goalsHit = 0, played = 0;
         list.forEach(m => {
           const real = data.libertadores.results[m.id];
           if (!real || real.h == null || real.a == null) return;
@@ -8293,10 +8328,14 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
           pts += d.pts;
           played++;
           if (d.exact) exact++;
+          else if (d.result) resultOnly++;
+          goalsHit += (d.goalsHit || 0);
         });
-        return { id: p, name: PLAYER_NAMES[p] || p, pts, exact, played };
+        const maxPts = played * 2;
+        const pct = maxPts > 0 ? (pts / maxPts * 100) : 0;
+        return { id: p, name: PLAYER_NAMES[p] || p, pts, exact, resultOnly, goalsHit, played, pct };
       });
-      rows.sort((a, b) => b.pts - a.pts || b.exact - a.exact || a.name.localeCompare(b.name));
+      rows.sort((a, b) => b.pts - a.pts || b.goalsHit - a.goalsHit || b.exact - a.exact || a.name.localeCompare(b.name));
       return rows;
     }
 
@@ -8345,9 +8384,29 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
 
       function rankTable(comp, title) {
         const rank = getLibRanking(comp);
-        return '<div class="lib-rank-card" style="position:static;margin-top:0.75rem"><h3>' + title + '</h3><table><thead><tr><th>#</th><th>Jugador</th><th>Pts</th><th>Ex.</th></tr></thead><tbody>' +
-          rank.map((r, i) => '<tr><td>' + (i + 1) + '</td><td style="font-weight:800;color:var(--' + r.id + ')">' + r.name + '</td><td class="pts">' + r.pts + '</td><td>' + r.exact + '</td></tr>').join('') +
-          '</tbody></table></div>';
+        return '<div class="lib-rank-card lib-rank-full">' +
+          '<h3>' + title + '</h3>' +
+          '<div style="overflow-x:auto">' +
+          '<table class="lib-rank-table">' +
+          '<thead><tr>' +
+          '<th>#</th><th>Jugador</th><th>Pts</th><th>Exactos (2pts)</th><th>Resultado (1pt)</th>' +
+          '<th>Goles acertados</th><th>Partidos jugados</th><th>% Aciertos*</th>' +
+          '</tr></thead><tbody>' +
+          rank.map((r, i) =>
+            '<tr>' +
+            '<td>' + (i + 1) + '</td>' +
+            '<td style="font-weight:800;color:var(--' + r.id + ')">' + r.name + '</td>' +
+            '<td class="pts">' + r.pts + '</td>' +
+            '<td>' + r.exact + '</td>' +
+            '<td>' + r.resultOnly + '</td>' +
+            '<td>' + r.goalsHit + '</td>' +
+            '<td>' + r.played + '</td>' +
+            '<td>' + r.pct.toFixed(1) + '%</td>' +
+            '</tr>'
+          ).join('') +
+          '</tbody></table></div>' +
+          '<p style="margin:0.5rem 0 0;font-size:0.75rem;color:var(--muted)">* % Aciertos = (puntos / máximos posibles) × 100. Máximo por partido = 2 pts.</p>' +
+          '</div>';
       }
 
       let adminHtml = '';
