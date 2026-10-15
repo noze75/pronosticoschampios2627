@@ -3505,6 +3505,65 @@
       color: var(--text);
     }
 
+  
+    .fifa-teams-scores {
+      display: flex;
+      flex-direction: column;
+      gap: 0.28rem;
+      margin: 0.35rem 0 0.45rem;
+    }
+    .fifa-team-score-row {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      min-width: 0;
+    }
+    .fifa-team-left {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      min-width: 0;
+      flex: 1;
+    }
+    .fifa-team-name {
+      font-size: 0.82rem;
+      font-weight: 800;
+      line-height: 1.15;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .fifa-side-score {
+      width: 2.1rem;
+      height: 1.85rem;
+      text-align: center;
+      font-weight: 900;
+      font-size: 0.95rem;
+      border-radius: 8px;
+      border: 1.5px solid rgba(0,230,118,0.45);
+      background: rgba(0,230,118,0.1);
+      color: var(--accent);
+      padding: 0;
+      -moz-appearance: textfield;
+      flex-shrink: 0;
+    }
+    .fifa-side-score::-webkit-outer-spin-button,
+    .fifa-side-score::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .fifa-side-score:disabled {
+      opacity: 1;
+      color: var(--accent);
+      -webkit-text-fill-color: var(--accent);
+      border-color: rgba(0,230,118,0.35);
+      background: rgba(0,230,118,0.08);
+      cursor: default;
+    }
+    .fifa-side-score:not(:disabled) {
+      border-color: var(--gold);
+      color: var(--text);
+      -webkit-text-fill-color: var(--text);
+      background: #0a1628;
+    }
+
   </style>
 </head>
 <body>
@@ -4475,16 +4534,16 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
         const res = await fetchWithTimeout(API_URL + '?t=' + Date.now());
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const remote = await res.json();
-        if (remote && typeof remote === 'object' && (remote.predictions || remote.results || remote.trivia)) {
+        if (remote && typeof remote === 'object' && (remote.predictions || remote.results || remote.trivia || remote.fifa || remote.libertadores)) {
           data = {
-            predictions: remote.predictions || data.predictions || {},
-            results: remote.results || data.results || {},
+            predictions: mergeMatchPlayerMaps(data.predictions, remote.predictions),
+            results: mergeResultsMaps(data.results, remote.results),
             trivia: mergeTriviaMaps(data.trivia || {}, remote.trivia || {}),
             logoRace: mergeLogoRaceMaps(data.logoRace || {}, remote.logoRace || {}),
-            fifa: remote.fifa || data.fifa || { predictions: {}, results: {}, windowId: null },
-              libertadores: remote.libertadores || data.libertadores || { predictions: {}, results: {} },
-            updatedAt: remote.updatedAt || null,
-            updatedBy: remote.updatedBy || null
+            fifa: mergeFifaBlock(data.fifa, remote.fifa),
+            libertadores: mergeLibBlock(data.libertadores, remote.libertadores),
+            updatedAt: remote.updatedAt || data.updatedAt || null,
+            updatedBy: remote.updatedBy || data.updatedBy || null
           };
           lastKnownUpdatedAt = data.updatedAt;
           try { localStorage.setItem('cl_preds_2026', JSON.stringify(data)); } catch(_) {}
@@ -4517,6 +4576,55 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       }
     }
 
+
+    /** Fusiona pronósticos por partido/jugador sin borrar lo del otro dispositivo */
+    function mergeMatchPlayerMaps(a, b) {
+      const out = {};
+      const ids = new Set([
+        ...Object.keys(a || {}),
+        ...Object.keys(b || {})
+      ]);
+      ids.forEach(mid => {
+        const pa = (a && a[mid]) || {};
+        const pb = (b && b[mid]) || {};
+        const players = new Set([...Object.keys(pa), ...Object.keys(pb)]);
+        const slot = {};
+        players.forEach(p => {
+          const xa = pa[p] || {};
+          const xb = pb[p] || {};
+          const h = (xb.h != null && xb.h !== '') ? xb.h : ((xa.h != null && xa.h !== '') ? xa.h : null);
+          const av = (xb.a != null && xb.a !== '') ? xb.a : ((xa.a != null && xa.a !== '') ? xa.a : null);
+          if (h != null || av != null) slot[p] = { h, a: av };
+        });
+        if (Object.keys(slot).length) out[mid] = slot;
+      });
+      return out;
+    }
+
+    function mergeResultsMaps(a, b) {
+      // Unión; si ambos tienen el partido, gana b (remoto al hacer pull)
+      return Object.assign({}, a || {}, b || {});
+    }
+
+    function mergeFifaBlock(local, remote) {
+      const L = local || {};
+      const R = remote || {};
+      return {
+        predictions: mergeMatchPlayerMaps(L.predictions, R.predictions),
+        results: mergeResultsMaps(L.results, R.results),
+        windowId: R.windowId || L.windowId || null
+      };
+    }
+
+    function mergeLibBlock(local, remote) {
+      const L = local || {};
+      const R = remote || {};
+      return {
+        predictions: mergeMatchPlayerMaps(L.predictions, R.predictions),
+        results: mergeResultsMaps(L.results, R.results)
+      };
+    }
+
     async function pushToRemote(showToast = true) {
       if (isSaving) return;
       isSaving = true;
@@ -4527,6 +4635,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
         trivia: data.trivia || {},
         logoRace: data.logoRace || {},
         fifa: data.fifa || { predictions: {}, results: {}, windowId: null },
+        libertadores: data.libertadores || { predictions: {}, results: {} },
         updatedAt: new Date().toISOString(),
         updatedBy: currentUser() || 'anon'
       };
@@ -7539,15 +7648,16 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
         }).join('');
 
         return '<div class="fifa-match" data-fifa-id="' + m.id + '">' +
-          '<div class="fifa-meta">' + whenLabel + ' · ' + m.comp + '</div>' +
-          '<div class="fifa-teams-row">' +
-            '<div class="fifa-team">' + fifaFlagHtml(m.local) + '<span>' + m.local + '</span></div>' +
-            '<div class="fifa-team">' + fifaFlagHtml(m.visitante) + '<span>' + m.visitante + '</span></div>' +
-          '</div>' +
-          '<div class="fifa-real">Real' + (realLocked ? ' 🔒' : '') + ' ' +
-            '<input type="number" min="0" max="20" data-fifa-real="' + m.id + '" data-side="h" value="' + (real.h != null && real.h !== '' ? real.h : '') + '" placeholder="-" ' + (realLocked ? 'disabled' : '') + ' />' +
-            '<span>:</span>' +
-            '<input type="number" min="0" max="20" data-fifa-real="' + m.id + '" data-side="a" value="' + (real.a != null && real.a !== '' ? real.a : '') + '" placeholder="-" ' + (realLocked ? 'disabled' : '') + ' />' +
+          '<div class="fifa-meta">' + whenLabel + ' · ' + m.comp + (realLocked ? '' : ' · Admin') + '</div>' +
+          '<div class="fifa-teams-scores">' +
+            '<div class="fifa-team-score-row">' +
+              '<div class="fifa-team-left">' + fifaFlagHtml(m.local) + '<span class="fifa-team-name">' + m.local + '</span></div>' +
+              '<input type="number" min="0" max="20" class="fifa-side-score" data-fifa-real="' + m.id + '" data-side="h" value="' + (real.h != null && real.h !== '' ? real.h : '') + '" placeholder="-" ' + (realLocked ? 'disabled' : '') + ' />' +
+            '</div>' +
+            '<div class="fifa-team-score-row">' +
+              '<div class="fifa-team-left">' + fifaFlagHtml(m.visitante) + '<span class="fifa-team-name">' + m.visitante + '</span></div>' +
+              '<input type="number" min="0" max="20" class="fifa-side-score" data-fifa-real="' + m.id + '" data-side="a" value="' + (real.a != null && real.a !== '' ? real.a : '') + '" placeholder="-" ' + (realLocked ? 'disabled' : '') + ' />' +
+            '</div>' +
           '</div>' +
           '<div class="fifa-preds-grid">' + predBoxes + '</div>' +
           '</div>';
@@ -8730,12 +8840,12 @@ function showFutbolSub(sub) {
           const remote = await res.json();
           if (remote && remote.updatedAt && remote.updatedAt !== lastKnownUpdatedAt) {
             data = {
-              predictions: remote.predictions || {},
-              results: remote.results || {},
+              predictions: mergeMatchPlayerMaps(data.predictions, remote.predictions),
+              results: mergeResultsMaps(data.results, remote.results),
               trivia: mergeTriviaMaps(data.trivia || {}, remote.trivia || {}),
               logoRace: mergeLogoRaceMaps(data.logoRace || {}, remote.logoRace || {}),
-              fifa: remote.fifa || data.fifa || { predictions: {}, results: {}, windowId: null },
-              libertadores: remote.libertadores || data.libertadores || { predictions: {}, results: {} },
+              fifa: mergeFifaBlock(data.fifa, remote.fifa),
+              libertadores: mergeLibBlock(data.libertadores, remote.libertadores),
               updatedAt: remote.updatedAt,
               updatedBy: remote.updatedBy || null
             };
@@ -8745,6 +8855,10 @@ function showFutbolSub(sub) {
             renderLeaderboard();
             renderStats();
             renderPersonalBar();
+            try {
+              if (typeof renderFifaPanel === 'function') renderFifaPanel();
+              if (typeof renderLibertadoresPanel === 'function') renderLibertadoresPanel();
+            } catch (_) {}
             if (document.getElementById('juegos')?.classList.contains('active') && !triviaState) renderTrivia();
             updateSyncStatus('synced');
             toast('Nuevos datos de ' + (remote.updatedBy || 'alguien'));
