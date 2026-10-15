@@ -3262,6 +3262,128 @@
       opacity: 0.5;
     }
 
+  
+    .lib-layout {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 1rem;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .lib-layout { grid-template-columns: 1fr; }
+    }
+    .lib-matches { display: flex; flex-direction: column; gap: 0.65rem; }
+    .lib-match-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.65rem 0.75rem;
+    }
+    .lib-match-card .lib-match-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-bottom: 0.4rem;
+      flex-wrap: wrap;
+    }
+    .lib-match-card .lib-match-head strong { font-size: 0.88rem; }
+    .lib-match-card .lib-match-head .meta { font-size: 0.7rem; color: var(--muted); font-weight: 700; }
+    .lib-match-teams {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-bottom: 0.45rem;
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+    .lib-match-teams img { width: 22px; height: 22px; object-fit: contain; }
+    .lib-real-badge {
+      margin-left: auto;
+      background: rgba(0,230,118,0.12);
+      border: 1px solid rgba(0,230,118,0.35);
+      color: var(--accent);
+      font-weight: 900;
+      font-size: 0.85rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 8px;
+    }
+    .lib-real-badge.pending { color: var(--muted); border-color: var(--border); background: rgba(0,0,0,0.2); font-weight: 700; font-size: 0.72rem; }
+    .lib-preds-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.35rem;
+    }
+    .lib-pred-box {
+      background: #0d1a2e;
+      border: 1px solid #2a4a75;
+      border-radius: 8px;
+      padding: 0.35rem 0.4rem;
+      font-size: 0.72rem;
+    }
+    .lib-pred-box .name {
+      font-weight: 800;
+      margin-bottom: 0.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .lib-pred-box.baez .name { color: var(--baez); }
+    .lib-pred-box.juan .name { color: var(--juan); }
+    .lib-pred-box.marrugo .name { color: var(--marrugo); }
+    .lib-pred-box.mauricio .name { color: var(--mauricio); }
+    .lib-pred-box .score-line {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.2rem;
+    }
+    .lib-pred-box input {
+      width: 36px;
+      height: 32px;
+      text-align: center;
+      font-weight: 900;
+      font-size: 1rem;
+      border-radius: 7px;
+      border: 2px solid #3d5a80;
+      background: #152033;
+      color: #f8fafc;
+      -moz-appearance: textfield;
+    }
+    .lib-pred-box input::-webkit-outer-spin-button,
+    .lib-pred-box input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .lib-pred-box.can-edit input { border-color: rgba(0,230,118,0.55); background: #0a1628; }
+    .lib-pred-box .pts-mini {
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 0.1rem 0.35rem;
+      border-radius: 5px;
+      color: var(--muted);
+    }
+    .lib-pred-box .pts-mini.ok { color: var(--accent); background: rgba(0,230,118,0.12); }
+    .lib-rank-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.75rem;
+      position: sticky;
+      top: 0.5rem;
+    }
+    .lib-rank-card h3 {
+      margin: 0 0 0.55rem;
+      font-size: 0.9rem;
+      font-weight: 900;
+      color: var(--accent);
+    }
+    .lib-rank-card table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    .lib-rank-card th, .lib-rank-card td {
+      padding: 0.35rem 0.3rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .lib-rank-card th { color: var(--muted); font-size: 0.68rem; text-transform: uppercase; }
+    .lib-rank-card td.pts { font-weight: 900; color: var(--accent); text-align: right; }
+
   </style>
 </head>
 <body>
@@ -3723,9 +3845,10 @@
         <div class="lib-wrap">
           <p class="lib-note">
             <strong style="color:var(--text)">Copa Libertadores 2026 · Semifinales</strong><br>
-            Ida / vuelta. Final a partido único el <strong>28 nov 2026</strong> en el Estadio Centenario (Montevideo).
-            Resultado fijo de la ida Fluminense–Palmeiras: <strong>1-2</strong>.
+            Pronostica los partidos (misma puntuación: 2 exacto · 1 resultado). La ida Fluminense–Palmeiras ya está <strong>1-2</strong>.
+            Final: <strong>28 nov</strong> · Centenario, Montevideo.
           </p>
+          <div id="libInteractive" style="margin-bottom:1rem;"></div>
           <div class="lib-bracket">
             <div class="lib-semi">
               <div class="lib-tie">
@@ -4177,6 +4300,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       trivia: {},      // playerId -> { best, bestStep, plays, name }
       logoRace: {},    // playerId -> { best, plays, total, name }
       fifa: { predictions: {}, results: {}, windowId: null },
+      libertadores: { predictions: {}, results: {} },
       updatedAt: null,
       updatedBy: null
     };
@@ -4270,6 +4394,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
               trivia: mergeTriviaMaps(local.trivia || {}, migrateLocalTriviaOnly()),
               logoRace: local.logoRace || {},
               fifa: local.fifa || { predictions: {}, results: {}, windowId: null },
+              libertadores: local.libertadores || { predictions: {}, results: {} },
               updatedAt: local.updatedAt || null,
               updatedBy: local.updatedBy || null
             };
@@ -4291,6 +4416,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
             trivia: mergeTriviaMaps(data.trivia || {}, remote.trivia || {}),
             logoRace: mergeLogoRaceMaps(data.logoRace || {}, remote.logoRace || {}),
             fifa: remote.fifa || data.fifa || { predictions: {}, results: {}, windowId: null },
+              libertadores: remote.libertadores || data.libertadores || { predictions: {}, results: {} },
             updatedAt: remote.updatedAt || null,
             updatedBy: remote.updatedBy || null
           };
@@ -8124,6 +8250,156 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
     }
 
     
+    
+    const LIBERTADORES_MATCHES = [
+      { id: 'lib_sf1_ida', ronda: 'SF1 Ida', local: 'Fluminense', visitante: 'Palmeiras', fecha: 'Mié 14 oct', hora_col: '19:30', lockedResult: { h: 1, a: 2 } },
+      { id: 'lib_sf1_vuelta', ronda: 'SF1 Vuelta', local: 'Palmeiras', visitante: 'Fluminense', fecha: 'Mié 21 oct', hora_col: '19:30' },
+      { id: 'lib_sf2_ida', ronda: 'SF2 Ida', local: 'Estudiantes', visitante: 'Flamengo', fecha: 'Jue 15 oct', hora_col: '19:30' },
+      { id: 'lib_sf2_vuelta', ronda: 'SF2 Vuelta', local: 'Flamengo', visitante: 'Estudiantes', fecha: 'Jue 22 oct', hora_col: '19:30' }
+    ];
+
+    function ensureLibertadoresData() {
+      if (!data.libertadores) data.libertadores = { predictions: {}, results: {} };
+      if (!data.libertadores.predictions) data.libertadores.predictions = {};
+      if (!data.libertadores.results) data.libertadores.results = {};
+      // Resultado fijo ida SF1
+      if (data.libertadores.results.lib_sf1_ida == null) {
+        data.libertadores.results.lib_sf1_ida = { h: 1, a: 2 };
+      }
+    }
+
+    
+    function libLogo(name) {
+      return 'logos/' + name + '.png';
+    }
+
+    function getLibRanking() {
+      ensureLibertadoresData();
+      const rows = PLAYERS.map(p => {
+        let pts = 0, played = 0, exact = 0;
+        LIBERTADORES_MATCHES.forEach(m => {
+          const real = data.libertadores.results[m.id];
+          if (!real || real.h == null || real.a == null) return;
+          const pred = (data.libertadores.predictions[m.id] || {})[p];
+          if (!pred || pred.h == null || pred.a == null) return;
+          const d = calcPoints(pred.h, pred.a, real.h, real.a);
+          pts += d.pts;
+          played++;
+          if (d.exact) exact++;
+        });
+        return { id: p, name: PLAYER_NAMES[p] || p, pts, played, exact };
+      });
+      rows.sort((a, b) => b.pts - a.pts || b.exact - a.exact || a.name.localeCompare(b.name));
+      return rows;
+    }
+
+    function renderLibertadoresPanel() {
+      ensureLibertadoresData();
+      const root = document.getElementById('libInteractive');
+      if (!root) return;
+      const me = (typeof currentUser === 'function') ? currentUser() : '';
+      const admin = !!adminUnlocked;
+
+      const matchHtml = LIBERTADORES_MATCHES.map(m => {
+        const real = data.libertadores.results[m.id] || m.lockedResult || null;
+        const hasReal = real && real.h != null && real.a != null;
+        const preds = data.libertadores.predictions[m.id] || {};
+        const boxes = PLAYERS.map(p => {
+          const pred = preds[p] || {};
+          const canEdit = (admin || (me && me === p)) && !hasReal;
+          let ptsHtml = '';
+          if (hasReal && pred.h != null && pred.a != null) {
+            const d = calcPoints(pred.h, pred.a, real.h, real.a);
+            ptsHtml = '<span class="pts-mini' + (d.pts > 0 ? ' ok' : '') + '">' + d.pts + ' pts</span>';
+          }
+          return '<div class="lib-pred-box ' + p + (canEdit ? ' can-edit' : '') + '">' +
+            '<div class="name"><span>' + (PLAYER_NAMES[p] || p) + '</span>' + ptsHtml + '</div>' +
+            '<div class="score-line">' +
+            '<input type="number" min="0" max="20" inputmode="numeric" data-lib-pred="' + m.id + '" data-lib-player="' + p + '" data-side="h" value="' + (pred.h != null ? pred.h : '') + '" ' + (canEdit ? '' : 'disabled') + ' placeholder="-" />' +
+            '<span style="color:#94a3b8;font-weight:900">:</span>' +
+            '<input type="number" min="0" max="20" inputmode="numeric" data-lib-pred="' + m.id + '" data-lib-player="' + p + '" data-side="a" value="' + (pred.a != null ? pred.a : '') + '" ' + (canEdit ? '' : 'disabled') + ' placeholder="-" />' +
+            '</div></div>';
+        }).join('');
+        return '<div class="lib-match-card">' +
+          '<div class="lib-match-head"><strong>' + m.ronda + '</strong><span class="meta">' + m.fecha + ' · ' + m.hora_col + ' COL</span></div>' +
+          '<div class="lib-match-teams">' +
+          '<img src="' + libLogo(m.local) + '" alt="" onerror="this.style.display=\'none\'" />' +
+          '<span>' + m.local + '</span><span style="color:var(--muted)">vs</span>' +
+          '<img src="' + libLogo(m.visitante) + '" alt="" onerror="this.style.display=\'none\'" />' +
+          '<span>' + m.visitante + '</span>' +
+          (hasReal
+            ? '<span class="lib-real-badge">' + real.h + ' : ' + real.a + '</span>'
+            : '<span class="lib-real-badge pending">Sin resultado</span>') +
+          '</div>' +
+          '<div class="lib-preds-grid">' + boxes + '</div></div>';
+      }).join('');
+
+      const rank = getLibRanking();
+      const rankHtml = '<div class="lib-rank-card"><h3>Mini ranking Libertadores</h3><table><thead><tr><th>#</th><th>Jugador</th><th>Pts</th><th>Exactos</th></tr></thead><tbody>' +
+        rank.map((r, i) => '<tr><td>' + (i + 1) + '</td><td style="font-weight:800;color:var(--' + r.id + ')">' + r.name + '</td><td class="pts">' + r.pts + '</td><td>' + r.exact + '</td></tr>').join('') +
+        '</tbody></table>' +
+        '<p style="margin:0.55rem 0 0;font-size:0.72rem;color:var(--muted);">Misma puntuación que Champions: 2 exacto · 1 resultado.</p></div>';
+
+      // Admin: cargar resultado en partidos abiertos
+      let adminHtml = '';
+      if (admin) {
+        adminHtml = '<div class="lib-match-card" style="border-color:rgba(255,213,79,0.35);"><strong style="font-size:0.8rem;color:var(--gold)">Admin · cargar resultado</strong>' +
+          LIBERTADORES_MATCHES.filter(m => !(data.libertadores.results[m.id] && data.libertadores.results[m.id].h != null)).map(m =>
+            '<div style="display:flex;flex-wrap:wrap;gap:0.35rem;align-items:center;margin-top:0.4rem;font-size:0.75rem;">' +
+            '<span style="min-width:110px;font-weight:800">' + m.ronda + '</span>' +
+            '<input type="number" min="0" max="20" data-lib-res="' + m.id + '" data-side="h" placeholder="' + m.local.slice(0,3) + '" style="width:48px;text-align:center" />' +
+            '<span>:</span>' +
+            '<input type="number" min="0" max="20" data-lib-res="' + m.id + '" data-side="a" placeholder="' + m.visitante.slice(0,3) + '" style="width:48px;text-align:center" />' +
+            '<button type="button" data-lib-res-save="' + m.id + '" style="padding:0.25rem 0.5rem;border-radius:6px;border:none;background:var(--accent);color:#04120a;font-weight:800;cursor:pointer">Guardar</button>' +
+            '</div>'
+          ).join('') + '</div>';
+      }
+
+      root.innerHTML = '<div class="lib-layout"><div class="lib-matches">' + matchHtml + adminHtml + '</div>' + rankHtml + '</div>';
+
+      root.querySelectorAll('[data-lib-pred]').forEach(inp => {
+        inp.addEventListener('change', onLibPredChange);
+        inp.addEventListener('input', onLibPredChange);
+      });
+      root.querySelectorAll('[data-lib-res-save]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-lib-res-save');
+          const hEl = root.querySelector('[data-lib-res="' + id + '"][data-side="h"]');
+          const aEl = root.querySelector('[data-lib-res="' + id + '"][data-side="a"]');
+          const h = hEl && hEl.value !== '' ? parseInt(hEl.value, 10) : null;
+          const a = aEl && aEl.value !== '' ? parseInt(aEl.value, 10) : null;
+          if (h == null || a == null || isNaN(h) || isNaN(a)) { toast('Completa ambos goles'); return; }
+          ensureLibertadoresData();
+          data.libertadores.results[id] = { h, a };
+          if (typeof saveData === 'function') saveData();
+          else if (typeof persist === 'function') persist();
+          renderLibertadoresPanel();
+          toast('Resultado guardado');
+        });
+      });
+    }
+
+    function onLibPredChange(e) {
+      const el = e.target;
+      const id = el.dataset.libPred;
+      const user = el.dataset.libPlayer;
+      const side = el.dataset.side;
+      if (!id || !user || !side) return;
+      ensureLibertadoresData();
+      if (!data.libertadores.predictions[id]) data.libertadores.predictions[id] = {};
+      if (!data.libertadores.predictions[id][user]) data.libertadores.predictions[id][user] = {};
+      const val = el.value === '' ? null : parseInt(el.value, 10);
+      data.libertadores.predictions[id][user][side] = (val == null || isNaN(val)) ? null : val;
+      if (typeof saveData === 'function') saveData();
+      else if (typeof persist === 'function') persist();
+      // refrescar pts del ranking sin perder foco
+      const rank = getLibRanking();
+      const tbody = document.querySelector('#libInteractive .lib-rank-card tbody');
+      if (tbody) {
+        tbody.innerHTML = rank.map((r, i) => '<tr><td>' + (i + 1) + '</td><td style="font-weight:800;color:var(--' + r.id + ')">' + r.name + '</td><td class="pts">' + r.pts + '</td><td>' + r.exact + '</td></tr>').join('');
+      }
+    }
+
     function showFutbolSub(sub) {
       sub = sub || 'champions';
       document.querySelectorAll('#futbolSubnav button').forEach(b => {
@@ -8135,6 +8411,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       try {
         if (sub === 'champions' && typeof renderMatches === 'function') renderMatches();
         if (sub === 'fifa' && typeof renderFifaPanel === 'function') renderFifaPanel();
+        if (sub === 'libertadores' && typeof renderLibertadoresPanel === 'function') renderLibertadoresPanel();
       } catch (e) { console.warn('showFutbolSub', e); }
     }
 
@@ -8179,6 +8456,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
               trivia: mergeTriviaMaps(local.trivia || {}, migrateLocalTriviaOnly()),
               logoRace: local.logoRace || {},
               fifa: local.fifa || { predictions: {}, results: {}, windowId: null },
+              libertadores: local.libertadores || { predictions: {}, results: {} },
               updatedAt: local.updatedAt || null,
               updatedBy: local.updatedBy || null
             };
@@ -8216,6 +8494,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
               trivia: mergeTriviaMaps(data.trivia || {}, remote.trivia || {}),
               logoRace: mergeLogoRaceMaps(data.logoRace || {}, remote.logoRace || {}),
               fifa: remote.fifa || data.fifa || { predictions: {}, results: {}, windowId: null },
+              libertadores: remote.libertadores || data.libertadores || { predictions: {}, results: {} },
               updatedAt: remote.updatedAt,
               updatedBy: remote.updatedBy || null
             };
