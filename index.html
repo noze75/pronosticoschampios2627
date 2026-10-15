@@ -4481,6 +4481,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
     }
     let saveTimer = null;
     let isSaving = false;
+    let pendingRemoteSave = false;
     let lastKnownUpdatedAt = null;
 
     async function fetchWithTimeout(url, options = {}, timeoutMs = FETCH_TIMEOUT_MS) {
@@ -4549,6 +4550,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
           try { localStorage.setItem('cl_preds_2026', JSON.stringify(data)); } catch(_) {}
         }
         updateSyncStatus('synced');
+        try { await pushToRemote(false); } catch (_) {}
       } catch (e) {
         console.warn('No se pudo cargar de npoint, usando localStorage', e);
         updateSyncStatus('offline');
@@ -4602,7 +4604,6 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
     }
 
     function mergeResultsMaps(a, b) {
-      // Unión; si ambos tienen el partido, gana b (remoto al hacer pull)
       return Object.assign({}, a || {}, b || {});
     }
 
@@ -4626,32 +4627,53 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
     }
 
     async function pushToRemote(showToast = true) {
-      if (isSaving) return;
+      if (isSaving) {
+        pendingRemoteSave = true;
+        return;
+      }
       isSaving = true;
       updateSyncStatus('saving');
-      const payload = {
-        predictions: data.predictions,
-        results: data.results,
-        trivia: data.trivia || {},
-        logoRace: data.logoRace || {},
-        fifa: data.fifa || { predictions: {}, results: {}, windowId: null },
-        libertadores: data.libertadores || { predictions: {}, results: {} },
-        updatedAt: new Date().toISOString(),
-        updatedBy: currentUser() || 'anon'
-      };
       try {
-        const res = await fetchWithTimeout(API_URL, {
+        try {
+          const resPull = await fetchWithTimeout(API_URL + '?t=' + Date.now());
+          if (resPull.ok) {
+            const remote = await resPull.json();
+            if (remote && typeof remote === 'object') {
+              data.predictions = mergeMatchPlayerMaps(remote.predictions, data.predictions);
+              data.results = mergeResultsMaps(remote.results, data.results);
+              data.trivia = mergeTriviaMaps(remote.trivia || {}, data.trivia || {});
+              data.logoRace = mergeLogoRaceMaps(remote.logoRace || {}, data.logoRace || {});
+              data.fifa = mergeFifaBlock(remote.fifa, data.fifa);
+              data.libertadores = mergeLibBlock(remote.libertadores, data.libertadores);
+            }
+          }
+        } catch (pullErr) {
+          console.warn('Pull previo al save falló', pullErr);
+        }
+
+        const payload = {
+          predictions: data.predictions || {},
+          results: data.results || {},
+          trivia: data.trivia || {},
+          logoRace: data.logoRace || {},
+          fifa: data.fifa || { predictions: {}, results: {}, windowId: null },
+          libertadores: data.libertadores || { predictions: {}, results: {} },
+          updatedAt: new Date().toISOString(),
+          updatedBy: currentUser() || 'anon'
+        };
+
+        let res = await fetchWithTimeout(API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
         if (!res.ok) {
-          const res2 = await fetchWithTimeout(API_URL, {
+          res = await fetchWithTimeout(API_URL, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
           });
-          if (!res2.ok) throw new Error('HTTP ' + res2.status);
+          if (!res.ok) throw new Error('HTTP ' + res.status);
         }
         data.updatedAt = payload.updatedAt;
         data.updatedBy = payload.updatedBy;
@@ -4662,9 +4684,13 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       } catch (e) {
         console.error(e);
         updateSyncStatus('error');
-        toast('Error al guardar en la nube (queda en local)');
+        if (showToast) toast('Error al guardar en la nube (queda en local)');
       } finally {
         isSaving = false;
+        if (pendingRemoteSave) {
+          pendingRemoteSave = false;
+          pushToRemote(false);
+        }
       }
     }
 
@@ -8832,39 +8858,45 @@ function showFutbolSub(sub) {
       renderStats();
       renderPersonalBar();
 
-      // Auto-refresh every 45s so others see changes
-      setInterval(async () => {
+      // Auto-refresh cada 20s + al volver a la pestaña
+    async function syncFromRemote() {
+      try {
+        const res = await fetchWithTimeout(API_URL + '?t=' + Date.now());
+        if (!res.ok) return;
+        const remote = await res.json();
+        if (!remote || typeof remote !== 'object') return;
+        if (remote.updatedAt && remote.updatedAt === lastKnownUpdatedAt) return;
+        data = {
+          predictions: mergeMatchPlayerMaps(data.predictions, remote.predictions),
+          results: mergeResultsMaps(data.results, remote.results),
+          trivia: mergeTriviaMaps(data.trivia || {}, remote.trivia || {}),
+          logoRace: mergeLogoRaceMaps(data.logoRace || {}, remote.logoRace || {}),
+          fifa: mergeFifaBlock(data.fifa, remote.fifa),
+          libertadores: mergeLibBlock(data.libertadores, remote.libertadores),
+          updatedAt: remote.updatedAt || data.updatedAt,
+          updatedBy: remote.updatedBy || data.updatedBy || null
+        };
+        if (remote.updatedAt) lastKnownUpdatedAt = remote.updatedAt;
+        try { localStorage.setItem('cl_preds_2026', JSON.stringify(data)); } catch(_) {}
+        renderMatches();
+        renderLeaderboard();
+        renderStats();
+        renderPersonalBar();
         try {
-          const res = await fetchWithTimeout(API_URL + '?t=' + Date.now());
-          if (!res.ok) return;
-          const remote = await res.json();
-          if (remote && remote.updatedAt && remote.updatedAt !== lastKnownUpdatedAt) {
-            data = {
-              predictions: mergeMatchPlayerMaps(data.predictions, remote.predictions),
-              results: mergeResultsMaps(data.results, remote.results),
-              trivia: mergeTriviaMaps(data.trivia || {}, remote.trivia || {}),
-              logoRace: mergeLogoRaceMaps(data.logoRace || {}, remote.logoRace || {}),
-              fifa: mergeFifaBlock(data.fifa, remote.fifa),
-              libertadores: mergeLibBlock(data.libertadores, remote.libertadores),
-              updatedAt: remote.updatedAt,
-              updatedBy: remote.updatedBy || null
-            };
-            lastKnownUpdatedAt = remote.updatedAt;
-            try { localStorage.setItem('cl_preds_2026', JSON.stringify(data)); } catch(_) {}
-            renderMatches();
-            renderLeaderboard();
-            renderStats();
-            renderPersonalBar();
-            try {
-              if (typeof renderFifaPanel === 'function') renderFifaPanel();
-              if (typeof renderLibertadoresPanel === 'function') renderLibertadoresPanel();
-            } catch (_) {}
-            if (document.getElementById('juegos')?.classList.contains('active') && !triviaState) renderTrivia();
-            updateSyncStatus('synced');
-            toast('Nuevos datos de ' + (remote.updatedBy || 'alguien'));
-          }
-        } catch(_) {}
-      }, 45000);
+          if (typeof renderFifaPanel === 'function') renderFifaPanel();
+          if (typeof renderLibertadoresPanel === 'function') renderLibertadoresPanel();
+          if (document.getElementById('juegos')?.classList.contains('active') && typeof renderGames === 'function') renderGames();
+        } catch (_) {}
+        updateSyncStatus('synced');
+        if (remote.updatedBy) toast('Datos actualizados de ' + remote.updatedBy);
+      } catch (_) {}
+    }
+    setInterval(() => { syncFromRemote(); }, 20000);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') syncFromRemote();
+    });
+    window.addEventListener('focus', () => { syncFromRemote(); });
+
 
       // First-visit welcome
       setTimeout(() => showWelcome(false), 600);
