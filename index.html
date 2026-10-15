@@ -3452,6 +3452,45 @@
       color: var(--accent);
     }
 
+  
+    .lib-bracket-mini {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0 0 0.75rem;
+      padding: 0.55rem 0.6rem;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .lib-bcol { flex: 1; display: flex; flex-direction: column; gap: 0.35rem; }
+    .lib-bround {
+      font-size: 0.65rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      margin-bottom: 0.15rem;
+    }
+    .lib-bslot {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.35rem 0.45rem;
+      font-size: 0.78rem;
+    }
+    .lib-bslot.ready { border-color: rgba(0,230,118,0.4); }
+    .lib-bslot img { width: 20px; height: 20px; object-fit: contain; }
+    .lib-bslot strong { display: block; font-size: 0.8rem; line-height: 1.15; }
+    .lib-bslot small { display: block; color: var(--muted); font-size: 0.65rem; font-weight: 700; }
+    .lib-barrow { color: var(--muted); font-weight: 900; font-size: 1.1rem; }
+    .lib-bvs { text-align: center; font-size: 0.7rem; font-weight: 800; color: var(--muted); }
+    .lib-final-card { border-color: rgba(0,230,118,0.35); }
+    .lib-rank-card.lib-rank-full { margin: 0 auto 0.5rem; }
+
   </style>
 </head>
 <body>
@@ -3913,8 +3952,7 @@
         <div class="lib-wrap">
           <p class="lib-note">
             <strong style="color:var(--text)">Libertadores y Suramericana 2026 · Semifinales</strong><br>
-            Izquierda <strong>Libertadores</strong> · derecha <strong>Suramericana</strong>.
-            Misma puntuación (2 exacto · 1 resultado). Partidos ya jugados: resultado fijo y <strong>2 pts para todos</strong>.
+            Ranking arriba · llaves con final automática al clasificar · izquierda <strong>Libertadores</strong> · derecha <strong>Suramericana</strong>. Partidos ya jugados: <strong>2 pts para todos</strong>.
           </p>
           <div id="libInteractive"></div>
         </div>
@@ -8275,11 +8313,68 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       { id: 'lib_sf1_vuelta', comp: 'lib', ronda: 'SF1 Vuelta', local: 'Palmeiras', visitante: 'Fluminense', fecha: 'Mié 21 oct', hora_col: '19:30' },
       { id: 'lib_sf2_ida', comp: 'lib', ronda: 'SF2 Ida', local: 'Estudiantes', visitante: 'Flamengo', fecha: 'Jue 15 oct', hora_col: '19:30' },
       { id: 'lib_sf2_vuelta', comp: 'lib', ronda: 'SF2 Vuelta', local: 'Flamengo', visitante: 'Estudiantes', fecha: 'Jue 22 oct', hora_col: '19:30' },
+      { id: 'lib_final', comp: 'lib', ronda: 'Final', local: null, visitante: null, fecha: 'Sáb 28 nov', hora_col: '16:00', isFinal: true },
       { id: 'sud_sf1_ida', comp: 'sud', ronda: 'SF1 Ida', local: 'Boca', visitante: 'Vasco', fecha: 'Mar 13 oct', hora_col: '19:30', result: { h: 0, a: 1 } },
       { id: 'sud_sf1_vuelta', comp: 'sud', ronda: 'SF1 Vuelta', local: 'Vasco', visitante: 'Boca', fecha: 'Mar 20 oct', hora_col: '19:30' },
       { id: 'sud_sf2_ida', comp: 'sud', ronda: 'SF2 Ida', local: 'Atlético Mineiro', visitante: 'City Torque', fecha: 'Mié 14 oct', hora_col: '17:00', result: { h: 3, a: 0 } },
-      { id: 'sud_sf2_vuelta', comp: 'sud', ronda: 'SF2 Vuelta', local: 'City Torque', visitante: 'Atlético Mineiro', fecha: 'Mié 21 oct', hora_col: '17:00' }
+      { id: 'sud_sf2_vuelta', comp: 'sud', ronda: 'SF2 Vuelta', local: 'City Torque', visitante: 'Atlético Mineiro', fecha: 'Mié 21 oct', hora_col: '17:00' },
+      { id: 'sud_final', comp: 'sud', ronda: 'Final', local: null, visitante: null, fecha: 'Sáb 21 nov', hora_col: '16:00', isFinal: true }
     ];
+
+    /** Resuelve equipos de un partido (finales dinámicas) */
+    function resolveConmebolMatch(m) {
+      if (!m) return m;
+      if (!m.isFinal) return m;
+      const w1 = getSeriesWinner(m.comp, 1);
+      const w2 = getSeriesWinner(m.comp, 2);
+      return Object.assign({}, m, {
+        local: w1 || 'Ganador SF1',
+        visitante: w2 || 'Ganador SF2',
+        teamsReady: !!(w1 && w2)
+      });
+    }
+
+    /**
+     * Ganador de serie ida+vuelta (mismo orden de equipos en ida).
+     * Ida: A vs B ; Vuelta: B vs A
+     */
+    function getSeriesWinner(comp, sfNum) {
+      ensureLibertadoresData();
+      const ida = CONMEBOL_MATCHES.find(m => m.comp === comp && m.ronda === ('SF' + sfNum + ' Ida'));
+      const vue = CONMEBOL_MATCHES.find(m => m.comp === comp && m.ronda === ('SF' + sfNum + ' Vuelta'));
+      if (!ida || !vue) return null;
+      const rI = data.libertadores.results[ida.id];
+      const rV = data.libertadores.results[vue.id];
+      if (!rI || rI.h == null || rI.a == null || !rV || rV.h == null || rV.a == null) return null;
+      const teamA = ida.local;   // local en ida
+      const teamB = ida.visitante;
+      const goalsA = rI.h + rV.a;
+      const goalsB = rI.a + rV.h;
+      if (goalsA > goalsB) return teamA;
+      if (goalsB > goalsA) return teamB;
+      // Empate en global: sin visitante definido de forma simple → aún no definimos penales
+      // Si empate, null hasta que admin cargue un desempate manual (opcional: preferir más goles de visitante clásico)
+      const awayA = rV.a; // goles de A como visitante en vuelta
+      const awayB = rI.a; // goles de B como visitante en ida
+      if (awayA > awayB) return teamA;
+      if (awayB > awayA) return teamB;
+      return null; // penales / por definir
+    }
+
+    function seriesAggLabel(comp, sfNum) {
+      const ida = CONMEBOL_MATCHES.find(m => m.comp === comp && m.ronda === ('SF' + sfNum + ' Ida'));
+      const vue = CONMEBOL_MATCHES.find(m => m.comp === comp && m.ronda === ('SF' + sfNum + ' Vuelta'));
+      if (!ida) return '';
+      const rI = data.libertadores.results[ida.id];
+      const rV = vue ? data.libertadores.results[vue.id] : null;
+      if (!rI || rI.h == null) return 'Sin jugar';
+      const a = ida.local, b = ida.visitante;
+      if (!rV || rV.h == null) return a + ' ' + rI.h + '-' + rI.a + ' ' + b + ' (ida)';
+      const gA = rI.h + rV.a, gB = rI.a + rV.h;
+      const w = getSeriesWinner(comp, sfNum);
+      return 'Global ' + gA + '-' + gB + (w ? ' · ' + w : '');
+    }
+
 
     function ensureLibertadoresData() {
       if (!data.libertadores) data.libertadores = { predictions: {}, results: {} };
@@ -8339,6 +8434,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       return rows;
     }
 
+    
     function renderLibertadoresPanel() {
       ensureLibertadoresData();
       const root = document.getElementById('libInteractive');
@@ -8347,13 +8443,15 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       const admin = !!adminUnlocked;
 
       function matchCards(comp) {
-        return CONMEBOL_MATCHES.filter(m => m.comp === comp).map(m => {
+        return CONMEBOL_MATCHES.filter(m => m.comp === comp).map(raw => {
+          const m = resolveConmebolMatch(raw);
           const real = data.libertadores.results[m.id] || null;
           const hasReal = real && real.h != null && real.a != null;
+          const isFinalPending = m.isFinal && !m.teamsReady;
           const preds = data.libertadores.predictions[m.id] || {};
           const boxes = PLAYERS.map(p => {
             const pred = preds[p] || {};
-            const canEdit = (admin || (me && me === p)) && !hasReal;
+            const canEdit = !!(me && me === p) && !hasReal && !isFinalPending;
             let ptsHtml = '';
             if (hasReal && pred.h != null && pred.a != null) {
               const d = calcPoints(pred.h, pred.a, real.h, real.a);
@@ -8367,19 +8465,52 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
               '<input type="number" min="0" max="20" inputmode="numeric" data-lib-pred="' + m.id + '" data-lib-player="' + p + '" data-side="a" value="' + (pred.a != null ? pred.a : '') + '" ' + (canEdit ? '' : 'disabled') + ' placeholder="-" />' +
               '</div></div>';
           }).join('');
-          return '<div class="lib-match-card">' +
+          const teamLine = m.isFinal && !m.teamsReady
+            ? '<span style="color:var(--muted)">' + m.local + ' vs ' + m.visitante + '</span>'
+            : ('<img src="' + libLogo(m.local) + '" alt="" onerror="this.style.display=\'none\'" />' +
+               '<span>' + m.local + '</span><span style="color:var(--muted);font-size:0.75rem">vs</span>' +
+               '<img src="' + libLogo(m.visitante) + '" alt="" onerror="this.style.display=\'none\'" />' +
+               '<span>' + m.visitante + '</span>');
+          return '<div class="lib-match-card' + (m.isFinal ? ' lib-final-card' : '') + '">' +
             '<div class="lib-match-head"><strong>' + m.ronda + '</strong><span class="meta">' + m.fecha + ' · ' + m.hora_col + ' COL</span></div>' +
-            '<div class="lib-match-teams">' +
-            '<img src="' + libLogo(m.local) + '" alt="" onerror="this.style.display=\'none\'" />' +
-            '<span>' + m.local + '</span><span style="color:var(--muted);font-size:0.75rem">vs</span>' +
-            '<img src="' + libLogo(m.visitante) + '" alt="" onerror="this.style.display=\'none\'" />' +
-            '<span>' + m.visitante + '</span>' +
+            '<div class="lib-match-teams">' + teamLine +
             (hasReal
               ? '<span class="lib-real-badge">' + real.h + ' : ' + real.a + '</span>'
-              : '<span class="lib-real-badge pending">Pendiente</span>') +
+              : (isFinalPending
+                  ? '<span class="lib-real-badge pending">Esperando finalistas</span>'
+                  : '<span class="lib-real-badge pending">Pendiente</span>')) +
             '</div>' +
-            '<div class="lib-preds-grid">' + boxes + '</div></div>';
+            (isFinalPending ? '<p style="margin:0;font-size:0.72rem;color:var(--muted)">El pronóstico de la final se habilita al conocerse los dos equipos.</p>' : '<div class="lib-preds-grid">' + boxes + '</div>') +
+            '</div>';
         }).join('');
+      }
+
+      function bracketHtml(comp, title, finalInfo) {
+        const w1 = getSeriesWinner(comp, 1);
+        const w2 = getSeriesWinner(comp, 2);
+        const a1 = seriesAggLabel(comp, 1);
+        const a2 = seriesAggLabel(comp, 2);
+        const ida1 = CONMEBOL_MATCHES.find(m => m.comp === comp && m.ronda === 'SF1 Ida');
+        const ida2 = CONMEBOL_MATCHES.find(m => m.comp === comp && m.ronda === 'SF2 Ida');
+        function slot(team, sub) {
+          const ready = team && team.indexOf('Ganador') !== 0;
+          return '<div class="lib-bslot' + (ready ? ' ready' : '') + '">' +
+            (ready ? '<img src="' + libLogo(team) + '" alt="" onerror="this.style.display=\'none\'" />' : '') +
+            '<div><strong>' + (team || '—') + '</strong><small>' + (sub || '') + '</small></div></div>';
+        }
+        return '<div class="lib-bracket-mini">' +
+          '<div class="lib-bcol">' +
+            '<div class="lib-bround">Semifinales</div>' +
+            slot(w1 || (ida1 ? ida1.local + ' / ' + ida1.visitante : 'SF1'), a1) +
+            slot(w2 || (ida2 ? ida2.local + ' / ' + ida2.visitante : 'SF2'), a2) +
+          '</div>' +
+          '<div class="lib-barrow">→</div>' +
+          '<div class="lib-bcol lib-bfinal">' +
+            '<div class="lib-bround">Final · ' + finalInfo + '</div>' +
+            slot(w1 || 'Ganador SF1', w1 ? 'Clasificado' : 'Por definir') +
+            '<div class="lib-bvs">vs</div>' +
+            slot(w2 || 'Ganador SF2', w2 ? 'Clasificado' : 'Por definir') +
+          '</div></div>';
       }
 
       function rankTable(comp, title) {
@@ -8405,21 +8536,22 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
             '</tr>'
           ).join('') +
           '</tbody></table></div>' +
-          '<p style="margin:0.5rem 0 0;font-size:0.75rem;color:var(--muted)">* % Aciertos = (puntos / máximos posibles) × 100. Máximo por partido = 2 pts.</p>' +
+          '<p style="margin:0.5rem 0 0;font-size:0.75rem;color:var(--muted)">* % Aciertos = (puntos / máximos posibles) × 100. Máximo por partido = 2 pts. Incluye final cuando esté definida.</p>' +
           '</div>';
       }
 
       let adminHtml = '';
       if (admin) {
         adminHtml = '<div class="lib-match-card" style="margin-top:0.75rem;border-color:rgba(255,213,79,0.45)"><strong style="font-size:0.85rem;color:var(--gold)">⚙️ Admin · resultados reales</strong>' +
-          '<p style="margin:0.25rem 0 0.4rem;font-size:0.72rem;color:var(--muted)">Edita y pulsa OK en cada partido (también los ya cargados).</p>' +
-          CONMEBOL_MATCHES.map(m => {
+          '<p style="margin:0.25rem 0 0.4rem;font-size:0.72rem;color:var(--muted)">Edita y pulsa OK. Al completar ida+vuelta, el ganador pasa a la final.</p>' +
+          CONMEBOL_MATCHES.map(raw => {
+            const m = resolveConmebolMatch(raw);
             const real = data.libertadores.results[m.id] || {};
             const hv = real.h != null ? real.h : '';
             const av = real.a != null ? real.a : '';
+            const label = (m.comp === 'lib' ? 'LIB' : 'SUD') + ' · ' + m.ronda + ' · ' + m.local + ' – ' + m.visitante;
             return '<div style="display:flex;flex-wrap:wrap;gap:0.35rem;align-items:center;margin-top:0.4rem;font-size:0.75rem;">' +
-              '<span style="min-width:150px;font-weight:800">' + (m.comp === 'lib' ? 'LIB' : 'SUD') + ' · ' + m.ronda + '</span>' +
-              '<span style="color:var(--muted);min-width:120px">' + m.local + ' – ' + m.visitante + '</span>' +
+              '<span style="min-width:220px;font-weight:800">' + label + '</span>' +
               '<input type="number" min="0" max="20" data-lib-res="' + m.id + '" data-side="h" value="' + hv + '" placeholder="L" style="width:48px;text-align:center;font-weight:800;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);padding:0.25rem" />' +
               '<span>:</span>' +
               '<input type="number" min="0" max="20" data-lib-res="' + m.id + '" data-side="a" value="' + av + '" placeholder="V" style="width:48px;text-align:center;font-weight:800;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);padding:0.25rem" />' +
@@ -8429,20 +8561,23 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       }
 
       root.innerHTML =
-        '<div class="lib-dual">' +
+        rankTable(null, 'Mini ranking · Libertadores + Suramericana') +
+        '<div class="lib-dual" style="margin-top:0.85rem">' +
           '<div class="lib-col">' +
             '<h3 class="lib-col-title">🏆 Libertadores</h3>' +
             '<p class="lib-col-sub">Final · 28 nov · Centenario (Montevideo)</p>' +
+            bracketHtml('lib', 'Libertadores', '28 nov · Montevideo') +
             matchCards('lib') +
           '</div>' +
           '<div class="lib-col">' +
             '<h3 class="lib-col-title">🌎 Suramericana</h3>' +
             '<p class="lib-col-sub">Final · 21 nov · Barranquilla</p>' +
+            bracketHtml('sud', 'Suramericana', '21 nov · Barranquilla') +
             matchCards('sud') +
           '</div>' +
         '</div>' +
-        rankTable(null, 'Mini ranking · Libertadores + Suramericana') +
-        adminHtml;
+        adminHtml +
+        (!admin ? '<p style="margin:0.75rem 0 0;text-align:center;font-size:0.78rem;color:var(--muted)">Los resultados reales solo los carga el <strong>ADMIN</strong>.</p>' : '');
 
       root.querySelectorAll('[data-lib-pred]').forEach(inp => {
         inp.addEventListener('change', onLibPredChange);
@@ -8450,6 +8585,10 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       });
       root.querySelectorAll('[data-lib-res-save]').forEach(btn => {
         btn.addEventListener('click', () => {
+          if (!adminUnlocked) {
+            toast('Solo el ADMIN puede cargar resultados reales');
+            return;
+          }
           const id = btn.getAttribute('data-lib-res-save');
           const hEl = root.querySelector('[data-lib-res="' + id + '"][data-side="h"]');
           const aEl = root.querySelector('[data-lib-res="' + id + '"][data-side="a"]');
@@ -8460,12 +8599,12 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
           data.libertadores.results[id] = { h, a };
           if (typeof saveData === 'function') saveData();
           renderLibertadoresPanel();
-          toast('Resultado guardado');
+          toast('Resultado real guardado');
         });
       });
     }
 
-    function onLibPredChange(e) {
+function onLibPredChange(e) {
       const el = e.target;
       const id = el.dataset.libPred;
       const user = el.dataset.libPlayer;
