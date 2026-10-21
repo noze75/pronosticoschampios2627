@@ -9083,10 +9083,15 @@ function onLibPredChange(e) {
       return y + 4;
     }
 
-    function pdfShortTeam(name) {
-      const s = String(name || '');
-      if (s.length <= 13) return s;
-      return s.slice(0, 11) + '…';
+    function pdfShortTeam(name, maxW, doc) {
+      let s = String(name || '');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(6.5);
+      while (s.length > 3 && doc.getTextWidth(s) > maxW) {
+        s = s.slice(0, -2) + '…';
+        if (s.length <= 4) break;
+      }
+      return s;
     }
 
     function pdfWriteMatches(doc, y, matchRows) {
@@ -9096,61 +9101,80 @@ function onLibPredChange(e) {
       const x0 = 14;
       const totalW = 182;
       const cardW = (totalW - gap * (cols - 1)) / cols;
-      const cardH = 31;
+      const pad = 2.5;          // padding interno
+      const cardH = 33;
 
       for (let i = 0; i < matchRows.length; i += cols) {
         y = pdfEnsureSpace(doc, y, cardH + 3);
         const slice = matchRows.slice(i, i + cols);
         slice.forEach((row, c) => {
           const cx = x0 + c * (cardW + gap);
+          const innerL = cx + pad + 1.2;
+          const innerR = cx + cardW - pad;
+          const innerW = innerR - innerL;
+          const mid = cx + cardW / 2;
+
           doc.setDrawColor(30, 58, 95);
           doc.setFillColor(250, 252, 255);
           doc.roundedRect(cx, y - 2, cardW, cardH, 1.5, 1.5, 'FD');
           doc.setFillColor(0, 230, 118);
           doc.rect(cx, y - 2, 1.2, cardH, 'F');
 
-          const mid = cx + cardW / 2;
+          // Equipos + marcador (centrados, recortados al ancho)
           doc.setFont('helvetica', 'bold');
           doc.setFontSize(6.5);
           doc.setTextColor(10, 22, 40);
-          doc.text(pdfShortTeam(row.local), mid, y + 2.2, { align: 'center' });
+          doc.text(pdfShortTeam(row.local, innerW - 2, doc), mid, y + 2.2, { align: 'center' });
 
           const scoreTxt = row.realH + '-' + row.realA;
           doc.setFillColor(10, 22, 40);
-          doc.roundedRect(mid - 7, y + 3.5, 14, 4.2, 1, 1, 'F');
+          doc.roundedRect(mid - 7, y + 3.8, 14, 4.2, 1, 1, 'F');
           doc.setTextColor(0, 230, 118);
           doc.setFontSize(6.5);
-          doc.text(scoreTxt, mid, y + 6.5, { align: 'center' });
+          doc.text(scoreTxt, mid, y + 6.8, { align: 'center' });
 
           doc.setTextColor(10, 22, 40);
           doc.setFont('helvetica', 'bold');
           doc.setFontSize(6.5);
-          doc.text(pdfShortTeam(row.visitante), mid, y + 11, { align: 'center' });
+          doc.text(pdfShortTeam(row.visitante, innerW - 2, doc), mid, y + 11.5, { align: 'center' });
 
           if (row.meta) {
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(5);
             doc.setTextColor(120, 135, 150);
             let meta = String(row.meta);
-            if (meta.length > 26) meta = meta.slice(0, 24) + '…';
-            doc.text(meta, mid, y + 14.2, { align: 'center' });
+            while (meta.length > 4 && doc.getTextWidth(meta) > innerW - 2) {
+              meta = meta.slice(0, -2) + '…';
+            }
+            doc.text(meta, mid, y + 14.8, { align: 'center' });
           }
 
+          // Predicciones 2x2 dentro del padding
+          const halfW = innerW / 2;
           row.playerLines.forEach((pl, pi) => {
             const col = pi % 2;
             const rn = Math.floor(pi / 2);
-            const px = cx + 2.5 + col * (cardW / 2 - 0.5);
-            const py = y + 18 + rn * 5.2;
+            const cellX = innerL + col * halfW;
+            const py = y + 19 + rn * 5.5;
             const rgb = PDF_PLAYER_RGB[pl.id] || [80, 90, 100];
+
+            // Nombre
             doc.setFont('helvetica', 'bold');
-            doc.setFontSize(5.2);
+            doc.setFontSize(5.5);
             doc.setTextColor(rgb[0], rgb[1], rgb[2]);
-            doc.text((pl.name || '').slice(0, 4), px, py);
+            const nm = (pl.name || '').length > 5 ? (pl.name || '').slice(0, 4) : (pl.name || '');
+            doc.text(nm, cellX, py);
+
+            // Marcador pred
             doc.setFont('helvetica', 'normal');
             doc.setTextColor(40, 50, 60);
             doc.setFontSize(5.5);
-            doc.text(pl.predText, px + 11, py);
+            doc.text(pl.predText, cellX + 11.5, py);
+
+            // Badge pts — anclado al borde derecho de la celda
             const ptsTxt = pl.pts == null ? '—' : String(pl.pts);
+            const badgeW = 6.5;
+            const badgeX = cellX + halfW - badgeW - 1.5;
             if (pl.exact) {
               doc.setFillColor(0, 200, 100);
               doc.setTextColor(255, 255, 255);
@@ -9164,10 +9188,10 @@ function onLibPredChange(e) {
               doc.setFillColor(200, 210, 220);
               doc.setTextColor(60, 70, 80);
             }
-            doc.roundedRect(px + 22, py - 2.2, 6.5, 3.2, 0.7, 0.7, 'F');
+            doc.roundedRect(badgeX, py - 2.3, badgeW, 3.3, 0.7, 0.7, 'F');
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(5);
-            doc.text(ptsTxt, px + 25.2, py, { align: 'center' });
+            doc.text(ptsTxt, badgeX + badgeW / 2, py, { align: 'center' });
           });
         });
         y += cardH + 2.2;
@@ -9227,12 +9251,6 @@ function onLibPredChange(e) {
       if (scope !== 'acc') {
         y = pdfWriteRanking(doc, y, warRanking, 'Guerra acumulada (todas las jornadas)');
       }
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.setTextColor(0, 120, 80);
-      y = pdfEnsureSpace(doc, y, 10);
-      doc.text('Partidos', 14, y);
-      y += 6;
       y = pdfWriteMatches(doc, y, rows);
       const fname = scope === 'acc' ? 'resumen-champions-acumulado.pdf' : ('resumen-champions-jornada-' + scope + '.pdf');
       pdfFooterAndSave(doc, fname);
@@ -9260,12 +9278,6 @@ function onLibPredChange(e) {
       }
       const ranking = pdfRankingFromRows(rows);
       y = pdfWriteRanking(doc, y, ranking, 'Clasificación Fecha FIFA');
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.setTextColor(0, 120, 80);
-      y = pdfEnsureSpace(doc, y, 10);
-      doc.text('Partidos', 14, y);
-      y += 6;
       y = pdfWriteMatches(doc, y, rows);
       pdfFooterAndSave(doc, 'resumen-fecha-fifa.pdf');
     }
@@ -9297,12 +9309,6 @@ function onLibPredChange(e) {
       }
       const ranking = pdfRankingFromRows(rows);
       y = pdfWriteRanking(doc, y, ranking, 'Mini ranking combinado');
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.setTextColor(0, 120, 80);
-      y = pdfEnsureSpace(doc, y, 10);
-      doc.text('Partidos', 14, y);
-      y += 6;
       y = pdfWriteMatches(doc, y, rows);
       pdfFooterAndSave(doc, 'resumen-libertadores-suramericana.pdf');
     }
