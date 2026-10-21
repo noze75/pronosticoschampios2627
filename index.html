@@ -9083,87 +9083,95 @@ function onLibPredChange(e) {
       return y + 4;
     }
 
+    function pdfShortTeam(name) {
+      const s = String(name || '');
+      if (s.length <= 13) return s;
+      return s.slice(0, 11) + '…';
+    }
+
     function pdfWriteMatches(doc, y, matchRows) {
       y = pdfSectionTitle(doc, y, 'Partidos y pronósticos');
-      matchRows.forEach((row, idx) => {
-        const cardH = 6 + 5 + (row.playerLines.length * 5.2) + 5;
-        y = pdfEnsureSpace(doc, y, cardH);
-        const x0 = 14;
-        const w = 182;
-        // Tarjeta
-        doc.setDrawColor(30, 58, 95);
-        doc.setFillColor(250, 252, 255);
-        doc.roundedRect(x0, y - 3, w, cardH - 1, 2, 2, 'FD');
-        // Barra lateral verde
-        doc.setFillColor(0, 230, 118);
-        doc.rect(x0, y - 3, 1.5, cardH - 1, 'F');
+      const cols = 3;
+      const gap = 2.5;
+      const x0 = 14;
+      const totalW = 182;
+      const cardW = (totalW - gap * (cols - 1)) / cols;
+      const cardH = 31;
 
-        // Marcador real: Local  [n-n]  Visitante
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(10);
-        doc.setTextColor(10, 22, 40);
-        const home = row.local || '';
-        const away = row.visitante || '';
-        doc.text(home, x0 + 5, y + 2);
-        const scoreTxt = row.realH + '  -  ' + row.realA;
-        doc.setFillColor(10, 22, 40);
-        const sw = Math.max(18, doc.getTextWidth(scoreTxt) + 6);
-        const scoreX = x0 + 92;
-        doc.roundedRect(scoreX, y - 1.5, sw, 6, 1.5, 1.5, 'F');
-        doc.setTextColor(0, 230, 118);
-        doc.setFontSize(9);
-        doc.text(scoreTxt, scoreX + sw / 2, y + 2.5, { align: 'center' });
-        doc.setTextColor(10, 22, 40);
-        doc.setFontSize(10);
-        doc.text(away, scoreX + sw + 4, y + 2);
+      for (let i = 0; i < matchRows.length; i += cols) {
+        y = pdfEnsureSpace(doc, y, cardH + 3);
+        const slice = matchRows.slice(i, i + cols);
+        slice.forEach((row, c) => {
+          const cx = x0 + c * (cardW + gap);
+          doc.setDrawColor(30, 58, 95);
+          doc.setFillColor(250, 252, 255);
+          doc.roundedRect(cx, y - 2, cardW, cardH, 1.5, 1.5, 'FD');
+          doc.setFillColor(0, 230, 118);
+          doc.rect(cx, y - 2, 1.2, cardH, 'F');
 
-        let yy = y + 7;
-        if (row.meta) {
-          doc.setFont('helvetica', 'normal');
-          doc.setFontSize(7.5);
-          doc.setTextColor(120, 135, 150);
-          doc.text(String(row.meta), x0 + 5, yy);
-          yy += 4.5;
-        }
-
-        // Predicciones en grid 2x2
-        const colW = 86;
-        row.playerLines.forEach((pl, pi) => {
-          const col = pi % 2;
-          const rowN = Math.floor(pi / 2);
-          const px = x0 + 5 + col * colW;
-          const py = yy + rowN * 5.2;
-          const rgb = PDF_PLAYER_RGB[pl.id] || [80, 90, 100];
-          doc.setFont('helvetica', 'bold');
-          doc.setFontSize(7.5);
-          doc.setTextColor(rgb[0], rgb[1], rgb[2]);
-          doc.text(pl.name, px, py);
-          doc.setFont('helvetica', 'normal');
-          doc.setTextColor(40, 50, 60);
-          doc.text(pl.predText, px + 22, py);
-          // Badge pts
-          let ptsTxt = pl.pts == null ? '—' : String(pl.pts);
-          if (pl.exact) {
-            doc.setFillColor(0, 200, 100);
-            doc.setTextColor(255, 255, 255);
-          } else if (pl.pts === 1) {
-            doc.setFillColor(255, 193, 7);
-            doc.setTextColor(40, 30, 0);
-          } else if (pl.pts === 0) {
-            doc.setFillColor(239, 83, 80);
-            doc.setTextColor(255, 255, 255);
-          } else {
-            doc.setFillColor(200, 210, 220);
-            doc.setTextColor(60, 70, 80);
-          }
-          doc.roundedRect(px + 38, py - 2.8, 12, 4, 1, 1, 'F');
+          const mid = cx + cardW / 2;
           doc.setFont('helvetica', 'bold');
           doc.setFontSize(6.5);
-          doc.text(ptsTxt, px + 44, py, { align: 'center' });
-        });
+          doc.setTextColor(10, 22, 40);
+          doc.text(pdfShortTeam(row.local), mid, y + 2.2, { align: 'center' });
 
-        y += cardH + 2;
-      });
+          const scoreTxt = row.realH + '-' + row.realA;
+          doc.setFillColor(10, 22, 40);
+          doc.roundedRect(mid - 7, y + 3.5, 14, 4.2, 1, 1, 'F');
+          doc.setTextColor(0, 230, 118);
+          doc.setFontSize(6.5);
+          doc.text(scoreTxt, mid, y + 6.5, { align: 'center' });
+
+          doc.setTextColor(10, 22, 40);
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(6.5);
+          doc.text(pdfShortTeam(row.visitante), mid, y + 11, { align: 'center' });
+
+          if (row.meta) {
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(5);
+            doc.setTextColor(120, 135, 150);
+            let meta = String(row.meta);
+            if (meta.length > 26) meta = meta.slice(0, 24) + '…';
+            doc.text(meta, mid, y + 14.2, { align: 'center' });
+          }
+
+          row.playerLines.forEach((pl, pi) => {
+            const col = pi % 2;
+            const rn = Math.floor(pi / 2);
+            const px = cx + 2.5 + col * (cardW / 2 - 0.5);
+            const py = y + 18 + rn * 5.2;
+            const rgb = PDF_PLAYER_RGB[pl.id] || [80, 90, 100];
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(5.2);
+            doc.setTextColor(rgb[0], rgb[1], rgb[2]);
+            doc.text((pl.name || '').slice(0, 4), px, py);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(40, 50, 60);
+            doc.setFontSize(5.5);
+            doc.text(pl.predText, px + 11, py);
+            const ptsTxt = pl.pts == null ? '—' : String(pl.pts);
+            if (pl.exact) {
+              doc.setFillColor(0, 200, 100);
+              doc.setTextColor(255, 255, 255);
+            } else if (pl.pts === 1) {
+              doc.setFillColor(255, 193, 7);
+              doc.setTextColor(40, 30, 0);
+            } else if (pl.pts === 0) {
+              doc.setFillColor(239, 83, 80);
+              doc.setTextColor(255, 255, 255);
+            } else {
+              doc.setFillColor(200, 210, 220);
+              doc.setTextColor(60, 70, 80);
+            }
+            doc.roundedRect(px + 22, py - 2.2, 6.5, 3.2, 0.7, 0.7, 'F');
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(5);
+            doc.text(ptsTxt, px + 25.2, py, { align: 'center' });
+          });
+        });
+        y += cardH + 2.2;
+      }
       return y;
     }
 
