@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pronósticos Champions League 2026/27 – Fase de Liga</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
@@ -3557,6 +3558,65 @@
       background: #0a1628;
     }
 
+    /* Resúmenes PDF */
+    .resumenes-wrap { max-width: 920px; margin: 0 auto; }
+    .resumenes-wrap > .rules { margin-bottom: 1rem; }
+    .resumen-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1rem 1.1rem 1.15rem;
+      margin-bottom: 0.85rem;
+    }
+    .resumen-card h3 {
+      margin: 0 0 0.35rem;
+      font-size: 1.05rem;
+      font-weight: 900;
+      color: var(--accent);
+    }
+    .resumen-card .resumen-desc {
+      margin: 0 0 0.75rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    .resumen-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      align-items: center;
+    }
+    .resumen-controls label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .resumen-controls select {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.4rem 0.55rem;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+    .resumen-controls button.primary {
+      background: var(--accent);
+      color: #04120a;
+      border: none;
+      border-radius: 8px;
+      padding: 0.45rem 0.9rem;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .resumen-controls button.primary:hover { filter: brightness(1.06); }
+    .resumen-hint {
+      margin: 0.55rem 0 0;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
   </style>
 </head>
 <body>
@@ -3625,6 +3685,7 @@
       <button data-panel="rondas">Rondas finales</button>
       <button data-panel="mapa">Mapa</button>
       <button data-panel="juegos">Juegos</button>
+      <button data-panel="resumenes">Resúmenes</button>
       <button data-panel="reglas">Reglas</button>
     </nav>
   </header>
@@ -3666,6 +3727,7 @@
           <button type="button" class="home-tab-card" data-go="rondas" onclick="goToPanel('rondas')"><span class="ico">🏆</span><span class="lab">Rondas finales</span></button>
           <button type="button" class="home-tab-card" data-go="mapa" onclick="goToPanel('mapa')"><span class="ico">🗺️</span><span class="lab">Mapa</span></button>
           <button type="button" class="home-tab-card" data-go="juegos" onclick="goToPanel('juegos')"><span class="ico">🎮</span><span class="lab">Juegos</span></button>
+          <button type="button" class="home-tab-card" data-go="resumenes" onclick="goToPanel('resumenes')"><span class="ico">📄</span><span class="lab">Resúmenes</span></button>
           <button type="button" class="home-tab-card" data-go="reglas" onclick="goToPanel('reglas')"><span class="ico">📋</span><span class="lab">Reglas</span></button>
         </div>
       </section>
@@ -4015,6 +4077,53 @@
             Ranking arriba · llaves con final automática al clasificar · izquierda <strong>Libertadores</strong> · derecha <strong>Suramericana</strong>. Partidos ya jugados: <strong>2 pts para todos</strong>.
           </p>
           <div id="libInteractive"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESÚMENES PDF -->
+    <div id="resumenes" class="panel">
+      <div class="resumenes-wrap">
+        <div class="rules">
+          <strong>Resúmenes descargables (PDF)</strong> —
+          Elige el torneo y genera un PDF con marcadores reales, pronósticos de cada uno y cómo va la guerra.
+        </div>
+
+        <div class="resumen-card">
+          <h3>⚽ Champions League</h3>
+          <p class="resumen-desc">Por jornada (solo partidos con resultado) o acumulado de toda la fase de liga.</p>
+          <div class="resumen-controls">
+            <label for="resumenClScope">Alcance</label>
+            <select id="resumenClScope">
+              <option value="acc">Acumulado (todas las jornadas)</option>
+              <option value="1">Jornada 1 · 8-10 sep 2026</option>
+              <option value="2">Jornada 2 · 13-14 oct 2026</option>
+              <option value="3">Jornada 3 · 20-21 oct 2026</option>
+              <option value="4">Jornada 4 · 3-4 nov 2026</option>
+              <option value="5">Jornada 5 · 24-25 nov 2026</option>
+              <option value="6">Jornada 6 · 8-9 dic 2026</option>
+              <option value="7">Jornada 7 · 19-20 ene 2027</option>
+              <option value="8">Jornada 8 · 27 ene 2027</option>
+            </select>
+            <button type="button" class="primary" onclick="downloadResumenChampionsPdf()">⬇ Descargar PDF</button>
+          </div>
+          <p class="resumen-hint">Si eliges una jornada sin resultados reales aún, el PDF avisará y saldrá casi vacío de partidos.</p>
+        </div>
+
+        <div class="resumen-card">
+          <h3>🌍 Fecha FIFA</h3>
+          <p class="resumen-desc">Resumen acumulativo de todos los partidos de Fecha FIFA / amistosos cargados.</p>
+          <div class="resumen-controls">
+            <button type="button" class="primary" onclick="downloadResumenFifaPdf()">⬇ Descargar PDF</button>
+          </div>
+        </div>
+
+        <div class="resumen-card">
+          <h3>🏆 Libertadores y Suramericana</h3>
+          <p class="resumen-desc">Partidos con resultado, pronósticos y mini ranking combinado de ambas copas.</p>
+          <div class="resumen-controls">
+            <button type="button" class="primary" onclick="downloadResumenLibPdf()">⬇ Descargar PDF</button>
+          </div>
         </div>
       </div>
     </div>
@@ -8764,6 +8873,284 @@ function onLibPredChange(e) {
       if (typeof saveData === 'function') saveData();
     }
 
+    // ========== RESÚMENES PDF ==========
+    const JORNADA_DATES_PDF = {
+      1: '8-10 sep 2026',
+      2: '13-14 oct 2026',
+      3: '20-21 oct 2026',
+      4: '3-4 nov 2026',
+      5: '24-25 nov 2026',
+      6: '8-9 dic 2026',
+      7: '19-20 ene 2027',
+      8: '27 ene 2027'
+    };
+
+    function pdfEnsureJsPdf() {
+      const mod = window.jspdf;
+      if (!mod || !mod.jsPDF) {
+        toast('No se pudo cargar la librería PDF. Revisa la conexión.');
+        return null;
+      }
+      return mod.jsPDF;
+    }
+
+    function pdfNewDoc() {
+      const jsPDF = pdfEnsureJsPdf();
+      if (!jsPDF) return null;
+      return new jsPDF({ unit: 'mm', format: 'a4' });
+    }
+
+    function pdfCollectMatchRows(matches, resultsMap, predictionsMap) {
+      const rows = [];
+      matches.forEach(m => {
+        const real = resultsMap[m.id];
+        if (!real || real.h == null || real.a == null) return;
+        const preds = predictionsMap[m.id] || {};
+        const playerLines = PLAYERS.map(p => {
+          const pred = preds[p] || {};
+          if (pred.h == null || pred.a == null) {
+            return { id: p, name: PLAYER_NAMES[p], predText: '—', pts: null, exact: false, result: false };
+          }
+          const r = calcPoints(pred.h, pred.a, real.h, real.a);
+          return {
+            id: p,
+            name: PLAYER_NAMES[p],
+            predText: pred.h + '-' + pred.a,
+            pts: r.pts,
+            exact: r.exact,
+            result: r.result
+          };
+        });
+        rows.push({
+          id: m.id,
+          label: (m.local || '?') + ' ' + real.h + '-' + real.a + ' ' + (m.visitante || '?'),
+          meta: (m.fecha || m.ronda || '') + (m.hora_col ? ' · ' + m.hora_col : ''),
+          realH: real.h,
+          realA: real.a,
+          playerLines
+        });
+      });
+      return rows;
+    }
+
+    function pdfRankingFromRows(matchRows) {
+      const stats = {};
+      PLAYERS.forEach(p => {
+        stats[p] = { id: p, name: PLAYER_NAMES[p], pts: 0, exact: 0, resultOnly: 0, goalsHit: 0, played: 0 };
+      });
+      matchRows.forEach(row => {
+        row.playerLines.forEach(pl => {
+          if (pl.pts == null) return;
+          const s = stats[pl.id];
+          s.pts += pl.pts;
+          s.played++;
+          if (pl.exact) s.exact++;
+          else if (pl.result) s.resultOnly++;
+        });
+      });
+      // goalsHit recalculated from raw if needed — optional for PDF
+      return PLAYERS.map(p => stats[p]).sort((a, b) => {
+        if (b.pts !== a.pts) return b.pts - a.pts;
+        if (b.exact !== a.exact) return b.exact - a.exact;
+        return a.name.localeCompare(b.name);
+      });
+    }
+
+    function pdfWriteHeader(doc, title, subtitle) {
+      doc.setFillColor(10, 22, 40);
+      doc.rect(0, 0, 210, 28, 'F');
+      doc.setTextColor(0, 230, 118);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.text(title, 14, 12);
+      doc.setTextColor(180, 200, 220);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text(subtitle, 14, 20);
+      doc.setTextColor(30, 40, 55);
+      return 34;
+    }
+
+    function pdfEnsureSpace(doc, y, need) {
+      if (y + need < 285) return y;
+      doc.addPage();
+      return 16;
+    }
+
+    function pdfWriteRanking(doc, y, ranking, heading) {
+      y = pdfEnsureSpace(doc, y, 28);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(0, 120, 80);
+      doc.text(heading, 14, y);
+      y += 6;
+      doc.setFontSize(9);
+      doc.setTextColor(40, 50, 60);
+      ranking.forEach((r, i) => {
+        y = pdfEnsureSpace(doc, y, 6);
+        const line = (i + 1) + '. ' + r.name + '  —  ' + r.pts + ' pts  ·  ' + r.exact + ' exactos  ·  ' + r.resultOnly + ' resultado  ·  ' + r.played + ' PJ';
+        doc.text(line, 14, y);
+        y += 5;
+      });
+      return y + 3;
+    }
+
+    function pdfWriteMatches(doc, y, matchRows) {
+      matchRows.forEach(row => {
+        y = pdfEnsureSpace(doc, y, 22);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.setTextColor(20, 30, 45);
+        doc.text(row.label, 14, y);
+        y += 4.5;
+        if (row.meta) {
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(8);
+          doc.setTextColor(100, 110, 120);
+          doc.text(String(row.meta), 14, y);
+          y += 4;
+        }
+        doc.setFontSize(8.5);
+        row.playerLines.forEach(pl => {
+          y = pdfEnsureSpace(doc, y, 5);
+          let ptsTxt = pl.pts == null ? 's/p' : (pl.pts + ' pts');
+          if (pl.exact) ptsTxt += ' ★';
+          doc.setTextColor(40, 50, 60);
+          doc.text(pl.name + ': ' + pl.predText + '  (' + ptsTxt + ')', 18, y);
+          y += 4.2;
+        });
+        y += 2.5;
+      });
+      return y;
+    }
+
+    function pdfFooterAndSave(doc, filename) {
+      const n = doc.getNumberOfPages();
+      for (let i = 1; i <= n; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(140, 150, 160);
+        doc.text('Champions 26/27 · Pronósticos  ·  pág. ' + i + '/' + n, 14, 292);
+      }
+      doc.save(filename);
+      toast('PDF descargado');
+    }
+
+    function downloadResumenChampionsPdf() {
+      const doc = pdfNewDoc();
+      if (!doc) return;
+      const scopeEl = document.getElementById('resumenClScope');
+      const scope = scopeEl ? scopeEl.value : 'acc';
+      let matches;
+      let title;
+      let subtitle;
+      if (scope === 'acc') {
+        matches = MATCHES.slice();
+        title = 'Champions 26/27 · Resumen acumulado';
+        subtitle = 'Fase de liga · todos los partidos con resultado real';
+      } else {
+        const j = parseInt(scope, 10);
+        matches = MATCHES.filter(m => m.jornada === j);
+        title = 'Champions 26/27 · Jornada ' + j;
+        subtitle = (JORNADA_DATES_PDF[j] || '') + ' · marcadores y pronósticos';
+      }
+      const rows = pdfCollectMatchRows(matches, data.results || {}, data.predictions || {});
+      let y = pdfWriteHeader(doc, title, subtitle);
+      if (!rows.length) {
+        doc.setFontSize(11);
+        doc.setTextColor(120, 80, 40);
+        doc.text('No hay partidos con resultado real en este alcance todavía.', 14, y);
+        pdfFooterAndSave(doc, scope === 'acc' ? 'resumen-champions-acumulado.pdf' : ('resumen-champions-jornada-' + scope + '.pdf'));
+        return;
+      }
+      const ranking = pdfRankingFromRows(rows);
+      // Guerra acumulada siempre con todos los resultados CL
+      const allRows = pdfCollectMatchRows(MATCHES, data.results || {}, data.predictions || {});
+      const warRanking = pdfRankingFromRows(allRows);
+      y = pdfWriteRanking(doc, y, ranking, scope === 'acc' ? 'Clasificación (acumulado)' : 'Puntos en esta jornada');
+      if (scope !== 'acc') {
+        y = pdfWriteRanking(doc, y, warRanking, 'Guerra acumulada (todas las jornadas)');
+      }
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(0, 120, 80);
+      y = pdfEnsureSpace(doc, y, 10);
+      doc.text('Partidos', 14, y);
+      y += 6;
+      y = pdfWriteMatches(doc, y, rows);
+      const fname = scope === 'acc' ? 'resumen-champions-acumulado.pdf' : ('resumen-champions-jornada-' + scope + '.pdf');
+      pdfFooterAndSave(doc, fname);
+    }
+
+    function downloadResumenFifaPdf() {
+      const doc = pdfNewDoc();
+      if (!doc) return;
+      if (typeof ensureFifaData === 'function') ensureFifaData();
+      const matches = (typeof FIFA_MATCHES !== 'undefined' ? FIFA_MATCHES : []).map(m => ({
+        id: m.id,
+        local: m.local,
+        visitante: m.visitante,
+        fecha: m.fecha || m.when || '',
+        hora_col: m.hora_col || ''
+      }));
+      const rows = pdfCollectMatchRows(matches, (data.fifa && data.fifa.results) || {}, (data.fifa && data.fifa.predictions) || {});
+      let y = pdfWriteHeader(doc, 'Fecha FIFA · Resumen', 'Ranking acumulativo · aparte de Champions');
+      if (!rows.length) {
+        doc.setFontSize(11);
+        doc.setTextColor(120, 80, 40);
+        doc.text('Aún no hay partidos de Fecha FIFA con resultado real.', 14, y);
+        pdfFooterAndSave(doc, 'resumen-fecha-fifa.pdf');
+        return;
+      }
+      const ranking = pdfRankingFromRows(rows);
+      y = pdfWriteRanking(doc, y, ranking, 'Clasificación Fecha FIFA');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(0, 120, 80);
+      y = pdfEnsureSpace(doc, y, 10);
+      doc.text('Partidos', 14, y);
+      y += 6;
+      y = pdfWriteMatches(doc, y, rows);
+      pdfFooterAndSave(doc, 'resumen-fecha-fifa.pdf');
+    }
+
+    function downloadResumenLibPdf() {
+      const doc = pdfNewDoc();
+      if (!doc) return;
+      if (typeof ensureLibertadoresData === 'function') ensureLibertadoresData();
+      const src = (typeof CONMEBOL_MATCHES !== 'undefined' ? CONMEBOL_MATCHES : []);
+      const matches = src.filter(m => !m.isFinal || (typeof resolveConmebolMatch === 'function' && resolveConmebolMatch(m).teamsReady)).map(raw => {
+        const m = (typeof resolveConmebolMatch === 'function') ? resolveConmebolMatch(raw) : raw;
+        return {
+          id: m.id,
+          local: m.local,
+          visitante: m.visitante,
+          fecha: (m.comp === 'lib' ? 'LIB ' : 'SUD ') + (m.ronda || ''),
+          hora_col: m.hora_col || '',
+          ronda: m.ronda
+        };
+      });
+      const rows = pdfCollectMatchRows(matches, (data.libertadores && data.libertadores.results) || {}, (data.libertadores && data.libertadores.predictions) || {});
+      let y = pdfWriteHeader(doc, 'Libertadores y Suramericana', 'Semifinales / final · pronósticos del grupo');
+      if (!rows.length) {
+        doc.setFontSize(11);
+        doc.setTextColor(120, 80, 40);
+        doc.text('Aún no hay partidos con resultado real en esta sección.', 14, y);
+        pdfFooterAndSave(doc, 'resumen-libertadores-suramericana.pdf');
+        return;
+      }
+      const ranking = pdfRankingFromRows(rows);
+      y = pdfWriteRanking(doc, y, ranking, 'Mini ranking combinado');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(0, 120, 80);
+      y = pdfEnsureSpace(doc, y, 10);
+      doc.text('Partidos', 14, y);
+      y += 6;
+      y = pdfWriteMatches(doc, y, rows);
+      pdfFooterAndSave(doc, 'resumen-libertadores-suramericana.pdf');
+    }
+
 function showFutbolSub(sub) {
       sub = sub || 'champions';
       document.querySelectorAll('#futbolSubnav button').forEach(b => {
@@ -8797,6 +9184,11 @@ function showFutbolSub(sub) {
       if (!card) return;
       goToPanel(card.getAttribute('data-go'));
     });
+
+    // Exponer resúmenes por si el onclick del HTML se evalúa en otro ámbito
+    window.downloadResumenChampionsPdf = downloadResumenChampionsPdf;
+    window.downloadResumenFifaPdf = downloadResumenFifaPdf;
+    window.downloadResumenLibPdf = downloadResumenLibPdf;
 
     document.getElementById('clubSearch')?.addEventListener('input', e => {
       renderClubes(e.target.value);
