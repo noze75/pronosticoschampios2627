@@ -8923,6 +8923,8 @@ function onLibPredChange(e) {
         });
         rows.push({
           id: m.id,
+          local: m.local || '?',
+          visitante: m.visitante || '?',
           label: (m.local || '?') + ' ' + real.h + '-' + real.a + ' ' + (m.visitante || '?'),
           meta: (m.fecha || m.ronda || '') + (m.hora_col ? ' · ' + m.hora_col : ''),
           realH: real.h,
@@ -8956,70 +8958,211 @@ function onLibPredChange(e) {
       });
     }
 
+    const PDF_PLAYER_RGB = {
+      baez: [255, 152, 0],
+      juan: [186, 104, 200],
+      marrugo: [38, 198, 218],
+      mauricio: [240, 128, 160]
+    };
+
     function pdfWriteHeader(doc, title, subtitle) {
+      // Fondo portada
       doc.setFillColor(10, 22, 40);
-      doc.rect(0, 0, 210, 28, 'F');
-      doc.setTextColor(0, 230, 118);
+      doc.rect(0, 0, 210, 36, 'F');
+      // Franja accent
+      doc.setFillColor(0, 230, 118);
+      doc.rect(0, 36, 210, 1.8, 'F');
+      // Badge
+      doc.setFillColor(0, 230, 118);
+      doc.roundedRect(14, 8, 28, 8, 2, 2, 'F');
+      doc.setTextColor(4, 18, 10);
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(14);
-      doc.text(title, 14, 12);
-      doc.setTextColor(180, 200, 220);
+      doc.setFontSize(7);
+      doc.text('26/27', 20.5, 13.2);
+      // Título
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(15);
+      doc.text(title, 46, 14);
+      doc.setTextColor(155, 176, 204);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9);
-      doc.text(subtitle, 14, 20);
-      doc.setTextColor(30, 40, 55);
-      return 34;
+      doc.text(subtitle, 46, 21);
+      // Fecha generación
+      const now = new Date();
+      const gen = now.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' }) +
+        ' · ' + now.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+      doc.setFontSize(7.5);
+      doc.setTextColor(120, 140, 160);
+      doc.text(gen, 14, 31);
+      return 44;
     }
 
     function pdfEnsureSpace(doc, y, need) {
-      if (y + need < 285) return y;
+      if (y + need < 278) return y;
       doc.addPage();
+      // Mini header en páginas siguientes
+      doc.setFillColor(10, 22, 40);
+      doc.rect(0, 0, 210, 10, 'F');
+      doc.setFillColor(0, 230, 118);
+      doc.rect(0, 10, 210, 0.8, 'F');
+      doc.setTextColor(0, 230, 118);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.text('Champions 26/27 · Pronósticos', 14, 6.5);
       return 16;
     }
 
-    function pdfWriteRanking(doc, y, ranking, heading) {
-      y = pdfEnsureSpace(doc, y, 28);
+    function pdfSectionTitle(doc, y, text) {
+      y = pdfEnsureSpace(doc, y, 12);
+      doc.setFillColor(0, 230, 118);
+      doc.roundedRect(14, y - 3.5, 2.2, 6, 0.8, 0.8, 'F');
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(11);
-      doc.setTextColor(0, 120, 80);
-      doc.text(heading, 14, y);
-      y += 6;
-      doc.setFontSize(9);
-      doc.setTextColor(40, 50, 60);
+      doc.setTextColor(10, 22, 40);
+      doc.text(text, 20, y);
+      return y + 7;
+    }
+
+    function pdfWriteRanking(doc, y, ranking, heading) {
+      y = pdfSectionTitle(doc, y, heading);
+      const rowH = 8;
+      const tableW = 182;
+      const x0 = 14;
+      // Cabecera tabla
+      y = pdfEnsureSpace(doc, y, rowH * 5 + 6);
+      doc.setFillColor(18, 38, 64);
+      doc.roundedRect(x0, y - 4, tableW, rowH, 1.5, 1.5, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7.5);
+      doc.setTextColor(155, 176, 204);
+      doc.text('#', x0 + 4, y);
+      doc.text('JUGADOR', x0 + 14, y);
+      doc.text('PTS', x0 + 70, y);
+      doc.text('EXACTOS', x0 + 92, y);
+      doc.text('RESULTADO', x0 + 120, y);
+      doc.text('PJ', x0 + 160, y);
+      y += rowH;
+
       ranking.forEach((r, i) => {
-        y = pdfEnsureSpace(doc, y, 6);
-        const line = (i + 1) + '. ' + r.name + '  —  ' + r.pts + ' pts  ·  ' + r.exact + ' exactos  ·  ' + r.resultOnly + ' resultado  ·  ' + r.played + ' PJ';
-        doc.text(line, 14, y);
-        y += 5;
+        y = pdfEnsureSpace(doc, y, rowH + 2);
+        // Alternar fondo
+        if (i % 2 === 0) {
+          doc.setFillColor(245, 248, 252);
+          doc.rect(x0, y - 4.5, tableW, rowH, 'F');
+        }
+        // Medalla / rank
+        if (i === 0) doc.setFillColor(0, 230, 118);
+        else if (i === 1) doc.setFillColor(255, 213, 79);
+        else if (i === 2) doc.setFillColor(66, 165, 245);
+        else doc.setFillColor(180, 190, 200);
+        doc.circle(x0 + 6, y - 1.2, 2.6, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(7);
+        doc.setTextColor(i < 3 ? 10 : 40, i < 3 ? 22 : 40, i < 3 ? 40 : 40);
+        doc.text(String(i + 1), x0 + 6, y, { align: 'center' });
+
+        const rgb = PDF_PLAYER_RGB[r.id] || [40, 50, 60];
+        doc.setTextColor(rgb[0], rgb[1], rgb[2]);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.text(r.name, x0 + 14, y);
+
+        doc.setTextColor(0, 150, 90);
+        doc.setFontSize(10);
+        doc.text(String(r.pts), x0 + 70, y);
+
+        doc.setTextColor(40, 50, 60);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8.5);
+        doc.text(String(r.exact), x0 + 92, y);
+        doc.text(String(r.resultOnly), x0 + 120, y);
+        doc.text(String(r.played), x0 + 160, y);
+        y += rowH;
       });
-      return y + 3;
+      return y + 4;
     }
 
     function pdfWriteMatches(doc, y, matchRows) {
-      matchRows.forEach(row => {
-        y = pdfEnsureSpace(doc, y, 22);
+      y = pdfSectionTitle(doc, y, 'Partidos y pronósticos');
+      matchRows.forEach((row, idx) => {
+        const cardH = 6 + 5 + (row.playerLines.length * 5.2) + 5;
+        y = pdfEnsureSpace(doc, y, cardH);
+        const x0 = 14;
+        const w = 182;
+        // Tarjeta
+        doc.setDrawColor(30, 58, 95);
+        doc.setFillColor(250, 252, 255);
+        doc.roundedRect(x0, y - 3, w, cardH - 1, 2, 2, 'FD');
+        // Barra lateral verde
+        doc.setFillColor(0, 230, 118);
+        doc.rect(x0, y - 3, 1.5, cardH - 1, 'F');
+
+        // Marcador real: Local  [n-n]  Visitante
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(10);
-        doc.setTextColor(20, 30, 45);
-        doc.text(row.label, 14, y);
-        y += 4.5;
+        doc.setTextColor(10, 22, 40);
+        const home = row.local || '';
+        const away = row.visitante || '';
+        doc.text(home, x0 + 5, y + 2);
+        const scoreTxt = row.realH + '  -  ' + row.realA;
+        doc.setFillColor(10, 22, 40);
+        const sw = Math.max(18, doc.getTextWidth(scoreTxt) + 6);
+        const scoreX = x0 + 92;
+        doc.roundedRect(scoreX, y - 1.5, sw, 6, 1.5, 1.5, 'F');
+        doc.setTextColor(0, 230, 118);
+        doc.setFontSize(9);
+        doc.text(scoreTxt, scoreX + sw / 2, y + 2.5, { align: 'center' });
+        doc.setTextColor(10, 22, 40);
+        doc.setFontSize(10);
+        doc.text(away, scoreX + sw + 4, y + 2);
+
+        let yy = y + 7;
         if (row.meta) {
           doc.setFont('helvetica', 'normal');
-          doc.setFontSize(8);
-          doc.setTextColor(100, 110, 120);
-          doc.text(String(row.meta), 14, y);
-          y += 4;
+          doc.setFontSize(7.5);
+          doc.setTextColor(120, 135, 150);
+          doc.text(String(row.meta), x0 + 5, yy);
+          yy += 4.5;
         }
-        doc.setFontSize(8.5);
-        row.playerLines.forEach(pl => {
-          y = pdfEnsureSpace(doc, y, 5);
-          let ptsTxt = pl.pts == null ? 's/p' : (pl.pts + ' pts');
-          if (pl.exact) ptsTxt += ' ★';
+
+        // Predicciones en grid 2x2
+        const colW = 86;
+        row.playerLines.forEach((pl, pi) => {
+          const col = pi % 2;
+          const rowN = Math.floor(pi / 2);
+          const px = x0 + 5 + col * colW;
+          const py = yy + rowN * 5.2;
+          const rgb = PDF_PLAYER_RGB[pl.id] || [80, 90, 100];
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(7.5);
+          doc.setTextColor(rgb[0], rgb[1], rgb[2]);
+          doc.text(pl.name, px, py);
+          doc.setFont('helvetica', 'normal');
           doc.setTextColor(40, 50, 60);
-          doc.text(pl.name + ': ' + pl.predText + '  (' + ptsTxt + ')', 18, y);
-          y += 4.2;
+          doc.text(pl.predText, px + 22, py);
+          // Badge pts
+          let ptsTxt = pl.pts == null ? '—' : String(pl.pts);
+          if (pl.exact) {
+            doc.setFillColor(0, 200, 100);
+            doc.setTextColor(255, 255, 255);
+          } else if (pl.pts === 1) {
+            doc.setFillColor(255, 193, 7);
+            doc.setTextColor(40, 30, 0);
+          } else if (pl.pts === 0) {
+            doc.setFillColor(239, 83, 80);
+            doc.setTextColor(255, 255, 255);
+          } else {
+            doc.setFillColor(200, 210, 220);
+            doc.setTextColor(60, 70, 80);
+          }
+          doc.roundedRect(px + 38, py - 2.8, 12, 4, 1, 1, 'F');
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(6.5);
+          doc.text(ptsTxt, px + 44, py, { align: 'center' });
         });
-        y += 2.5;
+
+        y += cardH + 2;
       });
       return y;
     }
@@ -9028,9 +9171,14 @@ function onLibPredChange(e) {
       const n = doc.getNumberOfPages();
       for (let i = 1; i <= n; i++) {
         doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setTextColor(140, 150, 160);
-        doc.text('Champions 26/27 · Pronósticos  ·  pág. ' + i + '/' + n, 14, 292);
+        doc.setDrawColor(0, 230, 118);
+        doc.setLineWidth(0.3);
+        doc.line(14, 287, 196, 287);
+        doc.setFontSize(7.5);
+        doc.setTextColor(120, 140, 160);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Champions 26/27 · Pronósticos del grupo', 14, 292);
+        doc.text('Pág. ' + i + ' / ' + n, 196, 292, { align: 'right' });
       }
       doc.save(filename);
       toast('PDF descargado');
