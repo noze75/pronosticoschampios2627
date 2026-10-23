@@ -2874,6 +2874,63 @@
       font-size: 0.75rem;
       font-weight: 700;
     }
+    #koMatchesContainer {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+    @media (max-width: 1100px) {
+      #koMatchesContainer { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 800px) {
+      #koMatchesContainer { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 520px) {
+      #koMatchesContainer { grid-template-columns: 1fr; }
+    }
+    .ko-round-sep {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      margin: 0.55rem 0 0.15rem;
+    }
+    .ko-round-sep:first-child { margin-top: 0; }
+    .ko-round-sep .jornada-label {
+      font-weight: 900;
+      font-size: 0.85rem;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+    .ko-round-sep .line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--border), transparent);
+    }
+    .match-card.ko-card .match-header .jornada {
+      background: rgba(105, 240, 174, 0.12);
+      color: #69f0ae;
+    }
+    .match-card.ko-card .ko-pens-inline {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.35rem 0.55rem;
+      margin: 0.35rem 0 0.15rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .match-card.ko-card .ko-pens-inline select {
+      font-size: 0.72rem;
+      font-weight: 700;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      padding: 0.12rem 0.3rem;
+    }
     }
     .later-stages span:nth-child(odd) {
       background: rgba(66,165,245,0.12);
@@ -6663,37 +6720,98 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       return legend + '<div class="ko-bracket-wrap"><div class="ko-bracket">' + html + '</div></div>';
     }
 
-    function renderKoDetailPanel() {
-      if (!koSelected) {
-        return '<div class="ko-detail-panel" style="opacity:0.85">' +
-          '<h4>Llave visual</h4>' +
-          '<p style="margin:0;font-size:0.82rem;color:var(--muted)">Haz clic en un cruce de la llave para ver ida/vuelta, penaltis y pronósticos.</p>' +
+    function renderKoMatchCard(m) {
+      ensureKoData();
+      const user = currentUser();
+      const real = data.ko.results[m.id] || {};
+      const preds = data.ko.predictions[m.id] || {};
+      const hasReal = real.h != null && real.a != null;
+      const locked = !adminUnlocked;
+      const homeName = koTeamLabel(m, 'local');
+      const awayName = koTeamLabel(m, 'visitante');
+      const roundLabels = { po: 'Playoff', r16: 'Octavos', qf: 'Cuartos', sf: 'Semis', final: 'Final' };
+      const legLabel = m.single ? 'Final' : (m.leg === 'ida' ? 'Ida' : 'Vuelta');
+      const head = (roundLabels[m.round] || m.round) + (m.round === 'final' ? '' : (' ' + m.tie)) + ' · ' + legLabel;
+
+      const predBoxes = PLAYERS.map(p => {
+        const pred = preds[p] || {};
+        const canEdit = !!user && user === p;
+        let badge = '';
+        if (hasReal && pred.h != null && pred.a != null) {
+          const r = calcPoints(pred.h, pred.a, real.h, real.a);
+          const cls = r.exact || r.pts === 2 ? 'exact' : (r.pts === 1 ? 'has-pts' : 'zero-pts');
+          badge = '<span class="pts-badge ' + cls + '">' + r.pts + ' pts</span>';
+        }
+        const boxCls = canEdit ? 'can-edit' : 'locked-edit';
+        return '<div class="pred-box ' + p + ' ' + boxCls + '">' +
+          '<div class="name">' + PLAYER_NAMES[p] + ' ' + badge + '</div>' +
+          '<div class="score-inputs pred-scores">' +
+            '<input type="number" min="0" max="20" inputmode="numeric" data-ko-pred="' + m.id + '" data-ko-player="' + p + '" data-side="h" value="' + (pred.h != null ? pred.h : '') + '" placeholder="-" ' + (canEdit ? '' : 'disabled') + ' />' +
+            '<span class="score-colon">:</span>' +
+            '<input type="number" min="0" max="20" inputmode="numeric" data-ko-pred="' + m.id + '" data-ko-player="' + p + '" data-side="a" value="' + (pred.a != null ? pred.a : '') + '" placeholder="-" ' + (canEdit ? '' : 'disabled') + ' />' +
+          '</div></div>';
+      }).join('');
+
+      let pensHtml = '';
+      const showPens = m.single || m.leg === 'vuelta';
+      if (showPens) {
+        const pensOn = !!real.pens;
+        const pw = real.pensWinner || '';
+        pensHtml = '<div class="ko-pens-inline">' +
+          '<label><input type="checkbox" data-ko-real="' + m.id + '" data-side="pens" ' + (pensOn ? 'checked' : '') + ' ' + (locked ? 'disabled' : '') + ' /> Penaltis</label>' +
+          '<select data-ko-real="' + m.id + '" data-side="pensWinner" ' + (locked ? 'disabled' : '') + '>' +
+            '<option value="">Ganador pen…</option>' +
+            '<option value="h"' + (pw === 'h' ? ' selected' : '') + '>' + homeName + '</option>' +
+            '<option value="a"' + (pw === 'a' ? ' selected' : '') + '>' + awayName + '</option>' +
+          '</select>' +
+          '<span style="opacity:0.75">No cuentan para puntos</span>' +
         '</div>';
       }
-      const { round, tie } = koSelected;
-      const titles = { po: 'Playoffs', r16: 'Octavos', qf: 'Cuartos', sf: 'Semis', final: 'Final' };
-      const title = (titles[round] || round) + (round === 'final' ? '' : (' · Cruce ' + tie));
-      let legsHtml = '';
-      if (round === 'final') {
-        const m = KO_MATCHES.find(x => x.round === 'final');
-        legsHtml = renderKoLegHtml(m);
-      } else {
-        legsHtml = KO_MATCHES.filter(x => x.round === round && x.tie === tie).map(renderKoLegHtml).join('');
-      }
-      const agg = koSeriesAggLabel(round, tie);
-      const w = getKoSeriesWinner(round, tie);
-      return '<div class="ko-detail-panel">' +
-        '<button type="button" class="ko-detail-close" data-ko-close="1">Cerrar</button>' +
-        '<h4>' + title + '</h4>' +
-        (agg ? '<div class="ko-tie-agg" style="margin-bottom:0.4rem">' + agg + '</div>' : '') +
-        (w ? '<div class="ko-winner-pill" style="margin-bottom:0.45rem">Clasifica: ' + w + '</div>' : '') +
-        legsHtml +
+
+      const logoH = (typeof LOGO_MAP !== 'undefined' && LOGO_MAP[homeName])
+        ? '<img class="team-logo" src="' + LOGO_MAP[homeName] + '" alt="" onerror="this.style.display=\'none\'" />'
+        : '';
+      const logoA = (typeof LOGO_MAP !== 'undefined' && LOGO_MAP[awayName])
+        ? '<img class="team-logo" src="' + LOGO_MAP[awayName] + '" alt="" onerror="this.style.display=\'none\'" />'
+        : '';
+
+      return '<div class="match-card ko-card" data-ko-id="' + m.id + '">' +
+        '<div class="match-header">' +
+          '<span class="jornada">' + head + '</span>' +
+          '<span>' + (m.fecha || '') + (m.hora_col ? ' · ' + m.hora_col + ' COT' : '') + '</span>' +
+        '</div>' +
+        '<div class="match-main-row' + (locked ? ' locked' : '') + '">' +
+          '<div class="team-score-row local">' +
+            logoH + '<span class="team-name">' + homeName + '</span>' +
+            '<input type="number" min="0" max="20" class="real-goal" data-ko-real="' + m.id + '" data-side="h" value="' + (real.h != null ? real.h : '') + '" placeholder="-" ' + (locked ? 'disabled' : '') + ' />' +
+          '</div>' +
+          '<div class="team-score-row visitante">' +
+            logoA + '<span class="team-name">' + awayName + '</span>' +
+            '<input type="number" min="0" max="20" class="real-goal" data-ko-real="' + m.id + '" data-side="a" value="' + (real.a != null ? real.a : '') + '" placeholder="-" ' + (locked ? 'disabled' : '') + ' />' +
+          '</div>' +
+        '</div>' +
+        pensHtml +
+        '<div class="predictions-grid">' + predBoxes + '</div>' +
       '</div>';
     }
 
-    function renderKoRound(round, title) {
-      // Mantenido por compatibilidad; la llave visual usa renderKoBracketTree
-      return '';
+    function renderKoMatchesGrid() {
+      const order = ['po', 'r16', 'qf', 'sf', 'final'];
+      const titles = {
+        po: 'Playoffs',
+        r16: 'Octavos de final',
+        qf: 'Cuartos de final',
+        sf: 'Semifinales',
+        final: 'Final'
+      };
+      let html = '';
+      order.forEach(round => {
+        const matches = KO_MATCHES.filter(m => m.round === round);
+        if (!matches.length) return;
+        html += '<div class="ko-round-sep"><span class="jornada-label">' + titles[round] + '</span><span class="line"></span></div>';
+        matches.forEach(m => { html += renderKoMatchCard(m); });
+      });
+      return '<div id="koMatchesContainer">' + html + '</div>';
     }
 
     function renderRondas() {
@@ -6748,29 +6866,19 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
 
       el.innerHTML = playoffHtml +
         '<div class="playoff-section">' +
-          '<h3 class="direct">② Llave · Playoffs → Final</h3>' +
-          '<p class="rondas-note">Vista en forma de llave. Ida y vuelta (final a partido único). Si el global empata → penaltis.<br>' +
+          '<h3 class="direct">② Llave visual · Playoffs → Final</h3>' +
+          '<p class="rondas-note">Solo ayuda visual. Abajo están los partidos para pronosticar (4 por fila), como en la fase de liga.<br>' +
           '<strong>Solo cuenta para los puntos el resultado en el tiempo regular o prórroga si la hay. Los penaltis no cuentan para los puntos en la predicción.</strong></p>' +
           renderKoBracketTree() +
-          renderKoDetailPanel() +
+        '</div>' +
+        '<div class="playoff-section">' +
+          '<h3 class="direct">③ Partidos · pronósticos</h3>' +
+          renderKoMatchesGrid() +
         '</div>';
 
+      // Llave: clic solo resalta (no abre panel)
       el.querySelectorAll('[data-ko-node]').forEach(node => {
-        node.addEventListener('click', () => {
-          const round = node.getAttribute('data-ko-node');
-          const tie = parseInt(node.getAttribute('data-ko-tie'), 10) || 1;
-          if (koSelected && koSelected.round === round && koSelected.tie === tie) {
-            koSelected = null;
-          } else {
-            koSelected = { round: round, tie: tie };
-          }
-          renderRondas();
-          const panel = document.querySelector('.ko-detail-panel');
-          if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        });
-      });
-      el.querySelectorAll('[data-ko-close]').forEach(btn => {
-        btn.addEventListener('click', () => { koSelected = null; renderRondas(); });
+        node.style.cursor = 'default';
       });
       el.querySelectorAll('[data-ko-pred]').forEach(inp => {
         inp.addEventListener('change', onKoPredChange);
