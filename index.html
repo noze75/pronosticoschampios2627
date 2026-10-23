@@ -2687,6 +2687,161 @@
       border-color: rgba(255,213,79,0.4);
       background: linear-gradient(145deg, rgba(255,213,79,0.08), var(--card) 50%);
     }
+    /* Llave visual tipo árbol */
+    .ko-bracket-wrap {
+      overflow-x: auto;
+      padding: 0.5rem 0 1rem;
+      margin-bottom: 0.75rem;
+    }
+    .ko-bracket {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      min-width: 920px;
+      padding: 0.5rem;
+    }
+    .ko-col {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      flex: 1 1 0;
+      min-width: 150px;
+      position: relative;
+    }
+    .ko-col-label {
+      text-align: center;
+      font-size: 0.68rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #69f0ae;
+      margin-bottom: 0.45rem;
+    }
+    .ko-col-body {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      flex: 1;
+      gap: 0.35rem;
+      position: relative;
+    }
+    .ko-node {
+      background: #0d3d32;
+      border: 1px solid #1b5e4a;
+      border-radius: 10px;
+      padding: 0.35rem 0.45rem;
+      cursor: pointer;
+      transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s;
+      position: relative;
+      z-index: 1;
+    }
+    .ko-node:hover, .ko-node.active {
+      border-color: #69f0ae;
+      box-shadow: 0 0 0 1px rgba(105,240,174,0.35);
+      transform: scale(1.02);
+    }
+    .ko-node.final-node {
+      background: linear-gradient(145deg, #1b5e20, #0d3d32);
+      border-color: rgba(255,213,79,0.45);
+    }
+    .ko-node-team {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.3rem;
+      font-size: 0.72rem;
+      font-weight: 800;
+      line-height: 1.25;
+      padding: 0.12rem 0;
+      color: #e8f5e9;
+    }
+    .ko-node-team .nm {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      min-width: 0;
+      flex: 1;
+    }
+    .ko-node-team.tbd .nm { color: #81c784; font-weight: 600; font-style: italic; }
+    .ko-node-team .sc {
+      font-weight: 900;
+      color: #ffd54f;
+      min-width: 1rem;
+      text-align: right;
+    }
+    .ko-node-meta {
+      font-size: 0.58rem;
+      font-weight: 700;
+      color: #81c784;
+      margin-top: 0.15rem;
+      text-align: center;
+    }
+    .ko-node-winner {
+      font-size: 0.6rem;
+      font-weight: 900;
+      color: #69f0ae;
+      text-align: center;
+      margin-top: 0.1rem;
+    }
+    /* Conectores entre columnas */
+    .ko-col:not(:last-child) .ko-col-body::after {
+      content: '';
+      position: absolute;
+      right: -12px;
+      top: 0;
+      bottom: 0;
+      width: 12px;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 12%,
+        #2e7d62 12%,
+        #2e7d62 13%,
+        transparent 13%,
+        transparent 37%,
+        #2e7d62 37%,
+        #2e7d62 38%,
+        transparent 38%,
+        transparent 62%,
+        #2e7d62 62%,
+        #2e7d62 63%,
+        transparent 63%,
+        transparent 87%,
+        #2e7d62 87%,
+        #2e7d62 88%,
+        transparent 88%
+      );
+      opacity: 0.55;
+    }
+    .ko-col-r16 .ko-col-body { gap: 0.45rem; }
+    .ko-col-qf .ko-col-body { gap: 1.1rem; }
+    .ko-col-sf .ko-col-body { gap: 2.2rem; }
+    .ko-col-final .ko-col-body { justify-content: center; }
+    .ko-detail-panel {
+      background: var(--card);
+      border: 1px solid rgba(105,240,174,0.35);
+      border-radius: 12px;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .ko-detail-panel h4 {
+      margin: 0 0 0.5rem;
+      font-size: 0.9rem;
+      font-weight: 900;
+      color: #69f0ae;
+    }
+    .ko-detail-panel .ko-detail-close {
+      float: right;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 6px;
+      padding: 0.15rem 0.45rem;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
     }
     .later-stages span:nth-child(odd) {
       background: rgba(66,165,245,0.12);
@@ -6397,35 +6552,102 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       '</div>';
     }
 
-    function renderKoRound(round, title) {
-      const ties = [];
+    let koSelected = null; // { round, tie }
+
+    function renderKoNode(round, tie) {
+      ensureKoData();
+      const isFinal = round === 'final';
+      let homeName, awayName, homeTbd, awayTbd, scH = '', scA = '';
+      if (isFinal) {
+        const m = KO_MATCHES.find(x => x.round === 'final');
+        homeName = koTeamLabel(m, 'local');
+        awayName = koTeamLabel(m, 'visitante');
+        homeTbd = !resolveKoTeam(m, 'local');
+        awayTbd = !resolveKoTeam(m, 'visitante');
+        const r = data.ko.results[m.id] || {};
+        if (r.h != null) scH = String(r.h);
+        if (r.a != null) scA = String(r.a);
+      } else {
+        const ida = KO_MATCHES.find(x => x.round === round && x.tie === tie && x.leg === 'ida');
+        const vue = KO_MATCHES.find(x => x.round === round && x.tie === tie && x.leg === 'vuelta');
+        homeName = koTeamLabel(ida, 'local');
+        awayName = koTeamLabel(ida, 'visitante');
+        homeTbd = !resolveKoTeam(ida, 'local');
+        awayTbd = !resolveKoTeam(ida, 'visitante');
+        const rI = data.ko.results[ida.id] || {};
+        const rV = vue ? (data.ko.results[vue.id] || {}) : {};
+        if (rI.h != null && rV.h != null) {
+          scH = String(Number(rI.h) + Number(rV.a));
+          scA = String(Number(rI.a) + Number(rV.h));
+        } else if (rI.h != null) {
+          scH = String(rI.h);
+          scA = String(rI.a);
+        }
+      }
+      const w = getKoSeriesWinner(round, isFinal ? 1 : tie);
+      const active = koSelected && koSelected.round === round && koSelected.tie === tie ? ' active' : '';
+      const cls = 'ko-node' + (isFinal ? ' final-node' : '') + active;
+      return '<div class="' + cls + '" data-ko-node="' + round + '" data-ko-tie="' + tie + '">' +
+        '<div class="ko-node-team' + (homeTbd ? ' tbd' : '') + '"><span class="nm">' + homeName + '</span><span class="sc">' + scH + '</span></div>' +
+        '<div class="ko-node-team' + (awayTbd ? ' tbd' : '') + '"><span class="nm">' + awayName + '</span><span class="sc">' + scA + '</span></div>' +
+        (w ? '<div class="ko-node-winner">→ ' + w + '</div>' : '') +
+      '</div>';
+    }
+
+    function renderKoBracketTree() {
+      const cols = [
+        { round: 'po', label: 'Playoffs', n: 8, cls: 'ko-col-po' },
+        { round: 'r16', label: 'Octavos', n: 8, cls: 'ko-col-r16' },
+        { round: 'qf', label: 'Cuartos', n: 4, cls: 'ko-col-qf' },
+        { round: 'sf', label: 'Semis', n: 2, cls: 'ko-col-sf' },
+        { round: 'final', label: 'Final', n: 1, cls: 'ko-col-final' }
+      ];
+      const html = cols.map(c => {
+        let nodes = '';
+        if (c.round === 'final') {
+          nodes = renderKoNode('final', 1);
+        } else {
+          for (let t = 1; t <= c.n; t++) nodes += renderKoNode(c.round, t);
+        }
+        return '<div class="ko-col ' + c.cls + '">' +
+          '<div class="ko-col-label">' + c.label + '</div>' +
+          '<div class="ko-col-body">' + nodes + '</div>' +
+        '</div>';
+      }).join('');
+      return '<div class="ko-bracket-wrap"><div class="ko-bracket">' + html + '</div></div>';
+    }
+
+    function renderKoDetailPanel() {
+      if (!koSelected) {
+        return '<div class="ko-detail-panel" style="opacity:0.85">' +
+          '<h4>Llave visual</h4>' +
+          '<p style="margin:0;font-size:0.82rem;color:var(--muted)">Haz clic en un cruce de la llave para ver ida/vuelta, penaltis y pronósticos.</p>' +
+        '</div>';
+      }
+      const { round, tie } = koSelected;
+      const titles = { po: 'Playoffs', r16: 'Octavos', qf: 'Cuartos', sf: 'Semis', final: 'Final' };
+      const title = (titles[round] || round) + (round === 'final' ? '' : (' · Cruce ' + tie));
+      let legsHtml = '';
       if (round === 'final') {
         const m = KO_MATCHES.find(x => x.round === 'final');
-        if (!m) return '';
-        const w = getKoSeriesWinner('final', 1);
-        return '<div class="ko-round-block">' +
-          '<div class="ko-round-title">' + title + '</div>' +
-          '<div class="ko-tie ko-final-card">' +
-            '<div class="ko-tie-head">Final · partido único</div>' +
-            (w ? '<div class="ko-winner-pill">🏆 ' + w + '</div>' : '') +
-            renderKoLegHtml(m) +
-          '</div></div>';
+        legsHtml = renderKoLegHtml(m);
+      } else {
+        legsHtml = KO_MATCHES.filter(x => x.round === round && x.tie === tie).map(renderKoLegHtml).join('');
       }
-      const maxTie = (round === 'po' || round === 'r16') ? 8 : (round === 'qf' ? 4 : 2);
-      for (let t = 1; t <= maxTie; t++) {
-        const legs = KO_MATCHES.filter(x => x.round === round && x.tie === t);
-        const agg = koSeriesAggLabel(round, t);
-        const w = getKoSeriesWinner(round, t);
-        ties.push('<div class="ko-tie">' +
-          '<div class="ko-tie-head">Cruce ' + t + '</div>' +
-          (agg ? '<div class="ko-tie-agg">' + agg + '</div>' : '') +
-          (w ? '<div class="ko-winner-pill">Clasifica: ' + w + '</div>' : '') +
-          legs.map(renderKoLegHtml).join('') +
-        '</div>');
-      }
-      return '<div class="ko-round-block">' +
-        '<div class="ko-round-title">' + title + '</div>' +
-        '<div class="ko-ties">' + ties.join('') + '</div></div>';
+      const agg = koSeriesAggLabel(round, tie);
+      const w = getKoSeriesWinner(round, tie);
+      return '<div class="ko-detail-panel">' +
+        '<button type="button" class="ko-detail-close" data-ko-close="1">Cerrar</button>' +
+        '<h4>' + title + '</h4>' +
+        (agg ? '<div class="ko-tie-agg" style="margin-bottom:0.4rem">' + agg + '</div>' : '') +
+        (w ? '<div class="ko-winner-pill" style="margin-bottom:0.45rem">Clasifica: ' + w + '</div>' : '') +
+        legsHtml +
+      '</div>';
+    }
+
+    function renderKoRound(round, title) {
+      // Mantenido por compatibilidad; la llave visual usa renderKoBracketTree
+      return '';
     }
 
     function renderRondas() {
@@ -6481,15 +6703,29 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       el.innerHTML = playoffHtml +
         '<div class="playoff-section">' +
           '<h3 class="direct">② Llave · Playoffs → Final</h3>' +
-          '<p class="rondas-note">Ida y vuelta en playoffs, octavos, cuartos y semis; final a partido único. Si el global (o el partido de final) empata → penaltis.<br>' +
+          '<p class="rondas-note">Vista en forma de llave. Ida y vuelta (final a partido único). Si el global empata → penaltis.<br>' +
           '<strong>Solo cuenta para los puntos el resultado en el tiempo regular o prórroga si la hay. Los penaltis no cuentan para los puntos en la predicción.</strong></p>' +
-          renderKoRound('po', 'Playoffs (ida y vuelta · penaltis si empate)') +
-          renderKoRound('r16', 'Octavos de final') +
-          renderKoRound('qf', 'Cuartos de final') +
-          renderKoRound('sf', 'Semifinales') +
-          renderKoRound('final', 'Final') +
+          renderKoBracketTree() +
+          renderKoDetailPanel() +
         '</div>';
 
+      el.querySelectorAll('[data-ko-node]').forEach(node => {
+        node.addEventListener('click', () => {
+          const round = node.getAttribute('data-ko-node');
+          const tie = parseInt(node.getAttribute('data-ko-tie'), 10) || 1;
+          if (koSelected && koSelected.round === round && koSelected.tie === tie) {
+            koSelected = null;
+          } else {
+            koSelected = { round: round, tie: tie };
+          }
+          renderRondas();
+          const panel = document.querySelector('.ko-detail-panel');
+          if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+      });
+      el.querySelectorAll('[data-ko-close]').forEach(btn => {
+        btn.addEventListener('click', () => { koSelected = null; renderRondas(); });
+      });
       el.querySelectorAll('[data-ko-pred]').forEach(inp => {
         inp.addEventListener('change', onKoPredChange);
         inp.addEventListener('input', onKoPredChange);
