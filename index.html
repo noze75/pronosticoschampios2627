@@ -2696,40 +2696,41 @@
     .ko-bracket {
       display: flex;
       align-items: stretch;
-      gap: 0;
-      min-width: 920px;
-      padding: 0.5rem;
+      gap: 1.15rem;
+      min-width: 1080px;
+      padding: 0.65rem 0.4rem;
     }
     .ko-col {
       display: flex;
       flex-direction: column;
       justify-content: space-around;
       flex: 1 1 0;
-      min-width: 150px;
+      min-width: 168px;
       position: relative;
     }
     .ko-col-label {
       text-align: center;
-      font-size: 0.68rem;
+      font-size: 0.7rem;
       font-weight: 900;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.05em;
       color: #69f0ae;
-      margin-bottom: 0.45rem;
+      margin-bottom: 0.55rem;
     }
     .ko-col-body {
       display: flex;
       flex-direction: column;
       justify-content: space-around;
       flex: 1;
-      gap: 0.35rem;
+      gap: 0.75rem;
       position: relative;
+      padding-right: 0.35rem;
     }
     .ko-node {
       background: #0d3d32;
       border: 1px solid #1b5e4a;
-      border-radius: 10px;
-      padding: 0.35rem 0.45rem;
+      border-radius: 12px;
+      padding: 0.42rem 0.5rem;
       cursor: pointer;
       transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s;
       position: relative;
@@ -2749,10 +2750,10 @@
       align-items: center;
       justify-content: space-between;
       gap: 0.3rem;
-      font-size: 0.72rem;
+      font-size: 0.74rem;
       font-weight: 800;
-      line-height: 1.25;
-      padding: 0.12rem 0;
+      line-height: 1.3;
+      padding: 0.16rem 0;
       color: #e8f5e9;
     }
     .ko-node-team .nm {
@@ -2769,6 +2770,56 @@
       min-width: 1rem;
       text-align: right;
     }
+    .ko-node-team .origin {
+      font-size: 0.52rem;
+      font-weight: 900;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      border-radius: 999px;
+      padding: 0.08rem 0.3rem;
+      margin-right: 0.22rem;
+      flex-shrink: 0;
+    }
+    .ko-node-team .origin.direct {
+      background: rgba(255, 213, 79, 0.2);
+      color: #ffd54f;
+      border: 1px solid rgba(255, 213, 79, 0.4);
+    }
+    .ko-node-team .origin.playoff {
+      background: rgba(105, 240, 174, 0.15);
+      color: #69f0ae;
+      border: 1px solid rgba(105, 240, 174, 0.35);
+    }
+    .ko-node-team.row-direct {
+      border-left: 3px solid #ffd54f;
+      padding-left: 0.3rem;
+    }
+    .ko-node-team.row-playoff {
+      border-left: 3px solid #69f0ae;
+      padding-left: 0.3rem;
+    }
+    .ko-legend-origins {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem 1.1rem;
+      margin: 0.15rem 0 0.7rem;
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .ko-legend-origins span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .ko-legend-origins i {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+    }
+    .ko-legend-origins i.direct { background: #ffd54f; }
+    .ko-legend-origins i.playoff { background: #69f0ae; }
     .ko-node-meta {
       font-size: 0.58rem;
       font-weight: 700;
@@ -2777,47 +2828,28 @@
       text-align: center;
     }
     .ko-node-winner {
-      font-size: 0.6rem;
+      font-size: 0.62rem;
       font-weight: 900;
       color: #69f0ae;
       text-align: center;
-      margin-top: 0.1rem;
+      margin-top: 0.15rem;
     }
     /* Conectores entre columnas */
-    .ko-col:not(:last-child) .ko-col-body::after {
+    .ko-col:not(:last-child)::after {
       content: '';
       position: absolute;
-      right: -12px;
-      top: 0;
-      bottom: 0;
-      width: 12px;
+      right: -0.65rem;
+      top: 2.1rem;
+      bottom: 0.4rem;
+      width: 0.65rem;
+      border-right: 2px solid rgba(46, 125, 98, 0.5);
       pointer-events: none;
-      background: repeating-linear-gradient(
-        to bottom,
-        transparent 0,
-        transparent 12%,
-        #2e7d62 12%,
-        #2e7d62 13%,
-        transparent 13%,
-        transparent 37%,
-        #2e7d62 37%,
-        #2e7d62 38%,
-        transparent 38%,
-        transparent 62%,
-        #2e7d62 62%,
-        #2e7d62 63%,
-        transparent 63%,
-        transparent 87%,
-        #2e7d62 87%,
-        #2e7d62 88%,
-        transparent 88%
-      );
-      opacity: 0.55;
     }
-    .ko-col-r16 .ko-col-body { gap: 0.45rem; }
-    .ko-col-qf .ko-col-body { gap: 1.1rem; }
-    .ko-col-sf .ko-col-body { gap: 2.2rem; }
-    .ko-col-final .ko-col-body { justify-content: center; }
+    .ko-col-po .ko-col-body { gap: 0.9rem; }
+    .ko-col-r16 .ko-col-body { gap: 0.9rem; }
+    .ko-col-qf .ko-col-body { gap: 1.7rem; }
+    .ko-col-sf .ko-col-body { gap: 3.1rem; }
+    .ko-col-final .ko-col-body { justify-content: center; gap: 0; }
     .ko-detail-panel {
       background: var(--card);
       border: 1px solid rgba(105,240,174,0.35);
@@ -6307,11 +6339,11 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
         const lb = poLabels[t - 1];
         list.push({ id: 'ko_po_' + t + '_ida', round: 'po', tie: t, leg: 'ida',
           local: null, visitante: null,
-          localLabel: lb.b + ' (local ida)', visitanteLabel: lb.a,
+          localLabel: lb.b, visitanteLabel: lb.a,
           fecha: 'Feb 2027', hora_col: '14:00' });
         list.push({ id: 'ko_po_' + t + '_vuelta', round: 'po', tie: t, leg: 'vuelta',
           local: null, visitante: null,
-          localLabel: lb.a + ' (local vuelta)', visitanteLabel: lb.b,
+          localLabel: lb.a, visitanteLabel: lb.b,
           fecha: 'Feb 2027', hora_col: '14:00' });
       }
       // Octavos: 8 cruces (1º–8º vs ganadores playoff)
@@ -6587,14 +6619,28 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       const w = getKoSeriesWinner(round, isFinal ? 1 : tie);
       const active = koSelected && koSelected.round === round && koSelected.tie === tie ? ' active' : '';
       const cls = 'ko-node' + (isFinal ? ' final-node' : '') + active;
+      // En octavos: local = directo (1º–8º), visitante = viene del playoff
+      let homeExtra = '', awayExtra = '';
+      let homeRow = homeTbd ? ' tbd' : '';
+      let awayRow = awayTbd ? ' tbd' : '';
+      if (round === 'r16') {
+        homeExtra = '<span class="origin direct">Directo</span>';
+        awayExtra = '<span class="origin playoff">Playoff</span>';
+        homeRow += ' row-direct';
+        awayRow += ' row-playoff';
+      }
       return '<div class="' + cls + '" data-ko-node="' + round + '" data-ko-tie="' + tie + '">' +
-        '<div class="ko-node-team' + (homeTbd ? ' tbd' : '') + '"><span class="nm">' + homeName + '</span><span class="sc">' + scH + '</span></div>' +
-        '<div class="ko-node-team' + (awayTbd ? ' tbd' : '') + '"><span class="nm">' + awayName + '</span><span class="sc">' + scA + '</span></div>' +
+        '<div class="ko-node-team' + homeRow + '">' + homeExtra + '<span class="nm">' + homeName + '</span><span class="sc">' + scH + '</span></div>' +
+        '<div class="ko-node-team' + awayRow + '">' + awayExtra + '<span class="nm">' + awayName + '</span><span class="sc">' + scA + '</span></div>' +
         (w ? '<div class="ko-node-winner">→ ' + w + '</div>' : '') +
       '</div>';
     }
 
     function renderKoBracketTree() {
+      const legend = '<div class="ko-legend-origins">' +
+        '<span><i class="direct"></i> Entra directo (1º–8º fase de liga)</span>' +
+        '<span><i class="playoff"></i> Viene del playoff (ganador 9º–24º)</span>' +
+      '</div>';
       const cols = [
         { round: 'po', label: 'Playoffs', n: 8, cls: 'ko-col-po' },
         { round: 'r16', label: 'Octavos', n: 8, cls: 'ko-col-r16' },
@@ -6614,7 +6660,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
           '<div class="ko-col-body">' + nodes + '</div>' +
         '</div>';
       }).join('');
-      return '<div class="ko-bracket-wrap"><div class="ko-bracket">' + html + '</div></div>';
+      return legend + '<div class="ko-bracket-wrap"><div class="ko-bracket">' + html + '</div></div>';
     }
 
     function renderKoDetailPanel() {
