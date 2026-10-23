@@ -7224,7 +7224,9 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
     }
 
     // ========== APÚRELE CON EL LOGO ==========
-    const LOGO_RACE_TEAMS = Object.keys(LOGO_MAP);
+    // Solo clubes con archivo de logo real (excluimos 4 sin imagen)
+    const LOGO_RACE_EXCLUDE = new Set(['Boca', 'Vasco', 'Atlético Mineiro', 'City Torque']);
+    const LOGO_RACE_TEAMS = Object.keys(LOGO_MAP).filter(t => !LOGO_RACE_EXCLUDE.has(t));
     const LOGO_RACE_DISPLAY = {
       "Bayern München": "Bayern Múnich",
       "Paris Saint-Germain": "PSG",
