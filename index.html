@@ -5409,6 +5409,11 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
         toast('Modo admin cerrado · resultados bloqueados');
         updateAdminButton();
         renderMatches();
+        if (typeof renderRondas === 'function' && document.getElementById('rondas')?.classList.contains('active')) renderRondas();
+        if (document.getElementById('futbol')?.classList.contains('active')) {
+          if (typeof renderFifaPanel === 'function') renderFifaPanel();
+          if (typeof renderLibertadoresPanel === 'function') renderLibertadoresPanel();
+        }
         if (typeof renderApiSyncBars === 'function') renderApiSyncBars();
         return;
       }
@@ -5416,14 +5421,15 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       if (pwd === null) return;
       if (pwd === ADMIN_PASSWORD) {
         adminUnlocked = true;
-        if (document.getElementById('futbol')?.classList.contains('active')) {
-          if (typeof renderFifaPanel === 'function') renderFifaPanel();
-          if (typeof renderLibertadoresPanel === 'function') renderLibertadoresPanel();
-          if (typeof renderMatches === 'function') renderMatches();
-        }
         toast('Modo admin activado · puedes editar resultados reales');
         updateAdminButton();
         renderMatches();
+        // Refrescar pestaña activa para habilitar casillas reales
+        if (typeof renderRondas === 'function' && document.getElementById('rondas')?.classList.contains('active')) renderRondas();
+        if (document.getElementById('futbol')?.classList.contains('active')) {
+          if (typeof renderFifaPanel === 'function') renderFifaPanel();
+          if (typeof renderLibertadoresPanel === 'function') renderLibertadoresPanel();
+        }
         if (typeof renderApiSyncBars === 'function') renderApiSyncBars();
       } else {
         toast('Contraseña incorrecta');
