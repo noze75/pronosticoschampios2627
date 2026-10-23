@@ -2930,6 +2930,21 @@
       background: var(--bg);
       color: var(--text);
       padding: 0.12rem 0.3rem;
+      max-width: 9rem;
+    }
+    .match-card.ko-card .ko-pens-score {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.15rem;
+    }
+    .match-card.ko-card .ko-pens-score .ko-score-inp {
+      width: 2rem;
+      font-size: 0.78rem;
+      padding: 0.12rem 0.1rem;
+    }
+    .match-card.ko-card .ko-pens-score .score-colon {
+      font-weight: 900;
+      color: var(--muted);
     }
     .ko-tie-frame {
       grid-column: span 2;
@@ -6590,7 +6605,10 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
         const r = m ? data.ko.results[m.id] : null;
         if (!r || r.h == null) return '';
         let s = r.h + '-' + r.a;
-        if (r.pens && r.pensWinner) s += ' (pen.)';
+        if (r.pens) {
+          if (r.pensH != null && r.pensA != null) s += ' (' + r.pensH + '-' + r.pensA + ' pen.)';
+          else s += ' (pen.)';
+        }
         const w = getKoSeriesWinner('final', 1);
         if (w) s += ' · ' + w;
         return s;
@@ -6606,7 +6624,10 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       const gB = Number(rI.a) + Number(rV.h);
       const w = getKoSeriesWinner(round, tie);
       let s = 'Global ' + gA + '-' + gB;
-      if (rV.pens) s += ' (pen.)';
+      if (rV && rV.pens) {
+        if (rV.pensH != null && rV.pensA != null) s += ' (' + rV.pensH + '-' + rV.pensA + ' pen.)';
+        else s += ' (pen.)';
+      }
       if (w) s += ' · ' + w;
       return s;
     }
@@ -6625,6 +6646,15 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       saveData(false);
     }
 
+    function syncKoPensWinner(id) {
+      const r = data.ko.results[id];
+      if (!r || !r.pens) return;
+      if (r.pensH != null && r.pensA != null && !Number.isNaN(r.pensH) && !Number.isNaN(r.pensA)) {
+        if (r.pensH > r.pensA) r.pensWinner = 'h';
+        else if (r.pensA > r.pensH) r.pensWinner = 'a';
+      }
+    }
+
     function onKoRealChange(e) {
       const inp = e.target;
       const id = inp.dataset.koReal;
@@ -6634,10 +6664,19 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       if (!data.ko.results[id]) data.ko.results[id] = {};
       if (side === 'pens') {
         data.ko.results[id].pens = !!inp.checked;
-        if (!inp.checked) delete data.ko.results[id].pensWinner;
+        if (!inp.checked) {
+          delete data.ko.results[id].pensWinner;
+          delete data.ko.results[id].pensH;
+          delete data.ko.results[id].pensA;
+        }
       } else if (side === 'pensWinner') {
         data.ko.results[id].pensWinner = inp.value || null;
         if (inp.value) data.ko.results[id].pens = true;
+      } else if (side === 'pensH' || side === 'pensA') {
+        const v = inp.value === '' ? null : Number(inp.value);
+        data.ko.results[id][side] = (v == null || Number.isNaN(v)) ? null : v;
+        data.ko.results[id].pens = true;
+        syncKoPensWinner(id);
       } else {
         const v = inp.value === '' ? null : Number(inp.value);
         data.ko.results[id][side] = (v == null || Number.isNaN(v)) ? null : v;
@@ -6827,15 +6866,24 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       let pensHtml = '';
       const showPens = m.single || m.leg === 'vuelta';
       if (showPens) {
-        const pensOn = !!real.pens;
+        const pensOn = !!real.pens || real.pensH != null || real.pensA != null;
         const pw = real.pensWinner || '';
+        const ph = real.pensH != null ? real.pensH : '';
+        const pa = real.pensA != null ? real.pensA : '';
         pensHtml = '<div class="ko-pens-inline">' +
           '<label><input type="checkbox" data-ko-real="' + m.id + '" data-side="pens" ' + (pensOn ? 'checked' : '') + ' ' + (locked ? 'disabled' : '') + ' /> Penaltis</label>' +
-          '<select data-ko-real="' + m.id + '" data-side="pensWinner" ' + (locked ? 'disabled' : '') + '>' +
-            '<option value="">Ganador pen…</option>' +
-            '<option value="h"' + (pw === 'h' ? ' selected' : '') + '>' + homeName + '</option>' +
-            '<option value="a"' + (pw === 'a' ? ' selected' : '') + '>' + awayName + '</option>' +
-          '</select>' +
+          (pensOn
+            ? '<span class="ko-pens-score">' +
+                '<input type="number" min="0" max="30" class="ko-score-inp" data-ko-real="' + m.id + '" data-side="pensH" value="' + ph + '" placeholder="-" title="Pen. local" ' + (locked ? 'disabled' : '') + ' />' +
+                '<span class="score-colon">:</span>' +
+                '<input type="number" min="0" max="30" class="ko-score-inp" data-ko-real="' + m.id + '" data-side="pensA" value="' + pa + '" placeholder="-" title="Pen. visitante" ' + (locked ? 'disabled' : '') + ' />' +
+              '</span>' +
+              '<select data-ko-real="' + m.id + '" data-side="pensWinner" ' + (locked ? 'disabled' : '') + '>' +
+                '<option value="">Ganador…</option>' +
+                '<option value="h"' + (pw === 'h' ? ' selected' : '') + '>' + homeName + '</option>' +
+                '<option value="a"' + (pw === 'a' ? ' selected' : '') + '>' + awayName + '</option>' +
+              '</select>'
+            : '') +
           '<span style="opacity:0.75">No cuentan para puntos</span>' +
         '</div>';
       }
