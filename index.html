@@ -8784,8 +8784,8 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
     const CONMEBOL_MATCHES = [
       { id: 'lib_sf1_ida', comp: 'lib', ronda: 'SF1 Ida', local: 'Fluminense', visitante: 'Palmeiras', fecha: 'Mié 14 oct', hora_col: '19:30', result: { h: 1, a: 2 } },
       { id: 'lib_sf1_vuelta', comp: 'lib', ronda: 'SF1 Vuelta', local: 'Palmeiras', visitante: 'Fluminense', fecha: 'Mié 21 oct', hora_col: '19:30' },
-      { id: 'lib_sf2_ida', comp: 'lib', ronda: 'SF2 Ida', local: 'Estudiantes', visitante: 'Flamengo', fecha: 'Jue 15 oct', hora_col: '19:30' },
-      { id: 'lib_sf2_vuelta', comp: 'lib', ronda: 'SF2 Vuelta', local: 'Flamengo', visitante: 'Estudiantes', fecha: 'Jue 22 oct', hora_col: '19:30' },
+      { id: 'lib_sf2_ida', comp: 'lib', ronda: 'SF2 Ida', local: 'Estudiantes', visitante: 'Flamengo', fecha: 'Jue 15 oct', hora_col: '19:30', result: { h: 0, a: 0 } },
+      { id: 'lib_sf2_vuelta', comp: 'lib', ronda: 'SF2 Vuelta', local: 'Flamengo', visitante: 'Estudiantes', fecha: 'Jue 22 oct', hora_col: '19:30', result: { h: 0, a: 0 }, seriesWinner: 'Estudiantes', seriesNote: 'penaltis' },
       { id: 'lib_final', comp: 'lib', ronda: 'Final', local: null, visitante: null, fecha: 'Sáb 28 nov', hora_col: '16:00', isFinal: true },
       { id: 'sud_sf1_ida', comp: 'sud', ronda: 'SF1 Ida', local: 'Boca', visitante: 'Vasco', fecha: 'Mar 13 oct', hora_col: '19:30', result: { h: 0, a: 1 } },
       { id: 'sud_sf1_vuelta', comp: 'sud', ronda: 'SF1 Vuelta', local: 'Vasco', visitante: 'Boca', fecha: 'Mar 20 oct', hora_col: '19:30' },
@@ -8816,6 +8816,9 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       const ida = CONMEBOL_MATCHES.find(m => m.comp === comp && m.ronda === ('SF' + sfNum + ' Ida'));
       const vue = CONMEBOL_MATCHES.find(m => m.comp === comp && m.ronda === ('SF' + sfNum + ' Vuelta'));
       if (!ida || !vue) return null;
+      // Ganador oficial por penaltis / desempate declarado en plantilla
+      if (vue.seriesWinner) return vue.seriesWinner;
+      if (ida.seriesWinner) return ida.seriesWinner;
       const rI = data.libertadores.results[ida.id];
       const rV = data.libertadores.results[vue.id];
       if (!rI || rI.h == null || rI.a == null || !rV || rV.h == null || rV.a == null) return null;
@@ -8825,8 +8828,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       const goalsB = rI.a + rV.h;
       if (goalsA > goalsB) return teamA;
       if (goalsB > goalsA) return teamB;
-      // Empate en global: sin visitante definido de forma simple → aún no definimos penales
-      // Si empate, null hasta que admin cargue un desempate manual (opcional: preferir más goles de visitante clásico)
+      // Empate en global → gol de visitante
       const awayA = rV.a; // goles de A como visitante en vuelta
       const awayB = rI.a; // goles de B como visitante en ida
       if (awayA > awayB) return teamA;
@@ -8845,7 +8847,13 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       if (!rV || rV.h == null) return a + ' ' + rI.h + '-' + rI.a + ' ' + b + ' (ida)';
       const gA = rI.h + rV.a, gB = rI.a + rV.h;
       const w = getSeriesWinner(comp, sfNum);
-      return 'Global ' + gA + '-' + gB + (w ? ' · ' + w : '');
+      const note = (vue && vue.seriesNote) || (ida && ida.seriesNote) || '';
+      let suffix = '';
+      if (w) {
+        suffix = ' · ' + w;
+        if (note === 'penaltis' && gA === gB) suffix += ' (pen.)';
+      }
+      return 'Global ' + gA + '-' + gB + suffix;
     }
 
 
@@ -8855,8 +8863,14 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       if (!data.libertadores.results) data.libertadores.results = {};
       CONMEBOL_MATCHES.forEach(m => {
         if (m.result) {
-          // Solo precarga si aún no hay resultado (admin puede sobrescribir después)
-          if (data.libertadores.results[m.id] == null) {
+          // Precarga resultado oficial de la plantilla (SF clasificadas).
+          // Fuerza SF2 Libertadores (Estudiantes finalista) y rellena huecos / 0-0 placeholder.
+          const forceIds = { lib_sf2_ida: 1, lib_sf2_vuelta: 1 };
+          const cur = data.libertadores.results[m.id];
+          const isEmpty = cur == null || cur.h == null || cur.a == null;
+          const isZeroPlaceholder = cur && Number(cur.h) === 0 && Number(cur.a) === 0
+            && !(m.result.h === 0 && m.result.a === 0);
+          if (forceIds[m.id] || isEmpty || isZeroPlaceholder) {
             data.libertadores.results[m.id] = { h: m.result.h, a: m.result.a };
           }
           if (!data.libertadores.predictions[m.id]) data.libertadores.predictions[m.id] = {};
