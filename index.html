@@ -2687,7 +2687,7 @@
 
     .cal-legend {
       display: flex; flex-wrap: wrap; gap: 0.85rem;
-      margin-bottom: 1rem; font-size: 0.82rem; color: var(--muted); font-weight: 600;
+      margin-bottom: 0.55rem; font-size: 0.82rem; color: var(--muted); font-weight: 600;
     }
     .cal-legend span { display: flex; align-items: center; gap: 0.35rem; }
     .cal-dot {
@@ -2697,6 +2697,15 @@
     .cal-dot.partial { background: #ffd54f; }
     .cal-dot.pending { background: #42a5f5; }
     .cal-dot.empty { background: #1a2a40; border: 1px solid var(--border); }
+    .cal-dot.comp-ucl { background: #29b6f6; }
+    .cal-dot.comp-fifa { background: #66bb6a; }
+    .cal-dot.comp-lib { background: #ffa726; }
+    .cal-dot.comp-sud { background: #ab47bc; }
+    .cal-dot.comp-titan { background: #ffd54f; }
+    .cal-legend-sep {
+      width: 1px; height: 14px; background: var(--border); margin: 0 0.15rem;
+      align-self: center;
+    }
 
     .cal-months {
       display: grid;
@@ -2759,6 +2768,23 @@
       font-weight: 800;
       opacity: 0.85;
     }
+    .cal-day .cal-comp-dots {
+      display: flex;
+      gap: 2px;
+      margin-top: 1px;
+      line-height: 0;
+    }
+    .cal-day .cal-comp-dots i {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .cal-day .cal-comp-dots i.ucl { background: #29b6f6; }
+    .cal-day .cal-comp-dots i.fifa { background: #66bb6a; }
+    .cal-day .cal-comp-dots i.lib { background: #ffa726; }
+    .cal-day .cal-comp-dots i.sud { background: #ab47bc; }
+    .cal-day .cal-comp-dots i.titan { background: #ffd54f; }
     .cal-day-detail {
       margin-top: 1.1rem;
       background: var(--card);
@@ -2777,12 +2803,36 @@
       flex-wrap: wrap;
       align-items: center;
       gap: 0.4rem 0.65rem;
-      padding: 0.45rem 0;
-      border-bottom: 1px solid rgba(30,58,95,0.5);
+      padding: 0.5rem 0.55rem;
+      margin: 0.25rem 0;
+      border-radius: 8px;
+      border-bottom: none;
+      border-left: 4px solid var(--border);
+      background: rgba(0,0,0,0.12);
       font-size: 0.88rem;
       font-weight: 600;
     }
-    .cal-match-row:last-child { border-bottom: none; }
+    .cal-match-row.src-ucl { border-left-color: #29b6f6; background: rgba(41,182,246,0.08); }
+    .cal-match-row.src-fifa { border-left-color: #66bb6a; background: rgba(102,187,106,0.08); }
+    .cal-match-row.src-lib { border-left-color: #ffa726; background: rgba(255,167,38,0.09); }
+    .cal-match-row.src-sud { border-left-color: #ab47bc; background: rgba(171,71,188,0.09); }
+    .cal-match-row.src-titan { border-left-color: #ffd54f; background: rgba(255,213,79,0.1); }
+    .cal-match-row .cal-tag {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      padding: 0.12rem 0.4rem;
+      border-radius: 999px;
+      white-space: nowrap;
+      max-width: 100%;
+    }
+    .cal-match-row.src-ucl .cal-tag { background: rgba(41,182,246,0.25); color: #81d4fa; }
+    .cal-match-row.src-fifa .cal-tag { background: rgba(102,187,106,0.25); color: #a5d6a7; }
+    .cal-match-row.src-lib .cal-tag { background: rgba(255,167,38,0.28); color: #ffcc80; }
+    .cal-match-row.src-sud .cal-tag { background: rgba(171,71,188,0.28); color: #ce93d8; }
+    .cal-match-row.src-titan .cal-tag { background: rgba(255,213,79,0.3); color: #ffe082; }
     .cal-match-row .score {
       color: var(--accent);
       font-weight: 900;
@@ -3920,7 +3970,12 @@
         <span><i class="cal-dot done"></i> Completo</span>
         <span><i class="cal-dot partial"></i> Parcial</span>
         <span><i class="cal-dot pending"></i> Pendiente</span>
-        <span><i class="cal-dot empty"></i> Sin partidos</span>
+        <span class="cal-legend-sep"></span>
+        <span><i class="cal-dot comp-ucl"></i> Champions</span>
+        <span><i class="cal-dot comp-fifa"></i> Fecha FIFA</span>
+        <span><i class="cal-dot comp-lib"></i> Libertadores</span>
+        <span><i class="cal-dot comp-sud"></i> Suramericana</span>
+        <span><i class="cal-dot comp-titan"></i> Titanes</span>
       </div>
       <div id="calendarMonths" class="cal-months"></div>
       <div id="calendarDayDetail" class="cal-day-detail" style="display:none;"></div>
@@ -5617,6 +5672,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
             key: pd.key,
             meta: pd,
             source: 'ucl',
+            colorKey: 'ucl',
             tag: 'Champions J' + m.jornada,
             local: m.local,
             visitante: m.visitante,
@@ -5636,11 +5692,13 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
           if (!pd) return;
           const real = (data && data.fifa && data.fifa.results) ? data.fifa.results[m.id] : null;
           const has = real && real.h != null && real.a != null && real.h !== '' && real.a !== '';
-          const tag = m.titan ? '⚔️ Titanes' : ('FIFA · ' + (m.comp || 'Fecha'));
+          const isTitan = !!m.titan;
+          const tag = isTitan ? '⚔️ Titanes' : ('FIFA · ' + (m.comp || 'Fecha'));
           events.push({
             key: pd.key,
             meta: pd,
             source: 'fifa',
+            colorKey: isTitan ? 'titan' : 'fifa',
             tag: tag,
             local: m.local,
             visitante: m.visitante,
@@ -5663,13 +5721,15 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
             ? data.libertadores.results[m.id]
             : (m.result || null);
           const has = real && real.h != null && real.a != null && real.h !== '' && real.a !== '';
-          const compLabel = m.comp === 'lib' ? 'Libertadores' : (m.comp === 'sud' ? 'Suramericana' : 'CONMEBOL');
+          const isLib = m.comp === 'lib';
+          const compLabel = isLib ? 'Libertadores' : (m.comp === 'sud' ? 'Suramericana' : 'CONMEBOL');
           const local = m.local || 'Por definir';
           const visitante = m.visitante || 'Por definir';
           events.push({
             key: pd.key,
             meta: pd,
             source: 'conmebol',
+            colorKey: isLib ? 'lib' : 'sud',
             tag: compLabel + ' · ' + (m.ronda || ''),
             local: local,
             visitante: visitante,
@@ -5725,15 +5785,22 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
             continue;
           }
           let done = 0;
+          const comps = new Set();
           bucket.matches.forEach(match => {
             if (match.hasResult) done++;
+            if (match.colorKey) comps.add(match.colorKey);
           });
           const total = bucket.matches.length;
           let status = 'pending';
           if (done === total) status = 'done';
           else if (done > 0) status = 'partial';
+          const dots = ['ucl', 'fifa', 'lib', 'sud', 'titan']
+            .filter(c => comps.has(c))
+            .map(c => '<i class="' + c + '"></i>')
+            .join('');
           cells += `<div class="cal-day has-matches ${status}" data-day="${key}" title="${total} partido(s)">
             ${d}<span class="cal-count">${done}/${total}</span>
+            <span class="cal-comp-dots">${dots}</span>
           </div>`;
         }
 
@@ -5758,8 +5825,9 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
             const score = match.hasResult
               ? `<span class="score">${match.scoreH} - ${match.scoreA}</span>`
               : `<span class="pending-score">por jugar</span>`;
-            return `<div class="cal-match-row">
-              <span style="color:var(--muted);font-size:0.72rem;min-width:7.5rem;">${match.tag}${match.hora ? ' · ' + match.hora : ''}</span>
+            const ck = match.colorKey || 'ucl';
+            return `<div class="cal-match-row src-${ck}">
+              <span class="cal-tag">${match.tag}${match.hora ? ' · ' + match.hora : ''}</span>
               <span>${match.local}</span>
               ${score}
               <span>${match.visitante}</span>
