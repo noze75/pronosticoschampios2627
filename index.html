@@ -859,6 +859,27 @@
       gap: 0.35rem;
       min-width: 0;
     }
+    .fifa-match.titan {
+      border-color: rgba(255, 193, 7, 0.55);
+      background: linear-gradient(145deg, rgba(255, 193, 7, 0.08), var(--card) 55%);
+      box-shadow: 0 0 0 1px rgba(255, 193, 7, 0.12);
+    }
+    .fifa-titan-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.62rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #1a1400;
+      background: linear-gradient(90deg, #ffc107, #ff9800);
+      padding: 0.18rem 0.45rem;
+      border-radius: 999px;
+      width: fit-content;
+      max-width: 100%;
+      line-height: 1.2;
+    }
     .fifa-match .fifa-meta {
       font-size: 0.65rem;
       font-weight: 700;
@@ -7427,7 +7448,8 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       'Australia': 'au', 'India': 'in', 'Burkina Faso': 'bf', 'Benín': 'bj',
       'Hungría': 'hu', 'Ucrania': 'ua', 'Polonia': 'pl', 'Suecia': 'se',
       'Austria': 'at', 'Rumanía': 'ro', 'Georgia': 'ge',
-      'Singapur': 'sg'
+      'Singapur': 'sg', 'Costa Rica': 'cr', 'Jamaica': 'jm',
+      'Islas Caimán': 'ky', 'Guyana': 'gy', 'Bermudas': 'bm', 'Santa Lucía': 'lc'
     };
 
     const FIFA_FLAG_EMOJI = {
@@ -7442,7 +7464,8 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       'Australia': '🇦🇺', 'India': '🇮🇳', 'Burkina Faso': '🇧🇫', 'Benín': '🇧🇯',
       'Hungría': '🇭🇺', 'Ucrania': '🇺🇦', 'Polonia': '🇵🇱', 'Suecia': '🇸🇪',
       'Austria': '🇦🇹', 'Rumanía': '🇷🇴', 'Georgia': '🇬🇪',
-      'Singapur': '🇸🇬'
+      'Singapur': '🇸🇬', 'Costa Rica': '🇨🇷', 'Jamaica': '🇯🇲',
+      'Islas Caimán': '🇰🇾', 'Guyana': '🇬🇾', 'Bermudas': '🇧🇲', 'Santa Lucía': '🇱🇨'
     };
 
     // ~30 partidos · siempre incluyen COL, ESP, FRA, ING, ITA, BRA, ARG, ALE
@@ -7491,6 +7514,14 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       { id: 'f39', date: '2026-11-16', hora_col: '14:45', local: 'Alemania', visitante: 'Países Bajos', comp: 'Nations League' },
       { id: 'f40', date: '2026-11-17', hora_col: '05:00', local: 'Singapur', visitante: 'Brasil', comp: 'Amistoso' },
       { id: 'f41', date: '2026-11-17', hora_col: '19:00', local: 'Chile', visitante: 'Colombia', comp: 'Amistoso' },
+      // —— Nov 2026 · Duelo de Titanes (ranking FIFA sótano) + 5 normales confirmados
+      { id: 'f42', date: '2026-11-12', hora_col: '14:00', local: 'Islas Caimán', visitante: 'Guyana', comp: 'Nations League B', titan: true },
+      { id: 'f43', date: '2026-11-13', hora_col: '14:00', local: 'Bermudas', visitante: 'Santa Lucía', comp: 'Nations League B', titan: true },
+      { id: 'f44', date: '2026-11-13', hora_col: '17:00', local: 'Argentina', visitante: 'Uruguay', comp: 'Amistoso' },
+      { id: 'f45', date: '2026-11-13', hora_col: '14:45', local: 'Países Bajos', visitante: 'Grecia', comp: 'Nations League' },
+      { id: 'f46', date: '2026-11-14', hora_col: '14:45', local: 'Portugal', visitante: 'Dinamarca', comp: 'Nations League' },
+      { id: 'f47', date: '2026-11-14', hora_col: '20:00', local: 'Jamaica', visitante: 'México', comp: 'Nations League A' },
+      { id: 'f48', date: '2026-11-17', hora_col: '17:00', local: 'Argentina', visitante: 'Costa Rica', comp: 'Amistoso' },
     ];
     let fifaTeamFilter = '';
 
@@ -7735,7 +7766,13 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       const user = currentUser();
       let sorted = FIFA_MATCHES.slice();
       if (fifaTeamFilter) sorted = sorted.filter(m => m.local === fifaTeamFilter || m.visitante === fifaTeamFilter);
-      sorted.sort((a, b) => a.date.localeCompare(b.date) || (a.hora_col || '').localeCompare(b.hora_col || '') || a.id.localeCompare(b.id));
+      // Titanes primero, luego por fecha
+      sorted.sort((a, b) => {
+        const ta = a.titan ? 0 : 1;
+        const tb = b.titan ? 0 : 1;
+        if (ta !== tb) return ta - tb;
+        return a.date.localeCompare(b.date) || (a.hora_col || '').localeCompare(b.hora_col || '') || a.id.localeCompare(b.id);
+      });
 
       if (!sorted.length) {
         el.innerHTML = '<div class="empty-state" style="padding:1.5rem 1rem;">No hay partidos' + (fifaTeamFilter ? ' de <strong>' + fifaTeamFilter + '</strong>' : '') + '.</div>';
@@ -7747,6 +7784,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
         const hasReal = real.h != null && real.a != null && real.h !== '' && real.a !== '';
         const realLocked = !adminUnlocked;
         const whenLabel = formatFifaWhen(m);
+        const isTitan = !!m.titan;
 
         const predBoxes = PLAYERS.map(p => {
           const pred = preds[p] || {};
@@ -7769,7 +7807,12 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
             '</div></div>';
         }).join('');
 
-        return '<div class="fifa-match" data-fifa-id="' + m.id + '">' +
+        const titanBadge = isTitan
+          ? '<div class="fifa-titan-badge">⚔️ Duelo de Titanes de la Fecha</div>'
+          : '';
+
+        return '<div class="fifa-match' + (isTitan ? ' titan' : '') + '" data-fifa-id="' + m.id + '">' +
+          titanBadge +
           '<div class="fifa-meta">' + whenLabel + ' · ' + m.comp + (realLocked ? '' : ' · Admin') + '</div>' +
           '<div class="fifa-teams-scores">' +
             '<div class="fifa-team-score-row">' +
