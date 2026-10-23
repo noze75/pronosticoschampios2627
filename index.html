@@ -3912,8 +3912,9 @@
     <!-- CALENDARIO -->
     <div id="calendario" class="panel">
       <div class="rules" style="margin-bottom:1rem;">
-        <strong>Calendario de la Fase de Liga</strong> — Días con partido. Verde = todos con resultado · Amarillo = algunos · Azul = pendientes.
-        Haz clic en un día para ver los partidos.
+        <strong>Calendario unificado</strong> — Champions · Fecha FIFA · Libertadores y Suramericana.
+        Verde = todos con resultado · Amarillo = algunos · Azul = pendientes.
+        Haz clic en un día para ver los partidos (con etiqueta de competición).
       </div>
       <div id="calendarLegend" class="cal-legend">
         <span><i class="cal-dot done"></i> Completo</span>
@@ -5577,18 +5578,122 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       return { y: year, m: month, d: day, key: `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}` };
     }
 
+    /** Fecha corta tipo "Mié 14 oct" o "Sáb 28 nov" → asume año 2026 si no hay año */
+    function parseShortFecha(fecha, defaultYear) {
+      const yDef = defaultYear || 2026;
+      const m = String(fecha || '').match(/(\d{1,2})\s+([a-záéíóú]+)/i);
+      if (!m) return null;
+      const day = parseInt(m[1], 10);
+      const monKey = m[2].toLowerCase().slice(0, 3);
+      const month = MES_MAP[monKey];
+      if (!month) return null;
+      const yearMatch = String(fecha).match(/(\d{4})/);
+      const year = yearMatch ? parseInt(yearMatch[1], 10) : yDef;
+      return { y: year, m: month, d: day, key: `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}` };
+    }
+
+    function parseIsoDateKey(iso) {
+      const parts = String(iso || '').split('-');
+      if (parts.length < 3) return null;
+      const y = parseInt(parts[0], 10);
+      const m = parseInt(parts[1], 10);
+      const d = parseInt(parts[2], 10);
+      if (!y || !m || !d) return null;
+      return { y: y, m: m, d: d, key: `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}` };
+    }
+
+    /** Eventos unificados para el calendario: Champions + FIFA + CONMEBOL */
+    function collectCalendarEvents() {
+      const events = [];
+
+      // Champions
+      if (typeof MATCHES !== 'undefined') {
+        MATCHES.forEach(m => {
+          const pd = parseMatchDate(m.fecha);
+          if (!pd) return;
+          const real = (data && data.results) ? data.results[m.id] : null;
+          const has = real && real.h != null && real.a != null && real.h !== '' && real.a !== '';
+          events.push({
+            key: pd.key,
+            meta: pd,
+            source: 'ucl',
+            tag: 'Champions J' + m.jornada,
+            local: m.local,
+            visitante: m.visitante,
+            hora: m.hora_col || '',
+            hasResult: has,
+            scoreH: has ? real.h : null,
+            scoreA: has ? real.a : null
+          });
+        });
+      }
+
+      // Fecha FIFA
+      if (typeof FIFA_MATCHES !== 'undefined') {
+        if (typeof ensureFifaData === 'function') ensureFifaData();
+        FIFA_MATCHES.forEach(m => {
+          const pd = parseIsoDateKey(m.date);
+          if (!pd) return;
+          const real = (data && data.fifa && data.fifa.results) ? data.fifa.results[m.id] : null;
+          const has = real && real.h != null && real.a != null && real.h !== '' && real.a !== '';
+          const tag = m.titan ? '⚔️ Titanes' : ('FIFA · ' + (m.comp || 'Fecha'));
+          events.push({
+            key: pd.key,
+            meta: pd,
+            source: 'fifa',
+            tag: tag,
+            local: m.local,
+            visitante: m.visitante,
+            hora: m.hora_col || '',
+            hasResult: has,
+            scoreH: has ? real.h : null,
+            scoreA: has ? real.a : null
+          });
+        });
+      }
+
+      // Libertadores / Suramericana
+      if (typeof CONMEBOL_MATCHES !== 'undefined') {
+        if (typeof ensureLibertadoresData === 'function') ensureLibertadoresData();
+        CONMEBOL_MATCHES.forEach(raw => {
+          const m = typeof resolveConmebolMatch === 'function' ? resolveConmebolMatch(raw) : raw;
+          const pd = parseShortFecha(m.fecha, 2026);
+          if (!pd) return;
+          const real = (data && data.libertadores && data.libertadores.results)
+            ? data.libertadores.results[m.id]
+            : (m.result || null);
+          const has = real && real.h != null && real.a != null && real.h !== '' && real.a !== '';
+          const compLabel = m.comp === 'lib' ? 'Libertadores' : (m.comp === 'sud' ? 'Suramericana' : 'CONMEBOL');
+          const local = m.local || 'Por definir';
+          const visitante = m.visitante || 'Por definir';
+          events.push({
+            key: pd.key,
+            meta: pd,
+            source: 'conmebol',
+            tag: compLabel + ' · ' + (m.ronda || ''),
+            local: local,
+            visitante: visitante,
+            hora: m.hora_col || '',
+            hasResult: has,
+            scoreH: has ? real.h : null,
+            scoreA: has ? real.a : null
+          });
+        });
+      }
+
+      return events;
+    }
+
     function renderCalendar() {
       const monthsEl = document.getElementById('calendarMonths');
       const detailEl = document.getElementById('calendarDayDetail');
       if (!monthsEl) return;
 
-      // Group matches by date key
+      const events = collectCalendarEvents();
       const byDay = {};
-      MATCHES.forEach(m => {
-        const pd = parseMatchDate(m.fecha);
-        if (!pd) return;
-        if (!byDay[pd.key]) byDay[pd.key] = { meta: pd, matches: [] };
-        byDay[pd.key].matches.push(m);
+      events.forEach(ev => {
+        if (!byDay[ev.key]) byDay[ev.key] = { meta: ev.meta, matches: [] };
+        byDay[ev.key].matches.push(ev);
       });
 
       // Months that appear
@@ -5621,8 +5726,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
           }
           let done = 0;
           bucket.matches.forEach(match => {
-            const real = data.results[match.id];
-            if (real && real.h != null && real.a != null) done++;
+            if (match.hasResult) done++;
           });
           const total = bucket.matches.length;
           let status = 'pending';
@@ -5643,14 +5747,19 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
           const bucket = byDay[key];
           if (!bucket || !detailEl) return;
           const { y, m, d } = bucket.meta;
-          const rows = bucket.matches.map(match => {
-            const real = data.results[match.id];
-            const has = real && real.h != null && real.a != null;
-            const score = has
-              ? `<span class="score">${real.h} - ${real.a}</span>`
+          // Orden: hora, luego fuente
+          const ordered = bucket.matches.slice().sort((a, b) => {
+            const ha = a.hora || '';
+            const hb = b.hora || '';
+            if (ha !== hb) return ha.localeCompare(hb);
+            return (a.tag || '').localeCompare(b.tag || '');
+          });
+          const rows = ordered.map(match => {
+            const score = match.hasResult
+              ? `<span class="score">${match.scoreH} - ${match.scoreA}</span>`
               : `<span class="pending-score">por jugar</span>`;
             return `<div class="cal-match-row">
-              <span style="color:var(--muted);font-size:0.78rem;">J${match.jornada} · ${match.hora_col || ''}</span>
+              <span style="color:var(--muted);font-size:0.72rem;min-width:7.5rem;">${match.tag}${match.hora ? ' · ' + match.hora : ''}</span>
               <span>${match.local}</span>
               ${score}
               <span>${match.visitante}</span>
