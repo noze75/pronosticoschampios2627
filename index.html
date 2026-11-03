@@ -8777,15 +8777,37 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       return d ? d.pts : null;
     }
 
+    /** Cierre de pronósticos Fecha FIFA: date ISO + hora_col (Colombia UTC−5) */
+    function isFifaMatchPredLocked(m) {
+      if (!m || !m.date) return false;
+      let hh = 0, mm = 0;
+      const hm = String(m.hora_col || '').trim().match(/(\d{1,2}):(\d{2})/);
+      if (hm) { hh = parseInt(hm[1], 10); mm = parseInt(hm[2], 10); }
+      const iso = m.date + 'T' + String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0') + ':00-05:00';
+      const kick = new Date(iso);
+      if (isNaN(kick.getTime())) return false;
+      return Date.now() >= kick.getTime();
+    }
+
     function getFifaPlayerStats() {
       ensureFifaData();
       const out = {};
-      PLAYERS.forEach(p => { out[p] = { pts: 0, exact: 0, resultOnly: 0, goalsHit: 0, played: 0 }; });
+      PLAYERS.forEach(p => { out[p] = { pts: 0, exact: 0, resultOnly: 0, np: 0, goalsHit: 0, played: 0 }; });
       FIFA_MATCHES.forEach(m => {
         const real = data.fifa.results[m.id];
         if (!real || real.h == null || real.a == null || real.h === '' || real.a === '') return;
+        const locked = isFifaMatchPredLocked(m);
         PLAYERS.forEach(p => {
           const pred = (data.fifa.predictions[m.id] || {})[p];
+          const hasPred = pred && pred.h != null && pred.a != null && pred.h !== '' && pred.a !== '';
+          if (!hasPred) {
+            if (locked) {
+              out[p].pts -= 1;
+              out[p].np++;
+              out[p].played++;
+            }
+            return;
+          }
           const d = fifaScoreDetail(pred, real);
           if (!d) return;
           out[p].played++;
@@ -8898,9 +8920,9 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       el.innerHTML =
         '<div class="fifa-rank-layout">' +
           '<div class="fifa-rank-wrap">' +
-            '<div class="fifa-rank-caption"><strong>Ranking Fecha FIFA</strong> · Pts → Goles → Exactos</div>' +
-            '<table><thead><tr><th>#</th><th>Jugador</th><th>Pts</th><th>Goles</th><th>Exactos</th><th>Solo res.</th><th>Jug.</th></tr></thead><tbody>' +
-            rows.map((r, i) => '<tr><td class="rank">' + (i + 1) + '</td><td class="player-name ' + r.id + '">' + PLAYER_NAMES[r.id] + '</td><td class="pts-col">' + r.pts + '</td><td>' + r.goalsHit + '</td><td>' + r.exact + '</td><td>' + r.resultOnly + '</td><td>' + r.played + '</td></tr>').join('') +
+            '<div class="fifa-rank-caption"><strong>Ranking Fecha FIFA</strong> · Pts → Goles → Exactos · NP (−1)</div>' +
+            '<table><thead><tr><th>#</th><th>Jugador</th><th>Pts</th><th>Goles</th><th>Exactos</th><th>Solo res.</th><th>NP</th><th>Jug.</th></tr></thead><tbody>' +
+            rows.map((r, i) => '<tr><td class="rank">' + (i + 1) + '</td><td class="player-name ' + r.id + '">' + PLAYER_NAMES[r.id] + '</td><td class="pts-col">' + r.pts + '</td><td>' + r.goalsHit + '</td><td>' + r.exact + '</td><td>' + r.resultOnly + '</td><td>' + (r.np || 0) + '</td><td>' + r.played + '</td></tr>').join('') +
             '</tbody></table>' +
           '</div>' +
           '<div class="fifa-leader-dance">' +
@@ -8961,37 +8983,49 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
         const preds = data.fifa.predictions[m.id] || {};
         const hasReal = real.h != null && real.a != null && real.h !== '' && real.a !== '';
         const realLocked = !adminUnlocked;
+        const predLocked = isFifaMatchPredLocked(m);
         const whenLabel = formatFifaWhen(m);
         const isTitan = !!m.titan;
 
         const predBoxes = PLAYERS.map(p => {
           const pred = preds[p] || {};
-          const canEdit = !!user && user === p;
+          const hasPred = pred.h != null && pred.a != null && pred.h !== '' && pred.a !== '';
+          const canEdit = !!user && user === p && !predLocked;
           let badge = '';
-          if (hasReal && pred.h != null && pred.a != null && pred.h !== '' && pred.a !== '') {
-            const pts = fifaScorePts(pred, real);
-            if (pts != null) {
-              const cls = pts === 2 ? 'exact' : (pts === 1 ? 'has-pts' : '');
-              badge = '<span class="pts-mini ' + cls + '">' + pts + ' pts</span>';
+          let scoreLine;
+          if (predLocked && !hasPred) {
+            badge = hasReal
+              ? '<span class="pts-mini" style="color:#ff8a80">−1</span>'
+              : '<span class="pts-mini" style="color:#ff8a80">NP</span>';
+            scoreLine = '<div class="score-line" style="justify-content:center;font-weight:900;color:#ff8a80;letter-spacing:0.06em">NP</div>';
+          } else {
+            if (hasReal && hasPred) {
+              const pts = fifaScorePts(pred, real);
+              if (pts != null) {
+                const cls = pts === 2 ? 'exact' : (pts === 1 ? 'has-pts' : '');
+                badge = '<span class="pts-mini ' + cls + '">' + pts + ' pts</span>';
+              }
             }
+            scoreLine = '<div class="score-line">' +
+              '<input type="number" min="0" max="20" inputmode="numeric" data-fifa-pred="' + m.id + '" data-fifa-player="' + p + '" data-side="h" value="' + (pred.h != null && pred.h !== '' ? pred.h : '') + '" placeholder="-" ' + (canEdit ? '' : 'disabled') + ' />' +
+              '<span style="color:var(--muted);font-weight:800">:</span>' +
+              '<input type="number" min="0" max="20" inputmode="numeric" data-fifa-pred="' + m.id + '" data-fifa-player="' + p + '" data-side="a" value="' + (pred.a != null && pred.a !== '' ? pred.a : '') + '" placeholder="-" ' + (canEdit ? '' : 'disabled') + ' />' +
+            '</div>';
           }
           const boxCls = 'fifa-pred-box ' + p + (canEdit ? ' can-edit' : '');
           return '<div class="' + boxCls + '">' +
             '<div class="name">' + PLAYER_NAMES[p] + ' ' + badge + '</div>' +
-            '<div class="score-line">' +
-              '<input type="number" min="0" max="20" inputmode="numeric" data-fifa-pred="' + m.id + '" data-fifa-player="' + p + '" data-side="h" value="' + (pred.h != null && pred.h !== '' ? pred.h : '') + '" placeholder="-" ' + (canEdit ? '' : 'disabled') + ' />' +
-              '<span style="color:var(--muted);font-weight:800">:</span>' +
-              '<input type="number" min="0" max="20" inputmode="numeric" data-fifa-pred="' + m.id + '" data-fifa-player="' + p + '" data-side="a" value="' + (pred.a != null && pred.a !== '' ? pred.a : '') + '" placeholder="-" ' + (canEdit ? '' : 'disabled') + ' />' +
-            '</div></div>';
+            scoreLine +
+          '</div>';
         }).join('');
 
         const titanBadge = isTitan
           ? '<div class="fifa-titan-badge">⚔️ Duelo de Titanes de la Fecha</div>'
           : '';
 
-        return '<div class="fifa-match' + (isTitan ? ' titan' : '') + '" data-fifa-id="' + m.id + '">' +
+        return '<div class="fifa-match' + (isTitan ? ' titan' : '') + (predLocked ? ' pred-closed' : '') + '" data-fifa-id="' + m.id + '">' +
           titanBadge +
-          '<div class="fifa-meta">' + whenLabel + ' · ' + m.comp + (realLocked ? '' : ' · Admin') + '</div>' +
+          '<div class="fifa-meta">' + whenLabel + ' · ' + m.comp + (predLocked ? ' · Cerrado' : '') + (realLocked ? '' : ' · Admin') + '</div>' +
           '<div class="fifa-teams-scores">' +
             '<div class="fifa-team-score-row">' +
               '<div class="fifa-team-left">' + fifaFlagHtml(m.local) + '<span class="fifa-team-name">' + m.local + '</span></div>' +
@@ -9042,6 +9076,12 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       }
       ensureFifaData();
       const id = e.target.dataset.fifaPred;
+      const matchObj = FIFA_MATCHES.find(x => x.id === id);
+      if (matchObj && isFifaMatchPredLocked(matchObj)) {
+        toast('Pronósticos cerrados: el partido ya empezó (hora Colombia)');
+        renderFifaMatches({ preserveScroll: true });
+        return;
+      }
       const side = e.target.dataset.side;
       const val = e.target.value === '' ? null : Number(e.target.value);
       if (!data.fifa.predictions[id]) data.fifa.predictions[id] = {};
@@ -9872,16 +9912,24 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
           if (forceIds[m.id] || isEmpty || isZeroPlaceholder) {
             data.libertadores.results[m.id] = { h: m.result.h, a: m.result.a };
           }
-          if (!data.libertadores.predictions[m.id]) data.libertadores.predictions[m.id] = {};
-          const real = data.libertadores.results[m.id];
-          PLAYERS.forEach(p => {
-            const cur = data.libertadores.predictions[m.id][p];
-            if (!cur || cur.h == null || cur.a == null) {
-              data.libertadores.predictions[m.id][p] = { h: real.h, a: real.a };
-            }
-          });
+          // Ya no se rellenan pronósticos automáticamente (para que NP / −1 funcione)
         }
       });
+    }
+
+    /** Cierre de pronósticos CONMEBOL (fecha corta "Mié 14 oct" + hora COL) */
+    function isLibMatchPredLocked(m) {
+      if (!m) return false;
+      const d = parseShortFecha(m.fecha, 2026);
+      if (!d) return false;
+      let hh = 0, mm = 0;
+      const hm = String(m.hora_col || '').trim().match(/(\d{1,2}):(\d{2})/);
+      if (hm) { hh = parseInt(hm[1], 10); mm = parseInt(hm[2], 10); }
+      const iso = d.y + '-' + String(d.m).padStart(2, '0') + '-' + String(d.d).padStart(2, '0') +
+        'T' + String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0') + ':00-05:00';
+      const kick = new Date(iso);
+      if (isNaN(kick.getTime())) return false;
+      return Date.now() >= kick.getTime();
     }
 
     function libLogo(name) {
@@ -9899,12 +9947,21 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       ensureLibertadoresData();
       const list = CONMEBOL_MATCHES.filter(m => !comp || m.comp === comp);
       const rows = PLAYERS.map(p => {
-        let pts = 0, exact = 0, resultOnly = 0, goalsHit = 0, played = 0;
+        let pts = 0, exact = 0, resultOnly = 0, np = 0, goalsHit = 0, played = 0;
         list.forEach(m => {
           const real = data.libertadores.results[m.id];
           if (!real || real.h == null || real.a == null) return;
           const pred = (data.libertadores.predictions[m.id] || {})[p];
-          if (!pred || pred.h == null || pred.a == null) return;
+          const hasPred = pred && pred.h != null && pred.a != null;
+          const locked = isLibMatchPredLocked(m);
+          if (!hasPred) {
+            if (locked) {
+              pts -= 1;
+              np++;
+              played++;
+            }
+            return;
+          }
           const d = calcPoints(pred.h, pred.a, real.h, real.a);
           pts += d.pts;
           played++;
@@ -9914,7 +9971,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
         });
         const maxPts = played * 2;
         const pct = maxPts > 0 ? (pts / maxPts * 100) : 0;
-        return { id: p, name: PLAYER_NAMES[p] || p, pts, exact, resultOnly, goalsHit, played, pct };
+        return { id: p, name: PLAYER_NAMES[p] || p, pts, exact, resultOnly, np, goalsHit, played, pct };
       });
       rows.sort((a, b) => b.pts - a.pts || b.goalsHit - a.goalsHit || b.exact - a.exact || a.name.localeCompare(b.name));
       return rows;
@@ -9938,21 +9995,33 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
           const hasReal = real && real.h != null && real.a != null;
           const isFinalPending = m.isFinal && !m.teamsReady;
           const preds = data.libertadores.predictions[m.id] || {};
+          const predLocked = isLibMatchPredLocked(m);
           const boxes = PLAYERS.map(p => {
             const pred = preds[p] || {};
-            const canEdit = !!(me && me === p) && !hasReal && !isFinalPending;
+            const hasPred = pred.h != null && pred.a != null;
+            const canEdit = !!(me && me === p) && !hasReal && !isFinalPending && !predLocked;
             let ptsHtml = '';
-            if (hasReal && pred.h != null && pred.a != null) {
-              const d = calcPoints(pred.h, pred.a, real.h, real.a);
-              ptsHtml = '<span class="pts-mini' + (d.pts > 0 ? ' ok' : '') + '">' + d.pts + ' pts</span>';
+            let scoreLine;
+            if (predLocked && !hasPred) {
+              ptsHtml = hasReal
+                ? '<span class="pts-mini" style="color:#ff8a80">−1</span>'
+                : '<span class="pts-mini" style="color:#ff8a80">NP</span>';
+              scoreLine = '<div class="score-line" style="justify-content:center;font-weight:900;color:#ff8a80;letter-spacing:0.06em">NP</div>';
+            } else {
+              if (hasReal && hasPred) {
+                const d = calcPoints(pred.h, pred.a, real.h, real.a);
+                ptsHtml = '<span class="pts-mini' + (d.pts > 0 ? ' ok' : '') + '">' + d.pts + ' pts</span>';
+              }
+              scoreLine = '<div class="score-line">' +
+                '<input type="number" min="0" max="20" inputmode="numeric" data-lib-pred="' + m.id + '" data-lib-player="' + p + '" data-side="h" value="' + (pred.h != null ? pred.h : '') + '" ' + (canEdit ? '' : 'disabled') + ' placeholder="-" />' +
+                '<span style="color:#94a3b8;font-weight:900">:</span>' +
+                '<input type="number" min="0" max="20" inputmode="numeric" data-lib-pred="' + m.id + '" data-lib-player="' + p + '" data-side="a" value="' + (pred.a != null ? pred.a : '') + '" ' + (canEdit ? '' : 'disabled') + ' placeholder="-" />' +
+              '</div>';
             }
             return '<div class="lib-pred-box ' + p + (canEdit ? ' can-edit' : '') + '">' +
               '<div class="name"><span>' + (PLAYER_NAMES[p] || p) + '</span>' + ptsHtml + '</div>' +
-              '<div class="score-line">' +
-              '<input type="number" min="0" max="20" inputmode="numeric" data-lib-pred="' + m.id + '" data-lib-player="' + p + '" data-side="h" value="' + (pred.h != null ? pred.h : '') + '" ' + (canEdit ? '' : 'disabled') + ' placeholder="-" />' +
-              '<span style="color:#94a3b8;font-weight:900">:</span>' +
-              '<input type="number" min="0" max="20" inputmode="numeric" data-lib-pred="' + m.id + '" data-lib-player="' + p + '" data-side="a" value="' + (pred.a != null ? pred.a : '') + '" ' + (canEdit ? '' : 'disabled') + ' placeholder="-" />' +
-              '</div></div>';
+              scoreLine +
+              '</div>';
           }).join('');
           const teamLine = m.isFinal && !m.teamsReady
             ? '<span style="color:var(--muted)">' + m.local + ' vs ' + m.visitante + '</span>'
@@ -10009,7 +10078,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
           '<div style="overflow-x:auto">' +
           '<table class="lib-rank-table">' +
           '<thead><tr>' +
-          '<th>#</th><th>Jugador</th><th>Pts</th><th>Exactos (2pts)</th><th>Resultado (1pt)</th>' +
+          '<th>#</th><th>Jugador</th><th>Pts</th><th>Exactos (2pts)</th><th>Resultado (1pt)</th><th>NP (−1)</th>' +
           '<th>Goles acertados</th><th>Partidos jugados</th><th>% Aciertos*</th>' +
           '</tr></thead><tbody>' +
           rank.map((r, i) =>
@@ -10019,13 +10088,14 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
             '<td class="pts">' + r.pts + '</td>' +
             '<td>' + r.exact + '</td>' +
             '<td>' + r.resultOnly + '</td>' +
+            '<td>' + (r.np || 0) + '</td>' +
             '<td>' + r.goalsHit + '</td>' +
             '<td>' + r.played + '</td>' +
             '<td>' + r.pct.toFixed(1) + '%</td>' +
             '</tr>'
           ).join('') +
           '</tbody></table></div>' +
-          '<p style="margin:0.5rem 0 0;font-size:0.75rem;color:var(--muted)">* % Aciertos = (puntos / máximos posibles) × 100. Máximo por partido = 2 pts. Incluye final cuando esté definida.</p>' +
+          '<p style="margin:0.5rem 0 0;font-size:0.75rem;color:var(--muted)">* % Aciertos = (puntos / máximos posibles) × 100. Máximo por partido = 2 pts. NP = sin pronóstico al cierre (hora COL) → −1 pt.</p>' +
           '</div>';
       }
 
@@ -10100,6 +10170,18 @@ function onLibPredChange(e) {
       const user = el.dataset.libPlayer;
       const side = el.dataset.side;
       if (!id || !user || !side) return;
+      const me = typeof currentUser === 'function' ? currentUser() : '';
+      if (!me || me !== user) {
+        toast('Elige Soy con tu nombre para editar');
+        if (typeof renderLibertadoresPanel === 'function') renderLibertadoresPanel();
+        return;
+      }
+      const matchObj = CONMEBOL_MATCHES.find(x => x.id === id);
+      if (matchObj && isLibMatchPredLocked(matchObj)) {
+        toast('Pronósticos cerrados: el partido ya empezó (hora Colombia)');
+        if (typeof renderLibertadoresPanel === 'function') renderLibertadoresPanel();
+        return;
+      }
       ensureLibertadoresData();
       if (!data.libertadores.predictions[id]) data.libertadores.predictions[id] = {};
       if (!data.libertadores.predictions[id][user]) data.libertadores.predictions[id][user] = {};
