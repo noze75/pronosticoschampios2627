@@ -10226,7 +10226,7 @@ function onLibPredChange(e) {
         const playerLines = PLAYERS.map(p => {
           const pred = preds[p] || {};
           if (pred.h == null || pred.a == null) {
-            return { id: p, name: PLAYER_NAMES[p], predText: '—', pts: null, exact: false, result: false };
+            return { id: p, name: PLAYER_NAMES[p], predText: 'NP', pts: -1, exact: false, result: false, np: true, zero: false };
           }
           const r = calcPoints(pred.h, pred.a, real.h, real.a);
           return {
@@ -10235,7 +10235,9 @@ function onLibPredChange(e) {
             predText: pred.h + '-' + pred.a,
             pts: r.pts,
             exact: r.exact,
-            result: r.result
+            result: r.result,
+            np: false,
+            zero: !r.exact && !r.result
           };
         });
         rows.push({
@@ -10255,7 +10257,7 @@ function onLibPredChange(e) {
     function pdfRankingFromRows(matchRows) {
       const stats = {};
       PLAYERS.forEach(p => {
-        stats[p] = { id: p, name: PLAYER_NAMES[p], pts: 0, exact: 0, resultOnly: 0, goalsHit: 0, played: 0 };
+        stats[p] = { id: p, name: PLAYER_NAMES[p], pts: 0, exact: 0, resultOnly: 0, np: 0, zero: 0, goalsHit: 0, played: 0 };
       });
       matchRows.forEach(row => {
         row.playerLines.forEach(pl => {
@@ -10263,16 +10265,201 @@ function onLibPredChange(e) {
           const s = stats[pl.id];
           s.pts += pl.pts;
           s.played++;
-          if (pl.exact) s.exact++;
+          if (pl.np) s.np++;
+          else if (pl.exact) s.exact++;
           else if (pl.result) s.resultOnly++;
+          else s.zero++;
         });
       });
-      // goalsHit recalculated from raw if needed — optional for PDF
       return PLAYERS.map(p => stats[p]).sort((a, b) => {
         if (b.pts !== a.pts) return b.pts - a.pts;
         if (b.exact !== a.exact) return b.exact - a.exact;
         return a.name.localeCompare(b.name);
       });
+    }
+
+    function pdfBuildAnalysis(matchRows, ranking) {
+      const nMatches = matchRows.length;
+      const leader = ranking[0];
+      const last = ranking[ranking.length - 1];
+      const gap = ranking.length > 1 ? (ranking[0].pts - ranking[1].pts) : 0;
+      let totalExact = 0, totalNp = 0, totalZero = 0;
+      ranking.forEach(r => { totalExact += r.exact || 0; totalNp += r.np || 0; totalZero += r.zero || 0; });
+      // Partido más fallado (más 0 + NP)
+      let worstMatch = null, worstScore = -1;
+      matchRows.forEach(row => {
+        let fails = 0;
+        row.playerLines.forEach(pl => { if (pl.np || pl.zero) fails++; });
+        if (fails > worstScore) { worstScore = fails; worstMatch = row; }
+      });
+      // Partido más acertado (más exactos)
+      let bestMatch = null, bestScore = -1;
+      matchRows.forEach(row => {
+        let ex = 0;
+        row.playerLines.forEach(pl => { if (pl.exact) ex++; });
+        if (ex > bestScore) { bestScore = ex; bestMatch = row; }
+      });
+      const bestExactPlayer = ranking.slice().sort((a, b) => b.exact - a.exact || b.pts - a.pts)[0];
+      const mostNp = ranking.slice().sort((a, b) => b.np - a.np || a.pts - b.pts)[0];
+      const lines = [];
+      if (leader) {
+        lines.push('Líder de la jornada: ' + leader.name + ' con ' + leader.pts + ' pts' +
+          (gap > 0 ? (' (+' + gap + ' sobre el 2º).') : '.'));
+      }
+      if (last && leader && last.id !== leader.id) {
+        lines.push('Cierra la tabla ' + last.name + ' (' + last.pts + ' pts).');
+      }
+      lines.push('En ' + nMatches + ' partido' + (nMatches === 1 ? '' : 's') + ' hubo ' +
+        totalExact + ' marcador' + (totalExact === 1 ? '' : 'es') + ' exacto' + (totalExact === 1 ? '' : 's') +
+        (totalNp ? (', ' + totalNp + ' NP') : '') +
+        (totalZero ? (' y ' + totalZero + ' fallo' + (totalZero === 1 ? '' : 's') + ' total' + (totalZero === 1 ? '' : 'es')) : '') + '.');
+      if (bestMatch && bestScore > 0) {
+        lines.push('Partido más clavado: ' + bestMatch.local + ' ' + bestMatch.realH + '-' + bestMatch.realA + ' ' +
+          bestMatch.visitante + ' (' + bestScore + ' exacto' + (bestScore === 1 ? '' : 's') + ').');
+      }
+      if (worstMatch && worstScore > 0) {
+        lines.push('El más difícil: ' + worstMatch.local + ' ' + worstMatch.realH + '-' + worstMatch.realA + ' ' +
+          worstMatch.visitante + ' (' + worstScore + ' sin puntos).');
+      }
+      return {
+        lines,
+        highlights: [
+          { label: 'Más puntos', value: leader ? (leader.name + ' · ' + leader.pts + ' pts') : '—', color: [0, 200, 100] },
+          { label: 'Más exactos', value: bestExactPlayer ? (bestExactPlayer.name + ' · ' + bestExactPlayer.exact) : '—', color: [66, 165, 245] },
+          { label: 'Más NP', value: (mostNp && mostNp.np > 0) ? (mostNp.name + ' · ' + mostNp.np) : 'Ninguno', color: [239, 83, 80] },
+          { label: 'Último', value: last ? (last.name + ' · ' + last.pts + ' pts') : '—', color: [255, 167, 38] }
+        ]
+      };
+    }
+
+    function pdfWriteAnalysis(doc, y, analysis) {
+      y = pdfSectionTitle(doc, y, 'Análisis de la jornada');
+      y = pdfEnsureSpace(doc, y, 28);
+      // Caja de texto
+      const boxH = 6 + analysis.lines.length * 5.2;
+      doc.setFillColor(245, 248, 252);
+      doc.setDrawColor(30, 58, 95);
+      doc.roundedRect(14, y - 3, 182, boxH, 2, 2, 'FD');
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.5);
+      doc.setTextColor(40, 50, 60);
+      analysis.lines.forEach((line, i) => {
+        doc.text(line, 18, y + 2 + i * 5.2, { maxWidth: 174 });
+      });
+      y += boxH + 4;
+      // Highlights 4 tarjetas
+      y = pdfEnsureSpace(doc, y, 22);
+      const cardW = 43.5;
+      const gap = 2.5;
+      analysis.highlights.forEach((h, i) => {
+        const cx = 14 + i * (cardW + gap);
+        doc.setFillColor(18, 38, 64);
+        doc.roundedRect(cx, y - 2, cardW, 18, 2, 2, 'F');
+        doc.setFillColor(h.color[0], h.color[1], h.color[2]);
+        doc.rect(cx, y - 2, 1.5, 18, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(6.5);
+        doc.setTextColor(155, 176, 204);
+        doc.text(h.label.toUpperCase(), cx + 4, y + 3);
+        doc.setFontSize(8);
+        doc.setTextColor(255, 255, 255);
+        const parts = doc.splitTextToSize(h.value, cardW - 8);
+        doc.text(parts, cx + 4, y + 9);
+      });
+      return y + 22;
+    }
+
+    function pdfWriteBarChart(doc, y, ranking, heading) {
+      y = pdfSectionTitle(doc, y, heading);
+      y = pdfEnsureSpace(doc, y, 48);
+      const x0 = 14;
+      const chartW = 182;
+      const chartH = 42;
+      const maxPts = Math.max(1, ...ranking.map(r => Math.max(0, r.pts)));
+      // Fondo
+      doc.setFillColor(250, 252, 255);
+      doc.setDrawColor(200, 210, 220);
+      doc.roundedRect(x0, y - 2, chartW, chartH + 8, 2, 2, 'FD');
+      const barAreaH = chartH - 8;
+      const slotW = chartW / ranking.length;
+      ranking.forEach((r, i) => {
+        const barH = (Math.max(0, r.pts) / maxPts) * barAreaH;
+        const bx = x0 + i * slotW + slotW * 0.2;
+        const bw = slotW * 0.6;
+        const by = y + chartH - 6 - barH;
+        const rgb = PDF_PLAYER_RGB[r.id] || [80, 90, 100];
+        doc.setFillColor(rgb[0], rgb[1], rgb[2]);
+        doc.roundedRect(bx, by, bw, Math.max(barH, 1.5), 1, 1, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.setTextColor(10, 22, 40);
+        doc.text(String(r.pts), bx + bw / 2, by - 1.5, { align: 'center' });
+        doc.setFontSize(7);
+        doc.setTextColor(rgb[0], rgb[1], rgb[2]);
+        const nm = (r.name || '').length > 8 ? (r.name || '').slice(0, 7) : (r.name || '');
+        doc.text(nm, x0 + i * slotW + slotW / 2, y + chartH + 3, { align: 'center' });
+      });
+      return y + chartH + 10;
+    }
+
+    function pdfWriteStackedBars(doc, y, ranking, heading) {
+      y = pdfSectionTitle(doc, y, heading);
+      y = pdfEnsureSpace(doc, y, 52);
+      const x0 = 14;
+      const chartW = 182;
+      const rowH = 9;
+      // Leyenda
+      const legend = [
+        { t: 'Exactos', c: [0, 200, 100] },
+        { t: 'Solo res.', c: [255, 193, 7] },
+        { t: 'Fallos', c: [239, 83, 80] },
+        { t: 'NP', c: [120, 130, 140] }
+      ];
+      let lx = x0;
+      legend.forEach(L => {
+        doc.setFillColor(L.c[0], L.c[1], L.c[2]);
+        doc.roundedRect(lx, y - 2, 3.5, 3.5, 0.5, 0.5, 'F');
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(6.5);
+        doc.setTextColor(60, 70, 80);
+        doc.text(L.t, lx + 5, y + 0.8);
+        lx += 28;
+      });
+      y += 6;
+      const maxPlayed = Math.max(1, ...ranking.map(r => r.played || 1));
+      ranking.forEach((r, i) => {
+        y = pdfEnsureSpace(doc, y, rowH + 2);
+        const rgb = PDF_PLAYER_RGB[r.id] || [80, 90, 100];
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(7.5);
+        doc.setTextColor(rgb[0], rgb[1], rgb[2]);
+        doc.text(r.name, x0, y + 2);
+        const barX = x0 + 28;
+        const barMaxW = chartW - 36;
+        const segs = [
+          { n: r.exact || 0, c: [0, 200, 100] },
+          { n: r.resultOnly || 0, c: [255, 193, 7] },
+          { n: r.zero || 0, c: [239, 83, 80] },
+          { n: r.np || 0, c: [120, 130, 140] }
+        ];
+        let sx = barX;
+        const total = Math.max(1, segs.reduce((a, s) => a + s.n, 0));
+        segs.forEach(s => {
+          if (!s.n) return;
+          const w = (s.n / total) * barMaxW * (r.played / maxPlayed);
+          doc.setFillColor(s.c[0], s.c[1], s.c[2]);
+          doc.roundedRect(sx, y - 1.5, Math.max(w, 1), 5.5, 0.8, 0.8, 'F');
+          if (w > 8) {
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(5.5);
+            doc.setTextColor(255, 255, 255);
+            doc.text(String(s.n), sx + w / 2, y + 2.2, { align: 'center' });
+          }
+          sx += w;
+        });
+        y += rowH;
+      });
+      return y + 4;
     }
 
     const PDF_PLAYER_RGB = {
@@ -10492,7 +10679,10 @@ function onLibPredChange(e) {
             const ptsTxt = pl.pts == null ? '—' : String(pl.pts);
             const badgeW = 6.5;
             const badgeX = cellX + halfW - badgeW - 1.5;
-            if (pl.exact) {
+            if (pl.np || pl.pts === -1) {
+              doc.setFillColor(120, 130, 140);
+              doc.setTextColor(255, 255, 255);
+            } else if (pl.exact) {
               doc.setFillColor(0, 200, 100);
               doc.setTextColor(255, 255, 255);
             } else if (pl.pts === 1) {
@@ -10505,10 +10695,10 @@ function onLibPredChange(e) {
               doc.setFillColor(200, 210, 220);
               doc.setTextColor(60, 70, 80);
             }
-            doc.roundedRect(badgeX, py - 2.3, badgeW, 3.3, 0.7, 0.7, 'F');
+            doc.roundedRect(badgeX, py - 2.3, badgeW + (pl.pts === -1 ? 1.5 : 0), 3.3, 0.7, 0.7, 'F');
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(5);
-            doc.text(ptsTxt, badgeX + badgeW / 2, py, { align: 'center' });
+            doc.text(ptsTxt, badgeX + (badgeW + (pl.pts === -1 ? 1.5 : 0)) / 2, py, { align: 'center' });
           });
         });
         y += cardH + 2.2;
@@ -10561,13 +10751,23 @@ function onLibPredChange(e) {
         return;
       }
       const ranking = pdfRankingFromRows(rows);
-      // Guerra acumulada siempre con todos los resultados CL
       const allRows = pdfCollectMatchRows(MATCHES, data.results || {}, data.predictions || {});
       const warRanking = pdfRankingFromRows(allRows);
-      y = pdfWriteRanking(doc, y, ranking, scope === 'acc' ? 'Clasificación (acumulado)' : 'Puntos en esta jornada');
+      const analysis = pdfBuildAnalysis(rows, ranking);
+
+      // Análisis + highlights
+      y = pdfWriteAnalysis(doc, y, analysis);
+      // Gráfico de barras: puntos de la jornada
+      y = pdfWriteBarChart(doc, y, ranking, scope === 'acc' ? 'Puntos acumulados' : 'Puntos de la jornada');
+      // Barras apiladas: composición
+      y = pdfWriteStackedBars(doc, y, ranking, 'Composición: exactos · resultado · fallos · NP');
+      // Tabla ranking
+      y = pdfWriteRanking(doc, y, ranking, scope === 'acc' ? 'Clasificación (acumulado)' : 'Clasificación de la jornada');
       if (scope !== 'acc') {
         y = pdfWriteRanking(doc, y, warRanking, 'Guerra acumulada (todas las jornadas)');
+        y = pdfWriteBarChart(doc, y, warRanking, 'Acumulado · cómo va la guerra');
       }
+      // Partidos
       y = pdfWriteMatches(doc, y, rows);
       const fname = scope === 'acc' ? 'resumen-champions-acumulado.pdf' : ('resumen-champions-jornada-' + scope + '.pdf');
       pdfFooterAndSave(doc, fname);
