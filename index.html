@@ -1863,6 +1863,33 @@
       background: rgba(255,82,82,0.14);
       border: 1px solid rgba(255,82,82,0.35);
     }
+    .pred-box .pts-badge.np-pts {
+      color: #ff8a80;
+      background: rgba(255,82,82,0.18);
+      border: 1px solid rgba(255,82,82,0.4);
+    }
+    .pred-box .np-label {
+      display: block;
+      text-align: center;
+      font-size: 1.05rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      color: #ff8a80;
+      padding: 0.35rem 0.2rem;
+    }
+    .match-card.pred-closed .match-header::after {
+      content: 'Cerrado';
+      margin-left: auto;
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #ff8a80;
+      background: rgba(255,82,82,0.12);
+      border: 1px solid rgba(255,82,82,0.3);
+      border-radius: 999px;
+      padding: 0.1rem 0.45rem;
+    }
 
     /* Equipo + gol en cada fila */
     .match-main-row {
@@ -4212,6 +4239,7 @@
             <th>Pts</th>
             <th>Exactos (2pts)</th>
             <th>Resultado (1pt)</th>
+            <th>NP (−1)</th>
             <th>Goles acertados</th>
             <th>Partidos jugados</th>
             <th>% Aciertos*</th>
@@ -4222,6 +4250,7 @@
       <div id="pelmazoQuote" class="pelmazo-quote" style="display:none;"></div>
       <p style="margin-top:0.75rem;font-size:0.8rem;color:var(--muted);">
         * % Aciertos = (puntos obtenidos / puntos máximos posibles) × 100. Máximo por partido = 2 pts.
+        NP = sin pronóstico al cierre (hora de inicio Colombia) → −1 pt.
       </p>
     </div>
 
@@ -4607,6 +4636,12 @@
           <li><strong>2 puntos</strong> → Se acierta el marcador exacto (resultado + goles de ambos equipos). Ejemplo: real 2-1 y se pronosticó 2-1.</li>
           <li><strong>1 punto</strong> → Se acierta solo el resultado (quién gana o empate), pero no el marcador exacto. Ejemplo: real 2-1 y se pronosticó 3-0 o 1-0.</li>
           <li><strong>0 puntos</strong> → Se falla el resultado completamente (pelmazo).</li>
+          <li><strong>−1 punto (NP)</strong> → Si al llegar la hora de inicio del partido (hora Colombia del cartel) no hay pronóstico, la casilla queda en <strong>NP</strong> (No Pronosticó) y resta 1 punto.</li>
+        </ul>
+        <h3 style="margin-top:1.25rem;">Cierre de pronósticos</h3>
+        <ul>
+          <li>Los pronósticos se <strong>cierran automáticamente</strong> a la hora de inicio del partido (hora Colombia indicada en cada tarjeta).</li>
+          <li>Después de esa hora no se puede editar el marcador previsto.</li>
         </ul>
         <h3 style="margin-top:1.25rem;">Desempate</h3>
         <ul>
@@ -5363,14 +5398,25 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
     function getPlayerStats() {
       const stats = {};
       PLAYERS.forEach(p => {
-        stats[p] = { pts: 0, exact: 0, resultOnly: 0, goalsHit: 0, played: 0, maxPossible: 0 };
+        stats[p] = { pts: 0, exact: 0, resultOnly: 0, np: 0, goalsHit: 0, played: 0, maxPossible: 0 };
       });
       MATCHES.forEach(m => {
         const real = data.results[m.id];
         if (!real || real.h == null || real.a == null) return;
+        const locked = typeof isMatchPredLocked === 'function' ? isMatchPredLocked(m) : false;
         PLAYERS.forEach(p => {
           const pred = (data.predictions[m.id] || {})[p];
-          if (!pred || pred.h == null || pred.a == null) return;
+          const hasPred = pred && pred.h != null && pred.a != null;
+          if (!hasPred) {
+            // NP: hora de inicio ya pasó y no hay pronóstico → −1
+            if (locked) {
+              stats[p].pts -= 1;
+              stats[p].np++;
+              stats[p].played++;
+              stats[p].maxPossible += 2;
+            }
+            return;
+          }
           const r = calcPoints(pred.h, pred.a, real.h, real.a);
           stats[p].pts += r.pts;
           stats[p].goalsHit += r.goalsHit;
@@ -5809,21 +5855,25 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
         const real = data.results[m.id] || {};
         const preds = data.predictions[m.id] || {};
         const hasReal = real.h != null && real.a != null;
+        const predLocked = isMatchPredLocked(m);
 
         const predBoxes = PLAYERS.map(p => {
           const pred = preds[p] || {};
-          // Solo se puede editar si hay alguien elegido en "Soy" y es esa persona
-          const canEdit = !!user && user === p;
+          const hasPred = pred.h != null && pred.a != null;
+          // Editable solo si Soy = p y el partido aún no ha empezado
+          const canEdit = !!user && user === p && !predLocked;
           let badge = '';
-          if (hasReal && pred.h != null && pred.a != null) {
-            const r = calcPoints(pred.h, pred.a, real.h, real.a);
-            const cls = r.exact || r.pts === 2 ? 'exact' : (r.pts === 1 ? 'has-pts' : 'zero-pts');
-            badge = `<span class="pts-badge ${cls}">${r.pts} pts</span>`;
-          }
-          const boxCls = canEdit ? 'can-edit' : 'locked-edit';
-          return `
-            <div class="pred-box ${p} ${boxCls}">
-              <div class="name">${PLAYER_NAMES[p]} ${badge}</div>
+          let scoreHtml;
+          if (predLocked && !hasPred) {
+            badge = hasReal ? '<span class="pts-badge np-pts">−1</span>' : '<span class="pts-badge np-pts">NP</span>';
+            scoreHtml = '<div class="np-label">NP</div>';
+          } else {
+            if (hasReal && hasPred) {
+              const r = calcPoints(pred.h, pred.a, real.h, real.a);
+              const cls = r.exact || r.pts === 2 ? 'exact' : (r.pts === 1 ? 'has-pts' : 'zero-pts');
+              badge = `<span class="pts-badge ${cls}">${r.pts} pts</span>`;
+            }
+            scoreHtml = `
               <div class="score-inputs pred-scores">
                 <input type="number" min="0" max="20" inputmode="numeric" data-match="${m.id}" data-player="${p}" data-side="h"
                   value="${pred.h != null ? pred.h : ''}" ${canEdit ? '' : 'disabled'}
@@ -5832,12 +5882,18 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
                 <input type="number" min="0" max="20" inputmode="numeric" data-match="${m.id}" data-player="${p}" data-side="a"
                   value="${pred.a != null ? pred.a : ''}" ${canEdit ? '' : 'disabled'}
                   placeholder="-" />
-              </div>
+              </div>`;
+          }
+          const boxCls = canEdit ? 'can-edit' : 'locked-edit';
+          return `
+            <div class="pred-box ${p} ${boxCls}">
+              <div class="name">${PLAYER_NAMES[p]} ${badge}</div>
+              ${scoreHtml}
             </div>`;
         }).join('');
 
         html += `
-          <div class="match-card" data-id="${m.id}">
+          <div class="match-card${predLocked ? ' pred-closed' : ''}" data-id="${m.id}">
             <div class="match-header">
               <span class="jornada">J${m.jornada}</span>
               <span>${m.fecha} · ${m.hora_col} COT</span>
@@ -5893,6 +5949,12 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
         const user = currentUser();
         if (!user || user !== player) {
           toast('Elige quién eres en Soy para editar tus pronósticos');
+          renderMatches();
+          return;
+        }
+        const matchObj = MATCHES.find(x => x.id === matchId);
+        if (matchObj && isMatchPredLocked(matchObj)) {
+          toast('Pronósticos cerrados: el partido ya empezó (hora Colombia)');
           renderMatches();
           return;
         }
@@ -5968,6 +6030,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
           <td><strong>${r.pts}</strong></td>
           <td>${r.exact}</td>
           <td>${r.resultOnly}</td>
+          <td>${r.np || 0}</td>
           <td>${r.goalsHit}</td>
           <td>${r.played}</td>
           <td class="pct">${r.pct.toFixed(1)}%</td>
@@ -6045,6 +6108,29 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       const year = parseInt(m[3], 10);
       if (!month) return null;
       return { y: year, m: month, d: day, key: `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}` };
+    }
+
+    /** Kickoff en zona Colombia (UTC−5) a partir de fecha + hora_col del cartel */
+    function parseColombiaKickoff(fecha, hora_col) {
+      const d = parseMatchDate(fecha);
+      if (!d) return null;
+      let hh = 0, mm = 0;
+      const hm = String(hora_col || '').trim().match(/(\d{1,2}):(\d{2})/);
+      if (hm) {
+        hh = parseInt(hm[1], 10);
+        mm = parseInt(hm[2], 10);
+      }
+      const iso = d.y + '-' + String(d.m).padStart(2, '0') + '-' + String(d.d).padStart(2, '0') +
+        'T' + String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0') + ':00-05:00';
+      const dt = new Date(iso);
+      return isNaN(dt.getTime()) ? null : dt;
+    }
+
+    function isMatchPredLocked(m) {
+      if (!m) return false;
+      const kick = parseColombiaKickoff(m.fecha, m.hora_col);
+      if (!kick) return false;
+      return Date.now() >= kick.getTime();
     }
 
     /** Fecha corta tipo "Mié 14 oct" o "Sáb 28 nov" → asume año 2026 si no hay año */
@@ -10584,6 +10670,17 @@ function showFutbolSub(sub) {
       } catch (_) {}
     }
     setInterval(() => { syncFromRemote(); }, 20000);
+    // Cierre de pronósticos al llegar la hora (Colombia): refresca tarjetas y tabla
+    setInterval(() => {
+      try {
+        if (document.getElementById('futbol')?.classList.contains('active') &&
+            document.getElementById('futbol-sub-champions')?.classList.contains('active')) {
+          renderMatches();
+        }
+        renderLeaderboard();
+        if (typeof renderPersonalBar === 'function') renderPersonalBar();
+      } catch (_) {}
+    }, 30000);
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') syncFromRemote();
     });
