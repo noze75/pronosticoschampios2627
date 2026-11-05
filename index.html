@@ -10278,27 +10278,33 @@ function onLibPredChange(e) {
       });
     }
 
-    function pdfBuildAnalysis(matchRows, ranking) {
+    function pdfFmtMatchShort(row) {
+      return row.local + ' ' + row.realH + '-' + row.realA + ' ' + row.visitante;
+    }
+
+    function pdfBuildAnalysis(matchRows, ranking, globalRanking) {
       const nMatches = matchRows.length;
       const leader = ranking[0];
       const last = ranking[ranking.length - 1];
       const gap = ranking.length > 1 ? (ranking[0].pts - ranking[1].pts) : 0;
       let totalExact = 0, totalNp = 0, totalZero = 0;
       ranking.forEach(r => { totalExact += r.exact || 0; totalNp += r.np || 0; totalZero += r.zero || 0; });
-      // Partido más fallado (más 0 + NP)
-      let worstMatch = null, worstScore = -1;
-      matchRows.forEach(row => {
-        let fails = 0;
-        row.playerLines.forEach(pl => { if (pl.np || pl.zero) fails++; });
-        if (fails > worstScore) { worstScore = fails; worstMatch = row; }
+
+      // Todos los partidos empatados en más exactos / más fallos
+      let bestScore = -1, worstScore = -1;
+      const scored = matchRows.map(row => {
+        let ex = 0, fails = 0;
+        row.playerLines.forEach(pl => {
+          if (pl.exact) ex++;
+          if (pl.np || pl.zero) fails++;
+        });
+        if (ex > bestScore) bestScore = ex;
+        if (fails > worstScore) worstScore = fails;
+        return { row, ex, fails };
       });
-      // Partido más acertado (más exactos)
-      let bestMatch = null, bestScore = -1;
-      matchRows.forEach(row => {
-        let ex = 0;
-        row.playerLines.forEach(pl => { if (pl.exact) ex++; });
-        if (ex > bestScore) { bestScore = ex; bestMatch = row; }
-      });
+      const bestMatches = bestScore > 0 ? scored.filter(s => s.ex === bestScore).map(s => s.row) : [];
+      const worstMatches = worstScore > 0 ? scored.filter(s => s.fails === worstScore).map(s => s.row) : [];
+
       const bestExactPlayer = ranking.slice().sort((a, b) => b.exact - a.exact || b.pts - a.pts)[0];
       const mostNp = ranking.slice().sort((a, b) => b.np - a.np || a.pts - b.pts)[0];
       const lines = [];
@@ -10313,16 +10319,33 @@ function onLibPredChange(e) {
         totalExact + ' marcador' + (totalExact === 1 ? '' : 'es') + ' exacto' + (totalExact === 1 ? '' : 's') +
         (totalNp ? (', ' + totalNp + ' NP') : '') +
         (totalZero ? (' y ' + totalZero + ' fallo' + (totalZero === 1 ? '' : 's') + ' total' + (totalZero === 1 ? '' : 'es')) : '') + '.');
-      if (bestMatch && bestScore > 0) {
-        lines.push('Partido más clavado: ' + bestMatch.local + ' ' + bestMatch.realH + '-' + bestMatch.realA + ' ' +
-          bestMatch.visitante + ' (' + bestScore + ' exacto' + (bestScore === 1 ? '' : 's') + ').');
+      if (bestMatches.length) {
+        const list = bestMatches.map(pdfFmtMatchShort).join(' · ');
+        lines.push('Más clavado' + (bestMatches.length > 1 ? 's' : '') +
+          ' (' + bestScore + ' exacto' + (bestScore === 1 ? '' : 's') + '): ' + list + '.');
       }
-      if (worstMatch && worstScore > 0) {
-        lines.push('El más difícil: ' + worstMatch.local + ' ' + worstMatch.realH + '-' + worstMatch.realA + ' ' +
-          worstMatch.visitante + ' (' + worstScore + ' sin puntos).');
+      if (worstMatches.length) {
+        const list = worstMatches.map(pdfFmtMatchShort).join(' · ');
+        lines.push('Más difícil' + (worstMatches.length > 1 ? 'es' : '') +
+          ' (' + worstScore + ' sin puntos): ' + list + '.');
       }
+
+      // Podio estilo STATS (acumulado global)
+      const gr = (globalRanking && globalRanking.length) ? globalRanking : ranking;
+      const withPct = gr.map(r => ({
+        ...r,
+        pct: r.played > 0 ? (r.pts / (r.played * 2) * 100) : 0
+      }));
+      const podium = withPct.length >= 4 ? {
+        first: withPct[0],
+        second: withPct[1],
+        third: withPct[2],
+        last: withPct[withPct.length - 1]
+      } : null;
+
       return {
         lines,
+        podium,
         highlights: [
           { label: 'Más puntos', value: leader ? (leader.name + ' · ' + leader.pts + ' pts') : '—', color: [0, 200, 100] },
           { label: 'Más exactos', value: bestExactPlayer ? (bestExactPlayer.name + ' · ' + bestExactPlayer.exact) : '—', color: [66, 165, 245] },
@@ -10334,19 +10357,72 @@ function onLibPredChange(e) {
 
     function pdfWriteAnalysis(doc, y, analysis) {
       y = pdfSectionTitle(doc, y, 'Análisis de la jornada');
-      y = pdfEnsureSpace(doc, y, 28);
-      // Caja de texto
-      const boxH = 6 + analysis.lines.length * 5.2;
+      // Caja de texto (altura según líneas, con wrap)
+      const wrapped = [];
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.5);
+      analysis.lines.forEach(line => {
+        const parts = doc.splitTextToSize(line, 174);
+        parts.forEach(p => wrapped.push(p));
+      });
+      const boxH = 6 + wrapped.length * 4.8;
+      y = pdfEnsureSpace(doc, y, boxH + 4);
       doc.setFillColor(245, 248, 252);
       doc.setDrawColor(30, 58, 95);
       doc.roundedRect(14, y - 3, 182, boxH, 2, 2, 'FD');
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8.5);
       doc.setTextColor(40, 50, 60);
-      analysis.lines.forEach((line, i) => {
-        doc.text(line, 18, y + 2 + i * 5.2, { maxWidth: 174 });
+      wrapped.forEach((line, i) => {
+        doc.text(line, 18, y + 2 + i * 4.8);
       });
       y += boxH + 4;
+
+      // Podio estilo STATS (don efecty / segundón / terceris / DON PELMAZO)
+      if (analysis.podium) {
+        y = pdfSectionTitle(doc, y, 'Podio general (STATS)');
+        y = pdfEnsureSpace(doc, y, 32);
+        const p = analysis.podium;
+        const podiumLines = [
+          { pre: 'El don efecty.com es ', name: p.first.name, id: p.first.id, mid: ' con un increíble ', pct: p.first.pct.toFixed(1) + '%', post: ' de aciertos' },
+          { pre: 'El segundón es ', name: p.second.name, id: p.second.id, mid: ' con el ', pct: p.second.pct.toFixed(1) + '%', post: ' de aciertos' },
+          { pre: 'El terceris es ', name: p.third.name, id: p.third.id, mid: ' con el ', pct: p.third.pct.toFixed(1) + '%', post: ' de aciertos' },
+          { pre: 'El DON PELMAZO es ', name: p.last.name, id: p.last.id, mid: ' con un paupérrimo ', pct: p.last.pct.toFixed(1) + '%', post: ' de aciertos', pelmazo: true }
+        ];
+        const ph = 6 + podiumLines.length * 6.2;
+        doc.setFillColor(10, 22, 40);
+        doc.roundedRect(14, y - 3, 182, ph, 2, 2, 'F');
+        podiumLines.forEach((L, i) => {
+          const py = y + 2 + i * 6.2;
+          let x = 18;
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(9);
+          if (L.pelmazo) {
+            doc.setTextColor(239, 83, 80);
+            doc.setFont('helvetica', 'bold');
+          } else {
+            doc.setTextColor(200, 210, 220);
+          }
+          doc.text(L.pre, x, py);
+          x += doc.getTextWidth(L.pre);
+          const rgb = PDF_PLAYER_RGB[L.id] || [0, 230, 118];
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor(rgb[0], rgb[1], rgb[2]);
+          doc.text(L.name, x, py);
+          x += doc.getTextWidth(L.name);
+          doc.setFont('helvetica', 'normal');
+          doc.setTextColor(200, 210, 220);
+          doc.text(L.mid, x, py);
+          x += doc.getTextWidth(L.mid);
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor(255, 255, 255);
+          doc.text(L.pct, x, py);
+          x += doc.getTextWidth(L.pct);
+          doc.setFont('helvetica', 'normal');
+          doc.setTextColor(200, 210, 220);
+          doc.text(L.post, x, py);
+        });
+        y += ph + 5;
+      }
+
       // Highlights 4 tarjetas
       y = pdfEnsureSpace(doc, y, 22);
       const cardW = 43.5;
@@ -10753,7 +10829,7 @@ function onLibPredChange(e) {
       const ranking = pdfRankingFromRows(rows);
       const allRows = pdfCollectMatchRows(MATCHES, data.results || {}, data.predictions || {});
       const warRanking = pdfRankingFromRows(allRows);
-      const analysis = pdfBuildAnalysis(rows, ranking);
+      const analysis = pdfBuildAnalysis(rows, ranking, warRanking);
 
       // Análisis + highlights
       y = pdfWriteAnalysis(doc, y, analysis);
