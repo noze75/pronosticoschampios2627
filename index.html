@@ -5188,6 +5188,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       fifa: { predictions: {}, results: {}, windowId: null },
       libertadores: { predictions: {}, results: {} },
       ko: { predictions: {}, results: {} }, // knockout Champions
+      betplaySim: {}, // playerId -> matchId -> { h, a }
       updatedAt: null,
       updatedBy: null
     };
@@ -5307,6 +5308,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
             fifa: mergeFifaBlock(data.fifa, remote.fifa),
             libertadores: mergeLibBlock(data.libertadores, remote.libertadores),
             ko: mergeKoBlock(data.ko, remote.ko),
+            betplaySim: mergeMatchPlayerMaps(data.betplaySim || {}, remote.betplaySim || {}),
             updatedAt: remote.updatedAt || data.updatedAt || null,
             updatedBy: remote.updatedBy || data.updatedBy || null
           };
@@ -5419,6 +5421,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
               data.fifa = mergeFifaBlock(remote.fifa, data.fifa);
               data.libertadores = mergeLibBlock(remote.libertadores, data.libertadores);
               data.ko = mergeKoBlock(remote.ko, data.ko);
+              data.betplaySim = mergeMatchPlayerMaps(remote.betplaySim || {}, data.betplaySim || {});
             }
           }
         } catch (pullErr) {
@@ -5433,6 +5436,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
           fifa: data.fifa || { predictions: {}, results: {}, windowId: null },
           libertadores: data.libertadores || { predictions: {}, results: {} },
           ko: data.ko || { predictions: {}, results: {} },
+          betplaySim: data.betplaySim || {},
           updatedAt: new Date().toISOString(),
           updatedBy: currentUser() || 'anon'
         };
@@ -5679,6 +5683,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       try {
         if (typeof renderFifaPanel === 'function') renderFifaPanel();
         if (typeof renderLibertadoresPanel === 'function') renderLibertadoresPanel();
+        if (typeof renderBetplayPanel === 'function') renderBetplayPanel();
       } catch (e) {}
     }
 
@@ -10026,27 +10031,45 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       { id: 'bp19_10', fecha: 19, when: 'Fecha 19', local: 'Atlético Nacional', visitante: 'Once Caldas' }
     ];
 
-    let betplaySim = {};
+    function ensureBetplaySim() {
+      if (!data.betplaySim || typeof data.betplaySim !== 'object') data.betplaySim = {};
+    }
 
-    function betplayComputeTable() {
+    function betplayGetSim(matchId, user) {
+      ensureBetplaySim();
+      if (!user) return {};
+      const slot = data.betplaySim[matchId] || {};
+      return slot[user] || {};
+    }
+
+    function betplaySetSim(matchId, user, side, val) {
+      ensureBetplaySim();
+      if (!data.betplaySim[matchId]) data.betplaySim[matchId] = {};
+      if (!data.betplaySim[matchId][user]) data.betplaySim[matchId][user] = {};
+      data.betplaySim[matchId][user][side] = val;
+    }
+
+    function betplayComputeTable(user) {
       const map = {};
       BETPLAY_STANDINGS.forEach(r => {
         map[r.team] = { team: r.team, pj: r.pj, g: r.g, e: r.e, p: r.p, gf: r.gf, gc: r.gc, pts: r.pts };
       });
-      BETPLAY_FIXTURES.forEach(m => {
-        const sim = betplaySim[m.id];
-        if (!sim || sim.h == null || sim.a == null) return;
-        const h = Number(sim.h), a = Number(sim.a);
-        if (Number.isNaN(h) || Number.isNaN(a)) return;
-        const home = map[m.local], away = map[m.visitante];
-        if (!home || !away) return;
-        home.pj++; away.pj++;
-        home.gf += h; home.gc += a;
-        away.gf += a; away.gc += h;
-        if (h > a) { home.g++; home.pts += 3; away.p++; }
-        else if (h < a) { away.g++; away.pts += 3; home.p++; }
-        else { home.e++; away.e++; home.pts += 1; away.pts += 1; }
-      });
+      if (user) {
+        BETPLAY_FIXTURES.forEach(m => {
+          const sim = betplayGetSim(m.id, user);
+          if (sim.h == null || sim.a == null) return;
+          const h = Number(sim.h), a = Number(sim.a);
+          if (Number.isNaN(h) || Number.isNaN(a)) return;
+          const home = map[m.local], away = map[m.visitante];
+          if (!home || !away) return;
+          home.pj++; away.pj++;
+          home.gf += h; home.gc += a;
+          away.gf += a; away.gc += h;
+          if (h > a) { home.g++; home.pts += 3; away.p++; }
+          else if (h < a) { away.g++; away.pts += 3; home.p++; }
+          else { home.e++; away.e++; home.pts += 1; away.pts += 1; }
+        });
+      }
       return Object.values(map).map(r => ({ ...r, dg: r.gf - r.gc })).sort((a, b) => {
         if (b.pts !== a.pts) return b.pts - a.pts;
         if (b.dg !== a.dg) return b.dg - a.dg;
@@ -10055,17 +10078,18 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       });
     }
 
-    function betplayFixtureRowsHtml(fechaNum) {
+    function betplayFixtureRowsHtml(fechaNum, user) {
+      const canEdit = !!user;
       return BETPLAY_FIXTURES.filter(m => m.fecha === fechaNum).map(m => {
-        const sim = betplaySim[m.id] || {};
+        const sim = betplayGetSim(m.id, user);
         const hv = sim.h != null ? sim.h : '';
         const av = sim.a != null ? sim.a : '';
         return '<div class="betplay-match-row" data-bp-id="' + m.id + '">' +
           '<span class="t-home" title="' + m.local + '">' + m.local + '</span>' +
           '<span class="scores">' +
-            '<input type="number" min="0" max="20" inputmode="numeric" data-bp-sim="' + m.id + '" data-side="h" value="' + hv + '" placeholder="-" />' +
+            '<input type="number" min="0" max="20" inputmode="numeric" data-bp-sim="' + m.id + '" data-side="h" value="' + hv + '" placeholder="-" ' + (canEdit ? '' : 'disabled') + ' />' +
             '<span>:</span>' +
-            '<input type="number" min="0" max="20" inputmode="numeric" data-bp-sim="' + m.id + '" data-side="a" value="' + av + '" placeholder="-" />' +
+            '<input type="number" min="0" max="20" inputmode="numeric" data-bp-sim="' + m.id + '" data-side="a" value="' + av + '" placeholder="-" ' + (canEdit ? '' : 'disabled') + ' />' +
           '</span>' +
           '<span class="t-away" title="' + m.visitante + '">' + m.visitante + '</span>' +
           '</div>';
@@ -10093,41 +10117,66 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
     function renderBetplayPanel() {
       const el = document.getElementById('betplaySimView');
       if (!el) return;
-      const table = betplayComputeTable();
+      ensureBetplaySim();
+      const user = typeof currentUser === 'function' ? currentUser() : '';
+      const table = betplayComputeTable(user);
+      const who = user
+        ? ('Simulando como <strong style="color:var(--' + user + ')">' + (PLAYER_NAMES[user] || user) + '</strong> · cada uno ve y edita solo su escenario')
+        : 'Elige <strong>Soy</strong> (arriba) para simular libremente. Cada usuario tiene su propia simulación.';
       el.innerHTML =
+        '<p class="lib-soy-hint' + (user ? ' ok' : '') + '" style="margin:0 0 0.65rem">' + who + '</p>' +
         '<div class="betplay-sim-layout">' +
           '<div class="betplay-fixtures-col">' +
             '<div class="betplay-col-title"><span>Partidos por simular</span>' +
-              '<button type="button" class="betplay-reset-btn" id="betplayResetBtn">Limpiar</button></div>' +
-            '<div class="betplay-fecha-label">Fecha 18 · 6–9 nov</div>' + betplayFixtureRowsHtml(18) +
-            '<div class="betplay-fecha-label">Fecha 19 · cierre fase regular</div>' + betplayFixtureRowsHtml(19) +
+              '<button type="button" class="betplay-reset-btn" id="betplayResetBtn"' + (user ? '' : ' disabled') + '>Limpiar míos</button></div>' +
+            '<div class="betplay-fecha-label">Fecha 18 · 6–9 nov</div>' + betplayFixtureRowsHtml(18, user) +
+            '<div class="betplay-fecha-label">Fecha 19 · cierre fase regular</div>' + betplayFixtureRowsHtml(19, user) +
           '</div>' +
           '<div class="betplay-table-col">' +
-            '<div class="betplay-col-title"><span>Tabla en vivo</span></div>' +
+            '<div class="betplay-col-title"><span>Tabla en vivo' + (user ? (' · ' + (PLAYER_NAMES[user] || user)) : '') + '</span></div>' +
             betplayTableHtml(table) +
-            '<p style="margin:0.55rem 0 0;font-size:0.72rem;color:var(--muted)">Base: tras fecha 17 · se recalcula con tus marcadores simulados.</p>' +
+            '<p style="margin:0.55rem 0 0;font-size:0.72rem;color:var(--muted)">Base: tras fecha 17 · solo cuenta tu simulación (no suma puntos al grupo).</p>' +
           '</div></div>';
       el.querySelectorAll('[data-bp-sim]').forEach(inp => {
         inp.addEventListener('input', onBetplaySimChange);
         inp.addEventListener('change', onBetplaySimChange);
       });
       const resetBtn = document.getElementById('betplayResetBtn');
-      if (resetBtn) resetBtn.addEventListener('click', () => { betplaySim = {}; renderBetplayPanel(); });
+      if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+          const u = currentUser();
+          if (!u) { toast('Elige Soy para limpiar tu simulación'); return; }
+          ensureBetplaySim();
+          BETPLAY_FIXTURES.forEach(m => {
+            if (data.betplaySim[m.id] && data.betplaySim[m.id][u]) {
+              delete data.betplaySim[m.id][u];
+            }
+          });
+          if (typeof saveData === 'function') saveData(false);
+          renderBetplayPanel();
+        });
+      }
     }
 
     function onBetplaySimChange(e) {
+      const user = currentUser();
+      if (!user) {
+        toast('Elige Soy con tu nombre para simular');
+        renderBetplayPanel();
+        return;
+      }
       const id = e.target.dataset.bpSim;
       const side = e.target.dataset.side;
       if (!id || !side) return;
-      if (!betplaySim[id]) betplaySim[id] = {};
       const v = e.target.value === '' ? null : parseInt(e.target.value, 10);
-      betplaySim[id][side] = (v == null || Number.isNaN(v)) ? null : v;
+      betplaySetSim(id, user, side, (v == null || Number.isNaN(v)) ? null : v);
+      if (typeof saveData === 'function') saveData(false);
       const col = document.querySelector('.betplay-table-col');
       if (col) {
         col.innerHTML =
-          '<div class="betplay-col-title"><span>Tabla en vivo</span></div>' +
-          betplayTableHtml(betplayComputeTable()) +
-          '<p style="margin:0.55rem 0 0;font-size:0.72rem;color:var(--muted)">Base: tras fecha 17 · se recalcula con tus marcadores simulados.</p>';
+          '<div class="betplay-col-title"><span>Tabla en vivo · ' + (PLAYER_NAMES[user] || user) + '</span></div>' +
+          betplayTableHtml(betplayComputeTable(user)) +
+          '<p style="margin:0.55rem 0 0;font-size:0.72rem;color:var(--muted)">Base: tras fecha 17 · solo cuenta tu simulación (no suma puntos al grupo).</p>';
       }
     }
 
