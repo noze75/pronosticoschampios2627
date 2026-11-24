@@ -1877,6 +1877,23 @@
       color: #ff8a80;
       padding: 0.35rem 0.2rem;
     }
+    .pred-hidden {
+      text-align: center;
+      font-size: 1.05rem;
+      line-height: 1.6;
+      opacity: 0.85;
+      user-select: none;
+    }
+    .blind-wait {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--muted);
+      margin: 0.35rem 0 0.15rem;
+      padding: 0.25rem 0.4rem;
+      border-radius: 8px;
+      background: rgba(255, 213, 79, 0.08);
+      border: 1px solid rgba(255, 213, 79, 0.22);
+    }
     .match-card.pred-closed .match-header::after {
       content: 'Cerrado';
       margin-left: auto;
@@ -4274,7 +4291,7 @@
           <div class="identity-menu" id="identityMenu" role="listbox" hidden>
             <button type="button" class="identity-option" data-value="" role="option">
               <span class="identity-option-avatar">👤</span>
-              <span>Ver todos (solo lectura)</span>
+              <span>Ver todos (ciegos hasta que todos carguen)</span>
             </button>
             <button type="button" class="identity-option" data-value="baez" role="option">
               <span class="identity-option-avatar" data-player="baez"></span>
@@ -6021,16 +6038,23 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
         const hasReal = real.h != null && real.a != null;
         const predLocked = isMatchPredLocked(m);
 
+        const revealAll = shouldRevealPredictions(preds, { hasReal: hasReal, locked: predLocked });
+        const waitingCount = PLAYERS.filter(p => !hasCompletePred(preds[p])).length;
         const predBoxes = PLAYERS.map(p => {
           const pred = preds[p] || {};
-          const hasPred = pred.h != null && pred.a != null;
+          const hasPred = hasCompletePred(pred);
           // Editable solo si Soy = p y el partido aún no ha empezado
           const canEdit = !!user && user === p && !predLocked;
+          const isOwn = !!user && user === p;
+          const reveal = isOwn || revealAll;
           let badge = '';
           let scoreHtml;
           if (predLocked && !hasPred) {
             badge = hasReal ? '<span class="pts-badge np-pts">−1</span>' : '<span class="pts-badge np-pts">NP</span>';
             scoreHtml = '<div class="np-label">NP</div>';
+          } else if (!reveal) {
+            scoreHtml = '<div class="pred-hidden" title="Oculto hasta que todos pronostiquen">🔒</div>';
+            if (hasPred) badge = '<span class="pts-badge" style="opacity:0.7">✓</span>';
           } else {
             if (hasReal && hasPred) {
               const r = calcPoints(pred.h, pred.a, real.h, real.a);
@@ -6055,6 +6079,9 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
               ${scoreHtml}
             </div>`;
         }).join('');
+        const blindNote = !revealAll
+          ? `<div class="blind-wait">🔒 Pronósticos ajenos ocultos · faltan ${waitingCount} por cargar</div>`
+          : '';
 
         html += `
           <div class="match-card${predLocked ? ' pred-closed' : ''}" data-id="${m.id}">
@@ -6075,13 +6102,14 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
               </div>
             </div>
             ${m.notas ? `<div class="note">📌 ${m.notas}</div>` : ''}
+            ${blindNote}
             <div class="predictions-grid">${predBoxes}</div>
           </div>`;
       });
 
       const hint = !user
-        ? `<div class="identity-hint">👆 Elige quién eres en <strong>Soy</strong> (arriba) para poder introducir tus pronósticos. Mientras tanto todo está bloqueado.</div>`
-        : `<div class="identity-hint" style="color:var(--accent);background:rgba(0,230,118,0.08);border-color:rgba(0,230,118,0.28);">Pronosticando como <strong>${PLAYER_NAMES[user]}</strong> — solo puedes editar tus casillas.</div>`;
+        ? `<div class="identity-hint">👆 Elige quién eres en <strong>Soy</strong> (arriba) para introducir tus pronósticos. Los ajenos se ocultan hasta que los 4 hayan cargado (también en «Ver todos»).</div>`
+        : `<div class="identity-hint" style="color:var(--accent);background:rgba(0,230,118,0.08);border-color:rgba(0,230,118,0.28);">Pronosticando como <strong>${PLAYER_NAMES[user]}</strong> — solo ves los tuyos hasta que todos hayan pronosticado o arranque el partido.</div>`;
 
       container.innerHTML = hint + html;
 
@@ -6295,6 +6323,23 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       const kick = parseColombiaKickoff(m.fecha, m.hora_col);
       if (!kick) return false;
       return Date.now() >= kick.getTime();
+    }
+
+    function hasCompletePred(pred) {
+      return pred != null && pred.h != null && pred.a != null && pred.h !== '' && pred.a !== '';
+    }
+
+    function allPlayersPredicted(preds) {
+      return PLAYERS.every(p => hasCompletePred((preds || {})[p]));
+    }
+
+    /** Pronósticos ajenos ocultos hasta que todos hayan cargado, haya resultado real o el partido esté cerrado por hora */
+    function shouldRevealPredictions(preds, opts) {
+      opts = opts || {};
+      if (allPlayersPredicted(preds)) return true;
+      if (opts.hasReal) return true;
+      if (opts.locked) return true;
+      return false;
     }
 
     /** Fecha corta tipo "Mié 14 oct" o "Sáb 28 nov" → asume año 2026 si no hay año */
@@ -6954,24 +6999,35 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       const awayTbd = !resolveKoTeam(m, 'visitante');
       const legLabel = m.single ? 'Final' : (m.leg === 'ida' ? 'Ida' : 'Vuelta');
 
+      const revealAll = shouldRevealPredictions(preds, { hasReal: hasReal, locked: hasReal });
       const predBoxes = PLAYERS.map(p => {
         const pred = preds[p] || {};
         const canEdit = !!user && user === p;
+        const isOwn = !!user && user === p;
+        const reveal = isOwn || revealAll;
         let badge = '';
-        if (hasReal && pred.h != null && pred.a != null) {
-          const r = calcPoints(pred.h, pred.a, real.h, real.a);
-          if (r) {
-            const cls = r.pts === 2 ? 'exact' : (r.pts === 1 ? 'has-pts' : '');
-            badge = '<span class="pts-mini ' + cls + '">' + r.pts + '</span>';
+        let scoreLine;
+        if (!reveal) {
+          scoreLine = '<div class="pred-hidden" title="Oculto hasta que todos pronostiquen">🔒</div>';
+          if (hasCompletePred(pred)) badge = '<span class="pts-mini" style="opacity:0.7">✓</span>';
+        } else {
+          if (hasReal && hasCompletePred(pred)) {
+            const r = calcPoints(pred.h, pred.a, real.h, real.a);
+            if (r) {
+              const cls = r.pts === 2 ? 'exact' : (r.pts === 1 ? 'has-pts' : '');
+              badge = '<span class="pts-mini ' + cls + '">' + r.pts + '</span>';
+            }
           }
-        }
-        return '<div class="ko-pred-box ' + p + (canEdit ? ' can-edit' : '') + '">' +
-          '<div class="name">' + PLAYER_NAMES[p] + ' ' + badge + '</div>' +
-          '<div class="score-line">' +
+          scoreLine = '<div class="score-line">' +
             '<input type="number" min="0" max="20" data-ko-pred="' + m.id + '" data-ko-player="' + p + '" data-side="h" value="' + (pred.h != null ? pred.h : '') + '" placeholder="-" ' + (canEdit ? '' : 'disabled') + ' />' +
             '<span>:</span>' +
             '<input type="number" min="0" max="20" data-ko-pred="' + m.id + '" data-ko-player="' + p + '" data-side="a" value="' + (pred.a != null ? pred.a : '') + '" placeholder="-" ' + (canEdit ? '' : 'disabled') + ' />' +
-          '</div></div>';
+          '</div>';
+        }
+        return '<div class="ko-pred-box ' + p + (canEdit ? ' can-edit' : '') + '">' +
+          '<div class="name">' + PLAYER_NAMES[p] + ' ' + badge + '</div>' +
+          scoreLine +
+          '</div>';
       }).join('');
 
       // Casilla penaltis: en vuelta (si global empatado o ya marcado) o final si empate
@@ -7100,23 +7156,34 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
       const legLabel = m.single ? 'Final' : (m.leg === 'ida' ? 'Ida' : 'Vuelta');
       const head = (roundLabels[m.round] || m.round) + (m.round === 'final' ? '' : (' ' + m.tie)) + ' · ' + legLabel;
 
+      const revealAll = shouldRevealPredictions(preds, { hasReal: hasReal, locked: hasReal });
       const predBoxes = PLAYERS.map(p => {
         const pred = preds[p] || {};
         const canEdit = !!user && user === p;
+        const isOwn = !!user && user === p;
+        const reveal = isOwn || revealAll;
         let badge = '';
-        if (hasReal && pred.h != null && pred.a != null) {
-          const r = calcPoints(pred.h, pred.a, real.h, real.a);
-          const cls = r.exact || r.pts === 2 ? 'exact' : (r.pts === 1 ? 'has-pts' : 'zero-pts');
-          badge = '<span class="pts-badge ' + cls + '">' + r.pts + ' pts</span>';
+        let scoreHtml;
+        if (!reveal) {
+          scoreHtml = '<div class="pred-hidden" title="Oculto hasta que todos pronostiquen">🔒</div>';
+          if (hasCompletePred(pred)) badge = '<span class="pts-badge" style="opacity:0.7">✓</span>';
+        } else {
+          if (hasReal && hasCompletePred(pred)) {
+            const r = calcPoints(pred.h, pred.a, real.h, real.a);
+            const cls = r.exact || r.pts === 2 ? 'exact' : (r.pts === 1 ? 'has-pts' : 'zero-pts');
+            badge = '<span class="pts-badge ' + cls + '">' + r.pts + ' pts</span>';
+          }
+          scoreHtml = '<div class="score-inputs pred-scores">' +
+            '<input type="number" min="0" max="20" inputmode="numeric" data-ko-pred="' + m.id + '" data-ko-player="' + p + '" data-side="h" value="' + (pred.h != null ? pred.h : '') + '" placeholder="-" ' + (canEdit ? '' : 'disabled') + ' />' +
+            '<span class="score-colon">:</span>' +
+            '<input type="number" min="0" max="20" inputmode="numeric" data-ko-pred="' + m.id + '" data-ko-player="' + p + '" data-side="a" value="' + (pred.a != null ? pred.a : '') + '" placeholder="-" ' + (canEdit ? '' : 'disabled') + ' />' +
+          '</div>';
         }
         const boxCls = canEdit ? 'can-edit' : 'locked-edit';
         return '<div class="pred-box ' + p + ' ' + boxCls + '">' +
           '<div class="name">' + PLAYER_NAMES[p] + ' ' + badge + '</div>' +
-          '<div class="score-inputs pred-scores">' +
-            '<input type="number" min="0" max="20" inputmode="numeric" data-ko-pred="' + m.id + '" data-ko-player="' + p + '" data-side="h" value="' + (pred.h != null ? pred.h : '') + '" placeholder="-" ' + (canEdit ? '' : 'disabled') + ' />' +
-            '<span class="score-colon">:</span>' +
-            '<input type="number" min="0" max="20" inputmode="numeric" data-ko-pred="' + m.id + '" data-ko-player="' + p + '" data-side="a" value="' + (pred.a != null ? pred.a : '') + '" placeholder="-" ' + (canEdit ? '' : 'disabled') + ' />' +
-          '</div></div>';
+          scoreHtml +
+          '</div>';
       }).join('');
 
       let pensHtml = '';
@@ -9151,10 +9218,13 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
         const whenLabel = formatFifaWhen(m);
         const isTitan = !!m.titan;
 
+        const revealAll = shouldRevealPredictions(preds, { hasReal: hasReal, locked: predLocked });
         const predBoxes = PLAYERS.map(p => {
           const pred = preds[p] || {};
-          const hasPred = pred.h != null && pred.a != null && pred.h !== '' && pred.a !== '';
+          const hasPred = hasCompletePred(pred);
           const canEdit = !!user && user === p && !predLocked;
+          const isOwn = !!user && user === p;
+          const reveal = isOwn || revealAll;
           let badge = '';
           let scoreLine;
           if (predLocked && !hasPred) {
@@ -9162,6 +9232,9 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
               ? '<span class="pts-mini" style="color:#ff8a80">−1</span>'
               : '<span class="pts-mini" style="color:#ff8a80">NP</span>';
             scoreLine = '<div class="score-line" style="justify-content:center;font-weight:900;color:#ff8a80;letter-spacing:0.06em">NP</div>';
+          } else if (!reveal) {
+            scoreLine = '<div class="pred-hidden" title="Oculto hasta que todos pronostiquen">🔒</div>';
+            if (hasPred) badge = '<span class="pts-mini" style="opacity:0.7">✓</span>';
           } else {
             if (hasReal && hasPred) {
               const pts = fifaScorePts(pred, real);
@@ -10356,10 +10429,13 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
           const isFinalPending = m.isFinal && !m.teamsReady;
           const preds = data.libertadores.predictions[m.id] || {};
           const predLocked = isLibMatchPredLocked(m);
+          const revealAll = shouldRevealPredictions(preds, { hasReal: hasReal, locked: predLocked || hasReal });
           const boxes = PLAYERS.map(p => {
             const pred = preds[p] || {};
-            const hasPred = pred.h != null && pred.a != null;
+            const hasPred = hasCompletePred(pred);
             const canEdit = !!(me && me === p) && !hasReal && !isFinalPending && !predLocked;
+            const isOwn = !!(me && me === p);
+            const reveal = isOwn || revealAll;
             let ptsHtml = '';
             let scoreLine;
             if (predLocked && !hasPred) {
@@ -10367,6 +10443,9 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
                 ? '<span class="pts-mini" style="color:#ff8a80">−1</span>'
                 : '<span class="pts-mini" style="color:#ff8a80">NP</span>';
               scoreLine = '<div class="score-line" style="justify-content:center;font-weight:900;color:#ff8a80;letter-spacing:0.06em">NP</div>';
+            } else if (!reveal) {
+              scoreLine = '<div class="pred-hidden" title="Oculto hasta que todos pronostiquen">🔒</div>';
+              if (hasPred) ptsHtml = '<span class="pts-mini" style="opacity:0.7">✓</span>';
             } else {
               if (hasReal && hasPred) {
                 const d = calcPoints(pred.h, pred.a, real.h, real.a);
