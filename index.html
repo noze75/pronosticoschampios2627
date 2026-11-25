@@ -11252,6 +11252,170 @@ function onLibPredChange(e) {
       return y;
     }
 
+    /** Tabla estilo Excel: partido | real | pred+pts de cada uno */
+    function pdfWriteExcelMatrix(doc, y, matchRows, heading) {
+      if (!matchRows || !matchRows.length) return y;
+      y = pdfSectionTitle(doc, y, heading || 'Tabla de resultados vs pronósticos');
+
+      const x0 = 14;
+      const totalW = 182;
+      const colNum = 7;
+      const colMatch = 52;
+      const colReal = 15;
+      const colP = (totalW - colNum - colMatch - colReal) / PLAYERS.length; // ~27
+      const rowH = 7.6;
+      const headerH = 7.5;
+
+      function colXs() {
+        const xs = [x0];
+        xs.push(xs[0] + colNum);
+        xs.push(xs[1] + colMatch);
+        PLAYERS.forEach((_, i) => xs.push(xs[2] + colReal + i * colP));
+        return xs;
+      }
+      const xs = colXs();
+      const widths = [colNum, colMatch, colReal].concat(PLAYERS.map(() => colP));
+
+      function drawHeader(yy) {
+        doc.setFillColor(18, 38, 64);
+        doc.rect(x0, yy, totalW, headerH, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(6.5);
+        doc.setTextColor(200, 215, 230);
+        const labels = ['#', 'Partido', 'Real'].concat(PLAYERS.map(p => PLAYER_NAMES[p] || p));
+        labels.forEach((lab, i) => {
+          const cx = xs[i] + widths[i] / 2;
+          doc.text(String(lab), cx, yy + 5, { align: 'center' });
+        });
+        doc.setFillColor(0, 230, 118);
+        doc.rect(x0, yy + headerH - 0.6, totalW, 0.6, 'F');
+        return yy + headerH;
+      }
+
+      // Colores más intensos (fondo celda + badge de puntos)
+      function cellFillForPl(pl) {
+        if (pl.np || pl.pts === -1) return [210, 214, 220];
+        if (pl.exact) return [165, 235, 195];
+        if (pl.pts === 1) return [255, 230, 140];
+        if (pl.pts === 0) return [255, 185, 185];
+        return [240, 244, 248];
+      }
+      function badgeFillForPl(pl) {
+        if (pl.np || pl.pts === -1) return [120, 130, 145];
+        if (pl.exact) return [0, 170, 90];
+        if (pl.pts === 1) return [230, 160, 0];
+        if (pl.pts === 0) return [220, 55, 55];
+        return [140, 150, 160];
+      }
+      function predTextColorForPl(pl) {
+        if (pl.np || pl.pts === -1) return [70, 80, 90];
+        if (pl.exact) return [0, 90, 45];
+        if (pl.pts === 1) return [120, 80, 0];
+        if (pl.pts === 0) return [140, 30, 30];
+        return [40, 50, 60];
+      }
+
+      y = pdfEnsureSpace(doc, y, headerH + rowH * 2);
+      y = drawHeader(y);
+
+      matchRows.forEach((row, idx) => {
+        if (y + rowH > 280) {
+          doc.addPage();
+          y = 18;
+          y = drawHeader(y);
+        }
+        if (idx % 2 === 0) {
+          doc.setFillColor(248, 250, 252);
+          doc.rect(x0, y, totalW, rowH, 'F');
+        }
+        doc.setDrawColor(200, 210, 220);
+        doc.setLineWidth(0.15);
+        doc.line(x0, y + rowH, x0 + totalW, y + rowH);
+
+        // #
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(6.5);
+        doc.setTextColor(120, 130, 140);
+        doc.text(String(idx + 1), xs[0] + colNum / 2, y + 5, { align: 'center' });
+
+        // Partido
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(6.2);
+        doc.setTextColor(20, 35, 55);
+        let matchTxt = pdfShortTeam(row.local, colMatch * 0.42, doc) + ' vs ' + pdfShortTeam(row.visitante, colMatch * 0.42, doc);
+        while (doc.getTextWidth(matchTxt) > colMatch - 2.5 && matchTxt.length > 8) {
+          matchTxt = matchTxt.slice(0, -2) + '…';
+        }
+        doc.text(matchTxt, xs[1] + 1.2, y + 5);
+
+        // Real
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(7.2);
+        doc.setFillColor(18, 38, 64);
+        doc.roundedRect(xs[2] + 1.5, y + 1.3, colReal - 3, rowH - 2.6, 1, 1, 'F');
+        doc.setTextColor(0, 230, 118);
+        doc.text(row.realH + '-' + row.realA, xs[2] + colReal / 2, y + 5.1, { align: 'center' });
+
+        // Cada jugador: marcador + badge de puntos más visible
+        PLAYERS.forEach((p, pi) => {
+          const pl = row.playerLines.find(x => x.id === p) || {
+            id: p, predText: '—', pts: null, exact: false, np: true
+          };
+          const cx = xs[3 + pi];
+          const fill = cellFillForPl(pl);
+          doc.setFillColor(fill[0], fill[1], fill[2]);
+          doc.rect(cx + 0.35, y + 0.55, colP - 0.7, rowH - 1.1, 'F');
+
+          const pred = pl.predText || '—';
+          const ptsTxt = (pl.pts == null) ? '—' : String(pl.pts);
+          const badgeW = (pl.pts === -1) ? 8.5 : 7.2;
+          const badgeH = 4.6;
+          const badgeX = cx + colP - badgeW - 1.4;
+          const badgeY = y + (rowH - badgeH) / 2;
+          const predCenterX = cx + (colP - badgeW - 1.4) / 2;
+
+          // Marcador (izquierda)
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(7);
+          const tc = predTextColorForPl(pl);
+          doc.setTextColor(tc[0], tc[1], tc[2]);
+          doc.text(pred, predCenterX, y + 5.1, { align: 'center' });
+
+          // Badge de puntos (derecha, contraste alto)
+          const bf = badgeFillForPl(pl);
+          doc.setFillColor(bf[0], bf[1], bf[2]);
+          doc.roundedRect(badgeX, badgeY, badgeW, badgeH, 1, 1, 'F');
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(7);
+          doc.setTextColor(255, 255, 255);
+          doc.text(ptsTxt, badgeX + badgeW / 2, y + 5.15, { align: 'center' });
+        });
+
+        y += rowH;
+      });
+
+      // Leyenda
+      y += 3;
+      y = pdfEnsureSpace(doc, y, 10);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(6.5);
+      const legend = [
+        { c: [0, 170, 90], t: 'Exacto (2 pts)' },
+        { c: [230, 160, 0], t: 'Resultado (1 pt)' },
+        { c: [220, 55, 55], t: 'Fallo (0)' },
+        { c: [120, 130, 145], t: 'NP (−1)' }
+      ];
+      let lx = x0;
+      legend.forEach(L => {
+        doc.setFillColor(L.c[0], L.c[1], L.c[2]);
+        doc.roundedRect(lx, y - 1.5, 4.5, 4.5, 0.7, 0.7, 'F');
+        doc.setTextColor(60, 70, 80);
+        doc.text(L.t, lx + 6, y + 1.3);
+        lx += doc.getTextWidth(L.t) + 13;
+      });
+      return y + 6;
+    }
+
     function pdfFooterAndSave(doc, filename) {
       const n = doc.getNumberOfPages();
       for (let i = 1; i <= n; i++) {
@@ -11313,8 +11477,10 @@ function onLibPredChange(e) {
         y = pdfWriteRanking(doc, y, warRanking, 'Guerra acumulada (todas las jornadas)');
         y = pdfWriteBarChart(doc, y, warRanking, 'Acumulado · cómo va la guerra');
       }
-      // Partidos
-      y = pdfWriteMatches(doc, y, rows);
+      // Tabla estilo Excel (resultado vs cada pronóstico)
+      y = pdfWriteExcelMatrix(doc, y, rows, scope === 'acc'
+        ? 'Tabla completa · resultado vs cada pronóstico'
+        : 'Tabla de la jornada · resultado vs cada pronóstico');
       const fname = scope === 'acc' ? 'resumen-champions-acumulado.pdf' : ('resumen-champions-jornada-' + scope + '.pdf');
       pdfFooterAndSave(doc, fname);
     }
@@ -11341,7 +11507,7 @@ function onLibPredChange(e) {
       }
       const ranking = pdfRankingFromRows(rows);
       y = pdfWriteRanking(doc, y, ranking, 'Clasificación Fecha FIFA');
-      y = pdfWriteMatches(doc, y, rows);
+      y = pdfWriteExcelMatrix(doc, y, rows, 'Tabla · resultado vs cada pronóstico');
       pdfFooterAndSave(doc, 'resumen-fecha-fifa.pdf');
     }
 
@@ -11372,7 +11538,7 @@ function onLibPredChange(e) {
       }
       const ranking = pdfRankingFromRows(rows);
       y = pdfWriteRanking(doc, y, ranking, 'Mini ranking combinado');
-      y = pdfWriteMatches(doc, y, rows);
+      y = pdfWriteExcelMatrix(doc, y, rows, 'Tabla · resultado vs cada pronóstico');
       pdfFooterAndSave(doc, 'resumen-libertadores-suramericana.pdf');
     }
 
