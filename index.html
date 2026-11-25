@@ -1706,6 +1706,30 @@
       height: 1px;
       background: linear-gradient(90deg, var(--border), transparent);
     }
+    .day-separator {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      margin: 0.35rem 0 0.05rem;
+      padding: 0.2rem 0;
+    }
+    .day-separator .day-label {
+      background: rgba(66, 165, 245, 0.14);
+      color: #90caf9;
+      border: 1px solid rgba(66, 165, 245, 0.28);
+      padding: 0.22rem 0.7rem;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 0.78rem;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    .day-separator .line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(66, 165, 245, 0.35), transparent);
+    }
 
     .match-card {
       background: var(--card);
@@ -6020,9 +6044,10 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
 
       let html = '';
       let lastJornada = null;
+      let lastFecha = null;
 
       list.forEach(m => {
-        // Insert separator when jornada changes (only when showing all)
+        // Separador de jornada (solo en "Todas")
         if (jornada === 'all' && m.jornada !== lastJornada) {
           html += `
             <div class="jornada-separator">
@@ -6031,6 +6056,16 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
               <span class="line"></span>
             </div>`;
           lastJornada = m.jornada;
+          lastFecha = null; // reinicia día al cambiar de jornada
+        }
+        // Separador por día (martes / miércoles / jueves…)
+        if (m.fecha && m.fecha !== lastFecha) {
+          html += `
+            <div class="day-separator">
+              <span class="day-label">${m.fecha}</span>
+              <span class="line"></span>
+            </div>`;
+          lastFecha = m.fecha;
         }
 
         const real = data.results[m.id] || {};
@@ -6107,11 +6142,7 @@ const TRIVIA_BANK = {"version":4,"currency":"pesos","ladder":[{"step":1,"prize":
           </div>`;
       });
 
-      const hint = !user
-        ? `<div class="identity-hint">👆 Elige quién eres en <strong>Soy</strong> (arriba) para introducir tus pronósticos. Los ajenos se ocultan hasta que los 4 hayan cargado (también en «Ver todos»).</div>`
-        : `<div class="identity-hint" style="color:var(--accent);background:rgba(0,230,118,0.08);border-color:rgba(0,230,118,0.28);">Pronosticando como <strong>${PLAYER_NAMES[user]}</strong> — solo ves los tuyos hasta que todos hayan pronosticado o arranque el partido.</div>`;
-
-      container.innerHTML = hint + html;
+      container.innerHTML = html;
 
       // Attach listeners
       container.querySelectorAll('input[type="number"]').forEach(inp => {
